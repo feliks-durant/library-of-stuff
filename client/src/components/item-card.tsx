@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import EditItemModal from "@/components/edit-item-modal";
 import type { Item } from "@shared/schema";
 
 interface ItemCardProps {
@@ -22,6 +24,8 @@ interface ItemCardProps {
 
 export default function ItemCard({ item }: ItemCardProps) {
   const [showDetails, setShowDetails] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const { user } = useAuth();
 
   const ownerName = item.owner?.firstName && item.owner?.lastName
     ? `${item.owner.firstName} ${item.owner.lastName.charAt(0)}.`
@@ -30,6 +34,8 @@ export default function ItemCard({ item }: ItemCardProps) {
   const ownerInitials = item.owner?.firstName && item.owner?.lastName
     ? `${item.owner.firstName[0]}${item.owner.lastName[0]}`
     : "?";
+
+  const isOwner = user?.id === item.ownerId;
 
   return (
     <>
@@ -135,10 +141,34 @@ export default function ItemCard({ item }: ItemCardProps) {
                   <p className="text-gray-600 text-sm">{ownerName}</p>
                 </div>
               </div>
+              
+              {isOwner && (
+                <div className="pt-4 border-t">
+                  <Button 
+                    onClick={() => {
+                      setShowDetails(false);
+                      setShowEditModal(true);
+                    }}
+                    className="w-full bg-brand-blue hover:bg-blue-700"
+                  >
+                    <i className="fas fa-edit mr-2"></i>
+                    Edit Item
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Item Modal */}
+      {isOwner && (
+        <EditItemModal 
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          itemId={item.id}
+        />
+      )}
     </>
   );
 }

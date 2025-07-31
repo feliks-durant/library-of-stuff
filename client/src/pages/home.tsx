@@ -36,7 +36,7 @@ export default function Home() {
     if (sortBy === "alphabetical") {
       return a.title.localeCompare(b.title);
     }
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
   });
 
   if (isLoading) {

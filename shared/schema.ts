@@ -95,16 +95,31 @@ export const insertItemSchema = createInsertSchema(items).omit({
   updatedAt: true,
 });
 
+export const updateItemSchema = createInsertSchema(items).omit({
+  id: true,
+  ownerId: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
 export const insertTrustRelationshipSchema = createInsertSchema(trustRelationships).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
+export const updateUserProfileSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Item = typeof items.$inferSelect;
 export type InsertItem = z.infer<typeof insertItemSchema>;
+export type UpdateItem = z.infer<typeof updateItemSchema>;
 export type TrustRelationship = typeof trustRelationships.$inferSelect;
 export type InsertTrustRelationship = z.infer<typeof insertTrustRelationshipSchema>;
+export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;

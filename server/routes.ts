@@ -1,8 +1,9 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertItemSchema, insertTrustRelationshipSchema } from "@shared/schema";
+import { insertItemSchema, updateItemSchema, insertTrustRelationshipSchema, updateUserProfileSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -30,6 +31,9 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files (uploaded images)
+  app.use('/uploads', express.static(path.resolve(import.meta.dirname, "../dist/public/uploads")));
+  
   // Auth middleware
   await setupAuth(app);
 
@@ -98,15 +102,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/items/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const itemId = req.params.id;
+      const item = await storage.getItem(itemId);
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+
+      res.json(item);
+    } catch (error) {
+      console.error("Error fetching item:", error);
+      res.status(500).json({ message: "Failed to fetch item" });
+    }
+  });
+
   app.put('/api/items/:id', isAuthenticated, upload.single('image'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const itemId = req.params.id;
       
-      const updateData = {
+      const updateData = updateItemSchema.parse({
         ...req.body,
         trustLevel: req.body.trustLevel ? parseInt(req.body.trustLevel) : undefined,
-      };
+      });
 
       if (req.file) {
         const fileExtension = path.extname(req.file.originalname);
@@ -116,9 +136,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.imageUrl = `/uploads/${fileName}`;
       }
 
-      const item = await storage.updateItem(itemId, updateData);
+      const item = await storage.updateItem(itemId, updateData, userId);
       if (!item) {
-        return res.status(404).json({ message: "Item not found" });
+        return res.status(404).json({ message: "Item not found or unauthorized" });
       }
 
       res.json(item);
@@ -159,6 +179,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching items:", error);
       res.status(500).json({ message: "Failed to search items" });
+    }
+  });
+
+  app.get('/api/items/my/search', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const query = req.query.q as string;
+      
+      if (!query) {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+
+      const items = await storage.searchUserItems(userId, query);
+      res.json(items);
+    } catch (error) {
+      console.error("Error searching user items:", error);
+      res.status(500).json({ message: "Failed to search user items" });
     }
   });
 
@@ -216,6 +253,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put('/api/users/profile', isAuthenticated, upload.single('profileImage'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      const updateData = updateUserProfileSchema.parse(req.body);
+
+      if (req.file) {
+        const fileExtension = path.extname(req.file.originalname);
+        const fileName = `profile_${req.file.filename}${fileExtension}`;
+        const newPath = path.join(uploadDir, fileName);
+        fs.renameSync(req.file.path, newPath);
+        updateData.profileImageUrl = `/uploads/${fileName}`;
+      }
+
+      const user = await storage.updateUserProfile(userId, updateData);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(400).json({ message: "Failed to update profile" });
+    }
+  });
+
   app.get('/api/users/connections', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -225,6 +288,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching connections:", error);
       res.status(500).json({ message: "Failed to fetch connections" });
     }
+  });
+
+  // QR code profile route - redirects to trust assignment
+  app.get('/profile/:userId', async (req, res) => {
+    const { userId } = req.params;
+    
+    // Check if user exists
+    const user = await storage.getUser(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    
+    // Redirect to frontend trust assignment page
+    res.redirect(`/trust/${userId}`);
   });
 
   const httpServer = createServer(app);

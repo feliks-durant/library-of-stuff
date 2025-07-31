@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
-import type { Item } from "@shared/schema";
+import EditProfileModal from "@/components/edit-profile-modal";
+import type { Item, User } from "@shared/schema";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -20,13 +22,14 @@ interface UserProfileModalProps {
 export default function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const { user } = useAuth();
   const [showQRCode, setShowQRCode] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   const { data: myItems = [] } = useQuery<Item[]>({
     queryKey: ["/api/items/my"],
     enabled: isOpen,
   });
 
-  const { data: connections = [] } = useQuery({
+  const { data: connections = [] } = useQuery<User[]>({
     queryKey: ["/api/users/connections"],
     enabled: isOpen,
   });
@@ -38,7 +41,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
   // Generate QR code URL for user profile
   const currentDomain = window.location.origin;
-  const profileUrl = `${currentDomain}/trust/${user.id}`;
+  const profileUrl = `${currentDomain}/profile/${user.id}`;
 
   const handleShareProfile = async () => {
     if (navigator.share) {
@@ -206,15 +209,27 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
           {/* Action Buttons */}
           <div className="flex space-x-4">
-            <Button variant="outline" className="flex-1">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => setShowEditProfile(true)}
+            >
               Edit Profile
             </Button>
-            <Button className="flex-1 bg-brand-blue hover:bg-blue-700">
-              Settings
-            </Button>
+            <Link href="/my-items">
+              <Button className="flex-1 bg-brand-blue hover:bg-blue-700">
+                Manage Items
+              </Button>
+            </Link>
           </div>
         </div>
       </DialogContent>
+      
+      {/* Edit Profile Modal */}
+      <EditProfileModal 
+        isOpen={showEditProfile}
+        onClose={() => setShowEditProfile(false)}
+      />
     </Dialog>
   );
 }

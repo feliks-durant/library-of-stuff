@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import TrustAssignment from "@/pages/trust-assignment";
+import MyItems from "@/pages/my-items";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -19,6 +20,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/my-items" component={MyItems} />
           <Route path="/trust/:userId" component={TrustAssignment} />
         </>
       )}

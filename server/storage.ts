@@ -6,24 +6,29 @@ import {
   type UpsertUser,
   type Item,
   type InsertItem,
+  type UpdateItem,
   type TrustRelationship,
   type InsertTrustRelationship,
+  type UpdateUserProfile,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, desc } from "drizzle-orm";
+import { eq, and, gte, desc, ne } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUserProfile(id: string, updates: UpdateUserProfile): Promise<User | undefined>;
   
   // Item operations
   createItem(item: InsertItem): Promise<Item>;
+  getItem(id: string): Promise<Item | undefined>;
   getItemsByUser(userId: string): Promise<Item[]>;
   getVisibleItems(userId: string): Promise<Item[]>;
-  updateItem(id: string, item: Partial<InsertItem>): Promise<Item | undefined>;
+  updateItem(id: string, item: UpdateItem, userId: string): Promise<Item | undefined>;
   deleteItem(id: string, userId: string): Promise<boolean>;
   searchItems(userId: string, query: string): Promise<Item[]>;
+  searchUserItems(userId: string, query: string): Promise<Item[]>;
   
   // Trust operations
   setTrustLevel(trustRelationship: InsertTrustRelationship): Promise<TrustRelationship>;
@@ -96,7 +101,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           // Don't show user's own items
-          eq(items.ownerId, userId) === false,
+          ne(items.ownerId, userId),
           // Only show items where user's trust level >= item's required trust level
           gte(trustRelationships.trustLevel, items.trustLevel)
         )
@@ -121,20 +126,34 @@ export class DatabaseStorage implements IStorage {
     })) as Item[];
   }
 
-  async updateItem(id: string, item: Partial<InsertItem>): Promise<Item | undefined> {
+  async getItem(id: string): Promise<Item | undefined> {
+    const [item] = await db.select().from(items).where(eq(items.id, id));
+    return item;
+  }
+
+  async updateItem(id: string, item: UpdateItem, userId: string): Promise<Item | undefined> {
     const [updatedItem] = await db
       .update(items)
       .set({ ...item, updatedAt: new Date() })
-      .where(eq(items.id, id))
+      .where(and(eq(items.id, id), eq(items.ownerId, userId)))
       .returning();
     return updatedItem;
+  }
+
+  async updateUserProfile(id: string, updates: UpdateUserProfile): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
   }
 
   async deleteItem(id: string, userId: string): Promise<boolean> {
     const result = await db
       .delete(items)
       .where(and(eq(items.id, id), eq(items.ownerId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async searchItems(userId: string, query: string): Promise<Item[]> {
@@ -142,6 +161,17 @@ export class DatabaseStorage implements IStorage {
     const lowercaseQuery = query.toLowerCase();
     
     return visibleItems.filter(item => 
+      item.title.toLowerCase().includes(lowercaseQuery) ||
+      item.description.toLowerCase().includes(lowercaseQuery) ||
+      item.category.toLowerCase().includes(lowercaseQuery)
+    );
+  }
+
+  async searchUserItems(userId: string, query: string): Promise<Item[]> {
+    const userItems = await this.getItemsByUser(userId);
+    const lowercaseQuery = query.toLowerCase();
+    
+    return userItems.filter(item => 
       item.title.toLowerCase().includes(lowercaseQuery) ||
       item.description.toLowerCase().includes(lowercaseQuery) ||
       item.category.toLowerCase().includes(lowercaseQuery)
