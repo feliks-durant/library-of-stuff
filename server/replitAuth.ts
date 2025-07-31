@@ -35,10 +35,10 @@ export function getSession() {
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Allow sessions for unauthenticated users
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production', // Only secure in production
       maxAge: sessionTtl,
     },
   });
@@ -111,21 +111,33 @@ export async function setupAuth(app: Express) {
   app.get("/api/callback", (req: any, res, next) => {
     passport.authenticate(`replitauth:${req.hostname}`, (err: any, user: any) => {
       if (err) {
+        console.log(`[AUTH CALLBACK] Authentication error:`, err);
         return next(err);
       }
       if (!user) {
+        console.log(`[AUTH CALLBACK] No user returned from auth`);
         return res.redirect("/api/login");
       }
+      
+      console.log(`[AUTH CALLBACK] User authenticated, logging in`);
       req.logIn(user, (err: any) => {
         if (err) {
+          console.log(`[AUTH CALLBACK] Login error:`, err);
           return next(err);
         }
+        
         // Check if there's a returnTo URL in the session
-        const returnTo = req.session.returnTo;
-        if (returnTo) {
+        console.log(`[AUTH CALLBACK] Session ID: ${req.sessionID}`);
+        console.log(`[AUTH CALLBACK] Session object:`, req.session);
+        const returnTo = req.session?.returnTo;
+        console.log(`[AUTH CALLBACK] Session returnTo: ${returnTo}`);
+        
+        if (returnTo && returnTo !== '/') {
           delete req.session.returnTo;
+          console.log(`[AUTH CALLBACK] Redirecting to: ${returnTo}`);
           return res.redirect(returnTo);
         }
+        console.log(`[AUTH CALLBACK] No valid returnTo found, redirecting to home`);
         return res.redirect("/");
       });
     })(req, res, next);
