@@ -290,18 +290,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // QR code profile route - redirects to trust assignment
-  app.get('/profile/:userId', async (req, res) => {
+  // QR code profile route - handles authentication and redirects appropriately
+  app.get('/profile/:userId', async (req: any, res) => {
     const { userId } = req.params;
     
-    // Check if user exists
-    const user = await storage.getUser(userId);
-    if (!user) {
-      return res.status(404).send('User not found');
+    try {
+      // Check if target user exists
+      const targetUser = await storage.getUser(userId);
+      if (!targetUser) {
+        return res.status(404).send('User not found');
+      }
+      
+      // Check if user is authenticated
+      const hasValidSession = req.session && req.session.passport && req.session.passport.user;
+      const isAuthenticatedResult = typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : false;
+      const hasUser = req.user && typeof req.user === 'object';
+      const hasClaims = hasUser && req.user.claims && req.user.claims.sub;
+      
+      const isFullyAuthenticated = hasValidSession && isAuthenticatedResult && hasClaims;
+      
+      if (isFullyAuthenticated) {
+        // User is authenticated, redirect to trust assignment page
+        res.redirect(`/trust/${userId}`);
+      } else {
+        // User not authenticated, store destination and redirect to login
+        if (req.session) {
+          req.session.returnTo = `/trust/${userId}`;
+        }
+        res.redirect('/api/login');
+      }
+    } catch (error) {
+      console.error("Error in profile route:", error);
+      res.status(500).send('Internal server error');
     }
-    
-    // Redirect to frontend trust assignment page
-    res.redirect(`/trust/${userId}`);
   });
 
   const httpServer = createServer(app);
