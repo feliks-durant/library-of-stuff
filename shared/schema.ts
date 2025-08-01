@@ -181,9 +181,6 @@ export const insertLoanRequestSchema = createInsertSchema(loanRequests).omit({
   borrowerId: true,  // This will be set from the authenticated user
   createdAt: true,
   updatedAt: true,
-}).extend({
-  requestedStartDate: z.string().transform((str) => new Date(str)),
-  requestedEndDate: z.string().transform((str) => new Date(str)),
 });
 
 export const updateLoanRequestSchema = createInsertSchema(loanRequests).omit({
