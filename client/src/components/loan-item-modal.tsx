@@ -28,7 +28,7 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
   const setOpen = externalOnClose !== undefined ? 
     (value: boolean) => { if (!value) externalOnClose(); } : 
     setInternalOpen;
-  const [startDate, setStartDate] = useState<Date>();
+  const [startDate] = useState<Date>(new Date()); // Always today
   const [endDate, setEndDate] = useState<Date>();
   const [selectedBorrower, setSelectedBorrower] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +82,6 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
       queryClient.invalidateQueries({ queryKey: ["/api/loans/my-lent"] });
       queryClient.invalidateQueries({ queryKey: ["/api/items/my"] });
       setOpen(false);
-      setStartDate(undefined);
       setEndDate(undefined);
       setSelectedBorrower("");
       setSearchQuery("");
@@ -106,10 +105,10 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
       searchQuery
     });
     
-    if (!startDate || !endDate || !selectedBorrower) {
+    if (!endDate || !selectedBorrower) {
       toast({
         title: "Error",
-        description: `Please fill in all required fields. Missing: ${!startDate ? 'Start Date ' : ''}${!endDate ? 'End Date ' : ''}${!selectedBorrower ? 'Borrower' : ''}`,
+        description: `Please fill in all required fields. Missing: ${!endDate ? 'End Date ' : ''}${!selectedBorrower ? 'Borrower' : ''}`,
         variant: "destructive",
       });
       return;
@@ -118,7 +117,7 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
     if (startDate >= endDate) {
       toast({
         title: "Error",
-        description: "End date must be after start date",
+        description: "End date must be after today",
         variant: "destructive",
       });
       return;
@@ -229,27 +228,15 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Start Date *</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <Label>Start Date</Label>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal bg-muted cursor-default"
+                disabled
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(startDate, "PPP")} (Today)
+              </Button>
             </div>
             
             <div className="space-y-2">
@@ -269,7 +256,7 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
                     mode="single"
                     selected={endDate}
                     onSelect={setEndDate}
-                    disabled={(date) => date < new Date() || (startDate ? date <= startDate : false)}
+                    disabled={(date) => date <= startDate}
                     initialFocus
                   />
                 </PopoverContent>

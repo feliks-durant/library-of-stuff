@@ -20,7 +20,7 @@ interface LoanRequestModalProps {
 
 export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
   const [open, setOpen] = useState(false);
-  const [startDate, setStartDate] = useState<Date>();
+  const [startDate] = useState<Date>(new Date()); // Always today
   const [endDate, setEndDate] = useState<Date>();
   const [message, setMessage] = useState("");
   const { toast } = useToast();
@@ -43,7 +43,6 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/loan-requests/my"] });
       setOpen(false);
-      setStartDate(undefined);
       setEndDate(undefined);
       setMessage("");
     },
@@ -59,10 +58,10 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!startDate || !endDate) {
+    if (!endDate) {
       toast({
         title: "Error",
-        description: "Please select both start and end dates",
+        description: "Please select an end date",
         variant: "destructive",
       });
       return;
@@ -71,7 +70,7 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
     if (startDate >= endDate) {
       toast({
         title: "Error",
-        description: "End date must be after start date",
+        description: "End date must be after today",
         variant: "destructive",
       });
       return;
@@ -103,30 +102,18 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Start Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal bg-muted cursor-default"
+                disabled
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(startDate, "PPP")} (Today)
+              </Button>
             </div>
             
             <div className="space-y-2">
-              <Label>End Date</Label>
+              <Label>Expected Return Date *</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -142,7 +129,7 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
                     mode="single"
                     selected={endDate}
                     onSelect={setEndDate}
-                    disabled={(date) => date < new Date() || (startDate ? date <= startDate : false)}
+                    disabled={(date) => date <= startDate}
                     initialFocus
                   />
                 </PopoverContent>
