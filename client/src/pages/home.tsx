@@ -129,7 +129,9 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
   const [showRequestModal, setShowRequestModal] = useState(false);
   
   const userName = formatDisplayName(user);
-  const userInitials = user.username?.[0]?.toUpperCase() || "U";
+  const userInitials = user.firstName && user.lastName
+    ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+    : user.username?.[0]?.toUpperCase() || "U";
 
   return (
     <>

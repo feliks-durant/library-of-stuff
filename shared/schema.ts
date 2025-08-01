@@ -281,12 +281,29 @@ export function formatUsername(user: { username?: string | null; discriminator?:
   return `${user.username}#${user.discriminator}`;
 }
 
-// Display just the username for UI (cleaner look)
-export function formatDisplayName(user: { username?: string | null; discriminator?: string | null } | { username?: string; discriminator?: string }): string {
-  if (!user.username) {
-    return 'Unknown User';
+// Display name priority: firstName lastName > username#discriminator > username > Unknown User
+export function formatDisplayName(user: { 
+  firstName?: string | null; 
+  lastName?: string | null; 
+  username?: string | null; 
+  discriminator?: string | null; 
+}): string {
+  // First priority: firstName + lastName
+  if (user.firstName && user.lastName) {
+    return `${user.firstName} ${user.lastName}`;
   }
-  return user.username;
+  
+  // Second priority: username#discriminator
+  if (user.username && user.discriminator) {
+    return `${user.username}#${user.discriminator}`;
+  }
+  
+  // Third priority: just username
+  if (user.username) {
+    return user.username;
+  }
+  
+  return 'Unknown User';
 }
 
 export function generateDiscriminator(): string {

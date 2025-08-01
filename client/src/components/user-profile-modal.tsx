@@ -33,8 +33,16 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
   if (!user) return null;
 
-  const displayName = user.username || "User";
-  const initials = user.username?.[0]?.toUpperCase() || "U";
+  // Show real name if available, fallback to username#discriminator
+  const displayName = user.firstName && user.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user.username && user.discriminator
+    ? `${user.username}#${user.discriminator}`
+    : "User";
+
+  const initials = user.firstName && user.lastName
+    ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+    : user.username?.[0]?.toUpperCase() || "U";
 
   // Generate QR code URL for user profile
   const currentDomain = window.location.origin;
