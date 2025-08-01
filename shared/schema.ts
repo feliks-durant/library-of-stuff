@@ -178,6 +178,7 @@ export const updateUserProfileSchema = createInsertSchema(users).omit({
 
 export const insertLoanRequestSchema = createInsertSchema(loanRequests).omit({
   id: true,
+  borrowerId: true,  // This will be set from the authenticated user
   createdAt: true,
   updatedAt: true,
 });

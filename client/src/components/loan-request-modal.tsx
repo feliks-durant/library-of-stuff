@@ -29,11 +29,12 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
   const createRequestMutation = useMutation({
     mutationFn: async (data: {
       itemId: string;
-      requestedStartDate: Date;
-      requestedEndDate: Date;
+      requestedStartDate: string;
+      requestedEndDate: string;
       message?: string;
     }) => {
-      return apiRequest("/api/loan-requests", "POST", data);
+      const response = await apiRequest("/api/loan-requests", "POST", data);
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -78,8 +79,8 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
 
     createRequestMutation.mutate({
       itemId: item.id,
-      requestedStartDate: startDate,
-      requestedEndDate: endDate,
+      requestedStartDate: startDate.toISOString(),
+      requestedEndDate: endDate.toISOString(),
       message: message || undefined,
     });
   };

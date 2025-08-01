@@ -21,6 +21,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, desc, ne, sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -249,7 +250,10 @@ export class DatabaseStorage implements IStorage {
 
   // Loan request operations
   async createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest> {
-    const [newRequest] = await db.insert(loanRequests).values(loanRequest).returning();
+    const [newRequest] = await db.insert(loanRequests).values({
+      ...loanRequest,
+      id: nanoid(),
+    }).returning();
     return newRequest;
   }
 
