@@ -26,7 +26,10 @@ import { z } from "zod";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 const formSchema = updateUserProfileSchema.pick({
-  email: true,
+  firstName: true,
+  lastName: true,
+  username: true,
+  discriminator: true,
 }).extend({
   profileImage: z.any().optional(),
 });
@@ -44,7 +47,10 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: user?.email ?? "",
+      firstName: user?.firstName ?? "",
+      lastName: user?.lastName ?? "",
+      username: user?.username ?? "",
+      discriminator: user?.discriminator ?? "",
     },
   });
 
@@ -52,7 +58,10 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       const formData = new FormData();
       
-      if (data.email) formData.append("email", data.email);
+      if (data.firstName) formData.append("firstName", data.firstName);
+      if (data.lastName) formData.append("lastName", data.lastName);
+      if (data.username) formData.append("username", data.username);
+      if (data.discriminator) formData.append("discriminator", data.discriminator);
       
       if (data.profileImage?.[0]) {
         formData.append("profileImage", data.profileImage[0]);
@@ -136,23 +145,78 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
               </Avatar>
             </div>
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="email"
-                      placeholder="your.email@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="John"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Doe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="JohnDoe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="discriminator"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Discriminator</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="1234"
+                        maxLength={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}

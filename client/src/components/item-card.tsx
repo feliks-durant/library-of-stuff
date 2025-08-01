@@ -17,6 +17,8 @@ import type { Item } from "@shared/schema";
 interface ItemCardProps {
   item: Item & {
     owner?: {
+      firstName?: string;
+      lastName?: string;
       username?: string;
       discriminator?: string;
       profileImageUrl?: string;
@@ -29,11 +31,16 @@ export default function ItemCard({ item }: ItemCardProps) {
   const [showEditModal, setShowEditModal] = useState(false);
   const { user } = useAuth();
 
-  const ownerName = item.owner?.username && item.owner?.discriminator
+  // Show real name if available, fallback to username#discriminator  
+  const ownerDisplayName = item.owner?.firstName && item.owner?.lastName
+    ? `${item.owner.firstName} ${item.owner.lastName}`
+    : item.owner?.username && item.owner?.discriminator
     ? `${item.owner.username}#${item.owner.discriminator}`
     : "Unknown User";
 
-  const ownerInitials = item.owner?.username
+  const ownerInitials = item.owner?.firstName && item.owner?.lastName
+    ? `${item.owner.firstName[0]}${item.owner.lastName[0]}`.toUpperCase()
+    : item.owner?.username
     ? item.owner.username[0].toUpperCase()
     : "?";
 
@@ -77,14 +84,14 @@ export default function ItemCard({ item }: ItemCardProps) {
               <Avatar className="w-6 h-6">
                 <AvatarImage 
                   src={item.owner?.profileImageUrl || undefined}
-                  alt={ownerName}
+                  alt={ownerDisplayName}
                   className="object-cover"
                 />
                 <AvatarFallback className="text-xs">
                   {ownerInitials}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm text-gray-500">{ownerName}</span>
+              <span className="text-sm text-gray-500">{ownerDisplayName}</span>
             </div>
             
             <Button
@@ -166,7 +173,7 @@ export default function ItemCard({ item }: ItemCardProps) {
                 <Avatar className="w-10 h-10">
                   <AvatarImage 
                     src={item.owner?.profileImageUrl || undefined}
-                    alt={ownerName}
+                    alt={ownerDisplayName}
                     className="object-cover"
                   />
                   <AvatarFallback>
@@ -175,7 +182,7 @@ export default function ItemCard({ item }: ItemCardProps) {
                 </Avatar>
                 <div>
                   <p className="font-medium text-gray-900 text-sm">Shared by</p>
-                  <p className="text-gray-600 text-sm">{ownerName}</p>
+                  <p className="text-gray-600 text-sm">{ownerDisplayName}</p>
                 </div>
               </div>
               

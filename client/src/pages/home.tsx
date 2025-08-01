@@ -303,18 +303,18 @@ export default function Home() {
         {/* Hero Section */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Discover Items You Can Borrow
+            Don't buy, borrow. 
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+          {/* <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
             Browse through items shared by your trusted network. Only items you're trusted to borrow will appear.
-          </p>
+          </p> */}
           
           {/* Search Bar */}
           <div className="max-w-lg mx-auto">
             <div className="relative">
               <Input
                 type="search"
-                placeholder="Search items you can borrow..."
+                placeholder="Search your web of trust..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 border-gray-300 focus:ring-2 focus:ring-brand-blue focus:border-transparent"

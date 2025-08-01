@@ -132,6 +132,8 @@ export class DatabaseStorage implements IStorage {
         ownerId: items.ownerId,
         createdAt: items.createdAt,
         updatedAt: items.updatedAt,
+        ownerFirstName: users.firstName,
+        ownerLastName: users.lastName,
         ownerUsername: users.username,
         ownerDiscriminator: users.discriminator,
         ownerProfileImage: users.profileImageUrl,
@@ -168,6 +170,8 @@ export class DatabaseStorage implements IStorage {
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       owner: {
+        firstName: item.ownerFirstName,
+        lastName: item.ownerLastName,
         username: item.ownerUsername,
         discriminator: item.ownerDiscriminator,
         profileImageUrl: item.ownerProfileImage,
@@ -275,9 +279,10 @@ export class DatabaseStorage implements IStorage {
   async getUserConnections(userId: string): Promise<Array<{ 
     trusteeId: string; 
     trustLevel: number; 
+    firstName?: string;
+    lastName?: string;
     username?: string;
     discriminator?: string;
-
     email?: string;
     profileImageUrl?: string;
     createdAt?: string;
@@ -287,9 +292,10 @@ export class DatabaseStorage implements IStorage {
       .select({
         trusteeId: trustRelationships.trusteeId,
         trustLevel: trustRelationships.trustLevel,
+        firstName: users.firstName,
+        lastName: users.lastName,
         username: users.username,
         discriminator: users.discriminator,
-
         email: users.email,
         profileImageUrl: users.profileImageUrl,
         createdAt: trustRelationships.createdAt,
@@ -302,9 +308,10 @@ export class DatabaseStorage implements IStorage {
     return connections.map(conn => ({
       trusteeId: conn.trusteeId,
       trustLevel: conn.trustLevel,
+      firstName: conn.firstName || undefined,
+      lastName: conn.lastName || undefined,
       username: conn.username || undefined,
       discriminator: conn.discriminator || undefined,
-
       email: conn.email || undefined,
       profileImageUrl: conn.profileImageUrl || undefined,
       createdAt: conn.createdAt?.toISOString() || undefined,
@@ -367,7 +374,10 @@ export class DatabaseStorage implements IStorage {
         createdAt: loanRequests.createdAt,
         updatedAt: loanRequests.updatedAt,
         itemTitle: items.title,
-        borrowerName: sql<string>`CONCAT(${users.username}, '#', ${users.discriminator})`,
+        borrowerFirstName: users.firstName,
+        borrowerLastName: users.lastName,
+        borrowerUsername: users.username,
+        borrowerDiscriminator: users.discriminator,
         borrowerEmail: users.email,
         borrowerProfileImage: users.profileImageUrl,
       })
@@ -424,7 +434,10 @@ export class DatabaseStorage implements IStorage {
         createdAt: loans.createdAt,
         itemTitle: items.title,
         itemImageUrl: items.imageUrl,
-        lenderName: sql<string>`CONCAT(${users.username}, '#', ${users.discriminator})`,
+        lenderFirstName: users.firstName,
+        lenderLastName: users.lastName,
+        lenderUsername: users.username,
+        lenderDiscriminator: users.discriminator,
         lenderEmail: users.email,
         lenderProfileImage: users.profileImageUrl,
       })
@@ -450,7 +463,10 @@ export class DatabaseStorage implements IStorage {
         createdAt: loans.createdAt,
         itemTitle: items.title,
         itemImageUrl: items.imageUrl,
-        borrowerName: sql<string>`CONCAT(${users.username}, '#', ${users.discriminator})`,
+        borrowerFirstName: users.firstName,
+        borrowerLastName: users.lastName,
+        borrowerUsername: users.username,
+        borrowerDiscriminator: users.discriminator,
         borrowerEmail: users.email,
         borrowerProfileImage: users.profileImageUrl,
       })
