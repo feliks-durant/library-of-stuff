@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import EditProfileModal from "@/components/edit-profile-modal";
-import type { Item, User } from "@shared/schema";
+import type { User } from "@shared/schema";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -24,10 +24,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
   const [showQRCode, setShowQRCode] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
 
-  const { data: myItems = [] } = useQuery<Item[]>({
-    queryKey: ["/api/items/my"],
-    enabled: isOpen,
-  });
+
 
   const { data: connections = [] } = useQuery<User[]>({
     queryKey: ["/api/users/connections"],
@@ -90,12 +87,6 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
               
               <div className="flex space-x-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-brand-blue">
-                    {myItems.length}
-                  </div>
-                  <div className="text-sm text-gray-600">Items Shared</div>
-                </div>
-                <div className="text-center">
                   <div className="text-2xl font-bold text-brand-green">
                     {connections.length}
                   </div>
@@ -150,62 +141,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
             </CardContent>
           </Card>
 
-          {/* My Items Section */}
-          <div>
-            <h5 className="font-semibold text-gray-900 mb-4">My Items</h5>
-            {myItems.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <i className="fas fa-box text-gray-400"></i>
-                  </div>
-                  <p className="text-gray-600 mb-4">You haven't added any items yet</p>
-                  <Button onClick={onClose} size="sm" className="bg-brand-blue hover:bg-blue-700">
-                    Add Your First Item
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {myItems.slice(0, 6).map((item) => (
-                  <Card key={item.id}>
-                    <CardContent className="p-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                          {item.imageUrl ? (
-                            <img 
-                              src={item.imageUrl} 
-                              alt={item.title}
-                              className="w-12 h-12 object-cover rounded-lg"
-                            />
-                          ) : (
-                            <i className="fas fa-box text-gray-400"></i>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h6 className="font-medium text-gray-900 text-sm truncate">
-                            {item.title}
-                          </h6>
-                          <p className="text-xs text-gray-500 capitalize">
-                            {item.category}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                {myItems.length > 6 && (
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="text-sm text-gray-600">
-                        +{myItems.length - 6} more items
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            )}
-          </div>
+
 
           {/* Action Buttons */}
           <div className="flex space-x-4">
