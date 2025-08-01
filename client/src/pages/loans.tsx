@@ -1,0 +1,243 @@
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CalendarIcon, Package, HandHeart } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
+
+interface LoanWithDetails {
+  id: string;
+  itemId: string;
+  borrowerId: string;
+  lenderId: string;
+  startDate: string;
+  expectedEndDate: string;
+  actualEndDate?: string;
+  status: string;
+  notes?: string;
+  createdAt: string;
+  // Additional fields that would be joined
+  itemTitle?: string;
+  itemImageUrl?: string;
+  borrowerName?: string;
+  borrowerEmail?: string;
+  borrowerProfileImage?: string;
+  lenderName?: string;
+  lenderEmail?: string;
+  lenderProfileImage?: string;
+}
+
+export default function LoansPage() {
+  const { toast } = useToast();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, isLoading, toast]);
+
+  const { data: borrowedLoans = [], isLoading: borrowedLoading } = useQuery<LoanWithDetails[]>({
+    queryKey: ["/api/loans/my-borrowed"],
+    retry: false,
+  });
+
+  const { data: lentLoans = [], isLoading: lentLoading } = useQuery<LoanWithDetails[]>({
+    queryKey: ["/api/loans/my-lent"],
+    retry: false,
+  });
+
+  const getStatusColor = (loan: LoanWithDetails) => {
+    if (loan.status === "returned") return "bg-green-100 text-green-800";
+    if (loan.status === "overdue") return "bg-red-100 text-red-800";
+    
+    const daysLeft = differenceInDays(new Date(loan.expectedEndDate), new Date());
+    if (daysLeft < 0) return "bg-red-100 text-red-800"; // Overdue
+    if (daysLeft <= 3) return "bg-yellow-100 text-yellow-800"; // Due soon
+    return "bg-blue-100 text-blue-800"; // Active
+  };
+
+  const getStatusText = (loan: LoanWithDetails) => {
+    if (loan.status === "returned") return "Returned";
+    if (loan.status === "overdue") return "Overdue";
+    
+    const daysLeft = differenceInDays(new Date(loan.expectedEndDate), new Date());
+    if (daysLeft < 0) return "Overdue";
+    if (daysLeft === 0) return "Due Today";
+    if (daysLeft === 1) return "Due Tomorrow";
+    if (daysLeft <= 7) return `Due in ${daysLeft} days`;
+    return "Active";
+  };
+
+  const LoanCard = ({ loan, type }: { loan: LoanWithDetails; type: "borrowed" | "lent" }) => {
+    const otherUser = type === "borrowed" 
+      ? { name: loan.lenderName, email: loan.lenderEmail, image: loan.lenderProfileImage }
+      : { name: loan.borrowerName, email: loan.borrowerEmail, image: loan.borrowerProfileImage };
+
+    return (
+      <Card key={loan.id}>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                {loan.itemImageUrl ? (
+                  <img 
+                    src={loan.itemImageUrl} 
+                    alt={loan.itemTitle}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <Package className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+              <div>
+                <CardTitle className="text-lg">
+                  {loan.itemTitle || "Unknown Item"}
+                </CardTitle>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Avatar className="w-5 h-5">
+                    <AvatarImage src={otherUser.image} />
+                    <AvatarFallback className="text-xs">
+                      {otherUser.name ? 
+                        otherUser.name.charAt(0).toUpperCase() : 
+                        otherUser.email?.charAt(0).toUpperCase()
+                      }
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>
+                    {type === "borrowed" ? "from" : "to"} {otherUser.name || otherUser.email}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Badge className={getStatusColor(loan)}>
+              {getStatusText(loan)}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <CalendarIcon className="h-4 w-4" />
+                <span>
+                  {format(new Date(loan.startDate), "MMM d")} - {" "}
+                  {format(new Date(loan.expectedEndDate), "MMM d, yyyy")}
+                </span>
+              </div>
+              {loan.actualEndDate && (
+                <>
+                  <span>•</span>
+                  <span>Returned {format(new Date(loan.actualEndDate), "MMM d, yyyy")}</span>
+                </>
+              )}
+            </div>
+            
+            {loan.notes && (
+              <div className="bg-muted p-3 rounded-lg">
+                <p className="text-sm font-medium mb-1">Notes:</p>
+                <p className="text-sm">{loan.notes}</p>
+              </div>
+            )}
+            
+            {loan.status === "active" && type === "borrowed" && (
+              <Button variant="outline" className="w-full">
+                Mark as Returned
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  if (isLoading || !isAuthenticated) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="container mx-auto p-6 max-w-4xl">
+      <h1 className="text-2xl font-bold mb-6">My Loans</h1>
+      
+      <Tabs defaultValue="borrowed" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="borrowed" className="flex items-center gap-2">
+            <HandHeart className="h-4 w-4" />
+            Borrowed ({borrowedLoans.length})
+          </TabsTrigger>
+          <TabsTrigger value="lent" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            Lent Out ({lentLoans.length})
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="borrowed" className="mt-6">
+          {borrowedLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : borrowedLoans.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <HandHeart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">No Borrowed Items</h3>
+                <p className="text-muted-foreground">
+                  You haven't borrowed any items yet. Check out the item search to find things you can borrow.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {borrowedLoans.map((loan) => (
+                <LoanCard key={loan.id} loan={loan} type="borrowed" />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="lent" className="mt-6">
+          {lentLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : lentLoans.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">No Lent Items</h3>
+                <p className="text-muted-foreground">
+                  You haven't lent out any items yet. Visit your items page to loan out your belongings.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {lentLoans.map((loan) => (
+                <LoanCard key={loan.id} loan={loan} type="lent" />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

@@ -61,18 +61,51 @@ export const trustRelationships = pgTable("trust_relationships", {
   unique().on(table.trusterId, table.trusteeId), // one trust relationship per pair
 ]);
 
+// Loan requests table
+export const loanRequests = pgTable("loan_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  itemId: varchar("item_id").notNull().references(() => items.id, { onDelete: "cascade" }),
+  borrowerId: varchar("borrower_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  requestedStartDate: timestamp("requested_start_date").notNull(),
+  requestedEndDate: timestamp("requested_end_date").notNull(),
+  status: varchar("status").notNull().default("pending"), // pending, approved, denied
+  message: text("message"), // optional message from borrower
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Active loans table
+export const loans = pgTable("loans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  itemId: varchar("item_id").notNull().references(() => items.id, { onDelete: "cascade" }),
+  borrowerId: varchar("borrower_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  lenderId: varchar("lender_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  startDate: timestamp("start_date").notNull(),
+  expectedEndDate: timestamp("expected_end_date").notNull(),
+  actualEndDate: timestamp("actual_end_date"), // null if still on loan
+  status: varchar("status").notNull().default("active"), // active, returned, overdue
+  notes: text("notes"), // optional notes
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   items: many(items),
   trustsGiven: many(trustRelationships, { relationName: "truster" }),
   trustsReceived: many(trustRelationships, { relationName: "trustee" }),
+  loanRequestsMade: many(loanRequests, { relationName: "borrower" }),
+  loansAsBorrower: many(loans, { relationName: "borrower" }),
+  loansAsLender: many(loans, { relationName: "lender" }),
 }));
 
-export const itemsRelations = relations(items, ({ one }) => ({
+export const itemsRelations = relations(items, ({ one, many }) => ({
   owner: one(users, {
     fields: [items.ownerId],
     references: [users.id],
   }),
+  loanRequests: many(loanRequests),
+  loans: many(loans),
 }));
 
 export const trustRelationshipsRelations = relations(trustRelationships, ({ one }) => ({
@@ -85,6 +118,35 @@ export const trustRelationshipsRelations = relations(trustRelationships, ({ one 
     fields: [trustRelationships.trusteeId],
     references: [users.id],
     relationName: "trustee",
+  }),
+}));
+
+export const loanRequestsRelations = relations(loanRequests, ({ one }) => ({
+  item: one(items, {
+    fields: [loanRequests.itemId],
+    references: [items.id],
+  }),
+  borrower: one(users, {
+    fields: [loanRequests.borrowerId],
+    references: [users.id],
+    relationName: "borrower",
+  }),
+}));
+
+export const loansRelations = relations(loans, ({ one }) => ({
+  item: one(items, {
+    fields: [loans.itemId],
+    references: [items.id],
+  }),
+  borrower: one(users, {
+    fields: [loans.borrowerId],
+    references: [users.id],
+    relationName: "borrower",
+  }),
+  lender: one(users, {
+    fields: [loans.lenderId],
+    references: [users.id],
+    relationName: "lender",
   }),
 }));
 
@@ -114,6 +176,35 @@ export const updateUserProfileSchema = createInsertSchema(users).omit({
   updatedAt: true,
 }).partial();
 
+export const insertLoanRequestSchema = createInsertSchema(loanRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateLoanRequestSchema = createInsertSchema(loanRequests).omit({
+  id: true,
+  itemId: true,
+  borrowerId: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
+export const insertLoanSchema = createInsertSchema(loans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateLoanSchema = createInsertSchema(loans).omit({
+  id: true,
+  itemId: true,
+  borrowerId: true,
+  lenderId: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -123,3 +214,9 @@ export type UpdateItem = z.infer<typeof updateItemSchema>;
 export type TrustRelationship = typeof trustRelationships.$inferSelect;
 export type InsertTrustRelationship = z.infer<typeof insertTrustRelationshipSchema>;
 export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
+export type LoanRequest = typeof loanRequests.$inferSelect;
+export type InsertLoanRequest = z.infer<typeof insertLoanRequestSchema>;
+export type UpdateLoanRequest = z.infer<typeof updateLoanRequestSchema>;
+export type Loan = typeof loans.$inferSelect;
+export type InsertLoan = z.infer<typeof insertLoanSchema>;
+export type UpdateLoan = z.infer<typeof updateLoanSchema>;

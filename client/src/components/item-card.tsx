@@ -10,6 +10,8 @@ import {
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import EditItemModal from "@/components/edit-item-modal";
+import { LoanRequestModal } from "@/components/loan-request-modal";
+import { HandHeart } from "lucide-react";
 import type { Item } from "@shared/schema";
 
 interface ItemCardProps {
@@ -142,8 +144,17 @@ export default function ItemCard({ item }: ItemCardProps) {
                 </div>
               </div>
               
-              {isOwner && (
-                <div className="pt-4 border-t">
+              <div className="pt-4 border-t space-y-2">
+                {!isOwner && (
+                  <LoanRequestModal item={item}>
+                    <Button className="w-full bg-brand-blue hover:bg-blue-700">
+                      <HandHeart className="w-4 h-4 mr-2" />
+                      Request to Borrow
+                    </Button>
+                  </LoanRequestModal>
+                )}
+                
+                {isOwner && (
                   <Button 
                     onClick={() => {
                       setShowDetails(false);
@@ -154,8 +165,8 @@ export default function ItemCard({ item }: ItemCardProps) {
                     <i className="fas fa-edit mr-2"></i>
                     Edit Item
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </DialogContent>

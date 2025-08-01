@@ -2,6 +2,8 @@ import {
   users,
   items,
   trustRelationships,
+  loanRequests,
+  loans,
   type User,
   type UpsertUser,
   type Item,
@@ -10,6 +12,12 @@ import {
   type TrustRelationship,
   type InsertTrustRelationship,
   type UpdateUserProfile,
+  type LoanRequest,
+  type InsertLoanRequest,
+  type UpdateLoanRequest,
+  type Loan,
+  type InsertLoan,
+  type UpdateLoan,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, desc, ne } from "drizzle-orm";
@@ -34,6 +42,20 @@ export interface IStorage {
   setTrustLevel(trustRelationship: InsertTrustRelationship): Promise<TrustRelationship>;
   getTrustLevel(trusterId: string, trusteeId: string): Promise<number>;
   getUserConnections(userId: string): Promise<User[]>;
+  
+  // Loan request operations
+  createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest>;
+  getLoanRequestsForItem(itemId: string): Promise<LoanRequest[]>;
+  getLoanRequestsForUser(userId: string): Promise<LoanRequest[]>;
+  getLoanRequestsByOwner(ownerId: string): Promise<LoanRequest[]>;
+  updateLoanRequest(id: string, updates: UpdateLoanRequest): Promise<LoanRequest | undefined>;
+  
+  // Loan operations
+  createLoan(loan: InsertLoan): Promise<Loan>;
+  getLoansForUser(userId: string): Promise<Loan[]>;
+  getLoansForOwner(ownerId: string): Promise<Loan[]>;
+  updateLoan(id: string, updates: UpdateLoan): Promise<Loan | undefined>;
+  getActiveLoanForItem(itemId: string): Promise<Loan | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -223,6 +245,186 @@ export class DatabaseStorage implements IStorage {
       .where(eq(trustRelationships.trusterId, userId));
     
     return connections;
+  }
+
+  // Loan request operations
+  async createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest> {
+    const [newRequest] = await db.insert(loanRequests).values(loanRequest).returning();
+    return newRequest;
+  }
+
+  async getLoanRequestsForItem(itemId: string): Promise<LoanRequest[]> {
+    return await db
+      .select()
+      .from(loanRequests)
+      .where(eq(loanRequests.itemId, itemId))
+      .orderBy(desc(loanRequests.createdAt));
+  }
+
+  async getLoanRequestsForUser(userId: string): Promise<LoanRequest[]> {
+    return await db
+      .select()
+      .from(loanRequests)
+      .where(eq(loanRequests.borrowerId, userId))
+      .orderBy(desc(loanRequests.createdAt));
+  }
+
+  async getLoanRequestsByOwner(ownerId: string): Promise<LoanRequest[]> {
+    // Get loan requests for items owned by this user
+    return await db
+      .select({
+        id: loanRequests.id,
+        itemId: loanRequests.itemId,
+        borrowerId: loanRequests.borrowerId,
+        requestedStartDate: loanRequests.requestedStartDate,
+        requestedEndDate: loanRequests.requestedEndDate,
+        status: loanRequests.status,
+        message: loanRequests.message,
+        createdAt: loanRequests.createdAt,
+        updatedAt: loanRequests.updatedAt,
+      })
+      .from(loanRequests)
+      .innerJoin(items, eq(loanRequests.itemId, items.id))
+      .where(eq(items.ownerId, ownerId))
+      .orderBy(desc(loanRequests.createdAt));
+  }
+
+  async getLoanRequestsByOwnerWithDetails(ownerId: string): Promise<any[]> {
+    // Get loan requests for items owned by this user with item and borrower details
+    return await db
+      .select({
+        id: loanRequests.id,
+        itemId: loanRequests.itemId,
+        borrowerId: loanRequests.borrowerId,
+        requestedStartDate: loanRequests.requestedStartDate,
+        requestedEndDate: loanRequests.requestedEndDate,
+        status: loanRequests.status,
+        message: loanRequests.message,
+        createdAt: loanRequests.createdAt,
+        updatedAt: loanRequests.updatedAt,
+        itemTitle: items.title,
+        borrowerName: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`,
+        borrowerEmail: users.email,
+        borrowerProfileImage: users.profileImageUrl,
+      })
+      .from(loanRequests)
+      .innerJoin(items, eq(loanRequests.itemId, items.id))
+      .innerJoin(users, eq(loanRequests.borrowerId, users.id))
+      .where(eq(items.ownerId, ownerId))
+      .orderBy(desc(loanRequests.createdAt));
+  }
+
+  async updateLoanRequest(id: string, updates: UpdateLoanRequest): Promise<LoanRequest | undefined> {
+    const [updatedRequest] = await db
+      .update(loanRequests)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(loanRequests.id, id))
+      .returning();
+    return updatedRequest;
+  }
+
+  // Loan operations
+  async createLoan(loan: InsertLoan): Promise<Loan> {
+    const [newLoan] = await db.insert(loans).values(loan).returning();
+    return newLoan;
+  }
+
+  async getLoansForUser(userId: string): Promise<Loan[]> {
+    return await db
+      .select()
+      .from(loans)
+      .where(eq(loans.borrowerId, userId))
+      .orderBy(desc(loans.createdAt));
+  }
+
+  async getLoansForOwner(ownerId: string): Promise<Loan[]> {
+    return await db
+      .select()
+      .from(loans)
+      .where(eq(loans.lenderId, ownerId))
+      .orderBy(desc(loans.createdAt));
+  }
+
+  async getLoansForUserWithDetails(userId: string): Promise<any[]> {
+    return await db
+      .select({
+        id: loans.id,
+        itemId: loans.itemId,
+        borrowerId: loans.borrowerId,
+        lenderId: loans.lenderId,
+        startDate: loans.startDate,
+        expectedEndDate: loans.expectedEndDate,
+        actualEndDate: loans.actualEndDate,
+        status: loans.status,
+        notes: loans.notes,
+        createdAt: loans.createdAt,
+        itemTitle: items.title,
+        itemImageUrl: items.imageUrl,
+        lenderName: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`,
+        lenderEmail: users.email,
+        lenderProfileImage: users.profileImageUrl,
+      })
+      .from(loans)
+      .innerJoin(items, eq(loans.itemId, items.id))
+      .innerJoin(users, eq(loans.lenderId, users.id))
+      .where(eq(loans.borrowerId, userId))
+      .orderBy(desc(loans.createdAt));
+  }
+
+  async getLoansForOwnerWithDetails(ownerId: string): Promise<any[]> {
+    return await db
+      .select({
+        id: loans.id,
+        itemId: loans.itemId,
+        borrowerId: loans.borrowerId,
+        lenderId: loans.lenderId,
+        startDate: loans.startDate,
+        expectedEndDate: loans.expectedEndDate,
+        actualEndDate: loans.actualEndDate,
+        status: loans.status,
+        notes: loans.notes,
+        createdAt: loans.createdAt,
+        itemTitle: items.title,
+        itemImageUrl: items.imageUrl,
+        borrowerName: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`,
+        borrowerEmail: users.email,
+        borrowerProfileImage: users.profileImageUrl,
+      })
+      .from(loans)
+      .innerJoin(items, eq(loans.itemId, items.id))
+      .innerJoin(users, eq(loans.borrowerId, users.id))
+      .where(eq(loans.lenderId, ownerId))
+      .orderBy(desc(loans.createdAt));
+  }
+
+  async updateLoan(id: string, updates: UpdateLoan): Promise<Loan | undefined> {
+    const [updatedLoan] = await db
+      .update(loans)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(loans.id, id))
+      .returning();
+    return updatedLoan;
+  }
+
+  async getActiveLoanForItem(itemId: string): Promise<Loan | undefined> {
+    const [loan] = await db
+      .select()
+      .from(loans)
+      .where(
+        and(
+          eq(loans.itemId, itemId),
+          eq(loans.status, 'active')
+        )
+      );
+    return loan;
+  }
+
+  async getActiveLoanForItem(itemId: string): Promise<Loan | undefined> {
+    const [activeLoan] = await db
+      .select()
+      .from(loans)
+      .where(and(eq(loans.itemId, itemId), eq(loans.status, "active")));
+    return activeLoan;
   }
 }
 

@@ -3,7 +3,16 @@ import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertItemSchema, updateItemSchema, insertTrustRelationshipSchema, updateUserProfileSchema } from "@shared/schema";
+import { 
+  insertItemSchema, 
+  updateItemSchema, 
+  insertTrustRelationshipSchema, 
+  updateUserProfileSchema, 
+  insertLoanRequestSchema,
+  updateLoanRequestSchema,
+  insertLoanSchema,
+  updateLoanSchema 
+} from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -322,6 +331,184 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error in profile route:", error);
       res.status(500).send('Internal server error');
+    }
+  });
+
+  // User connections route for loan modal
+  app.get('/api/users/connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const connections = await storage.getUserConnections(userId);
+      res.json(connections);
+    } catch (error) {
+      console.error("Error fetching user connections:", error);
+      res.status(500).json({ message: "Failed to fetch user connections" });
+    }
+  });
+
+  // Loan request routes
+  app.post('/api/loan-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validatedData = insertLoanRequestSchema.parse(req.body);
+      
+      // Check if item exists and user has access to it
+      const items = await storage.getVisibleItems(userId);
+      const item = items.find(i => i.id === validatedData.itemId);
+      if (!item) {
+        return res.status(404).json({ message: "Item not found or not accessible" });
+      }
+      
+      // Check if item is already on loan
+      const activeLoan = await storage.getActiveLoanForItem(validatedData.itemId);
+      if (activeLoan) {
+        return res.status(400).json({ message: "Item is already on loan" });
+      }
+      
+      const loanRequest = await storage.createLoanRequest({
+        ...validatedData,
+        borrowerId: userId,
+      });
+      res.json(loanRequest);
+    } catch (error) {
+      console.error("Error creating loan request:", error);
+      res.status(500).json({ message: "Failed to create loan request" });
+    }
+  });
+
+  app.get('/api/loan-requests/my', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const requests = await storage.getLoanRequestsForUser(userId);
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching loan requests:", error);
+      res.status(500).json({ message: "Failed to fetch loan requests" });
+    }
+  });
+
+  app.get('/api/loan-requests/pending', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const requests = await storage.getLoanRequestsByOwnerWithDetails(userId);
+      const pendingRequests = requests.filter(r => r.status === 'pending');
+      res.json(pendingRequests);
+    } catch (error) {
+      console.error("Error fetching pending loan requests:", error);
+      res.status(500).json({ message: "Failed to fetch pending loan requests" });
+    }
+  });
+
+  app.patch('/api/loan-requests/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+      const validatedData = updateLoanRequestSchema.parse(req.body);
+      
+      // Get the loan request to check ownership
+      const requests = await storage.getLoanRequestsByOwner(userId);
+      const request = requests.find(r => r.id === id);
+      if (!request) {
+        return res.status(404).json({ message: "Loan request not found" });
+      }
+      
+      // If approving the request, create a loan
+      if (validatedData.status === 'approved') {
+        const item = await storage.getItem(request.itemId);
+        if (!item) {
+          return res.status(404).json({ message: "Item not found" });
+        }
+        
+        // Create the loan
+        await storage.createLoan({
+          itemId: request.itemId,
+          borrowerId: request.borrowerId,
+          lenderId: userId,
+          startDate: request.requestedStartDate,
+          expectedEndDate: request.requestedEndDate,
+          status: 'active',
+        });
+      }
+      
+      const updatedRequest = await storage.updateLoanRequest(id, validatedData);
+      res.json(updatedRequest);
+    } catch (error) {
+      console.error("Error updating loan request:", error);
+      res.status(500).json({ message: "Failed to update loan request" });
+    }
+  });
+
+  // Loan routes
+  app.post('/api/loans', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validatedData = insertLoanSchema.parse(req.body);
+      
+      // Check if user owns the item
+      const item = await storage.getItem(validatedData.itemId);
+      if (!item || item.ownerId !== userId) {
+        return res.status(404).json({ message: "Item not found or not owned by user" });
+      }
+      
+      // Check if item is already on loan
+      const activeLoan = await storage.getActiveLoanForItem(validatedData.itemId);
+      if (activeLoan) {
+        return res.status(400).json({ message: "Item is already on loan" });
+      }
+      
+      const loan = await storage.createLoan({
+        ...validatedData,
+        lenderId: userId,
+      });
+      res.json(loan);
+    } catch (error) {
+      console.error("Error creating loan:", error);
+      res.status(500).json({ message: "Failed to create loan" });
+    }
+  });
+
+  app.get('/api/loans/my-borrowed', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const loans = await storage.getLoansForUserWithDetails(userId);
+      res.json(loans);
+    } catch (error) {
+      console.error("Error fetching borrowed loans:", error);
+      res.status(500).json({ message: "Failed to fetch borrowed loans" });
+    }
+  });
+
+  app.get('/api/loans/my-lent', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const loans = await storage.getLoansForOwnerWithDetails(userId);
+      res.json(loans);
+    } catch (error) {
+      console.error("Error fetching lent loans:", error);
+      res.status(500).json({ message: "Failed to fetch lent loans" });
+    }
+  });
+
+  app.patch('/api/loans/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+      const validatedData = updateLoanSchema.parse(req.body);
+      
+      // Get the loan to check ownership (either borrower or lender)
+      const borrowedLoans = await storage.getLoansForUser(userId);
+      const lentLoans = await storage.getLoansForOwner(userId);
+      const loan = [...borrowedLoans, ...lentLoans].find(l => l.id === id);
+      
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      
+      const updatedLoan = await storage.updateLoan(id, validatedData);
+      res.json(updatedLoan);
+    } catch (error) {
+      console.error("Error updating loan:", error);
+      res.status(500).json({ message: "Failed to update loan" });
     }
   });
 

@@ -3,10 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import NavigationHeader from "@/components/navigation-header";
 import EditItemModal from "@/components/edit-item-modal";
+import { LoanItemModal } from "@/components/loan-item-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { HandHeart } from "lucide-react";
 import type { Item } from "@shared/schema";
 
 export default function MyItems() {
@@ -205,11 +207,21 @@ export default function MyItems() {
                     <Button
                       onClick={() => handleEditItem(item.id)}
                       size="sm"
-                      className="flex-1 bg-brand-blue hover:bg-blue-700"
+                      variant="outline"
+                      className="flex-1"
                     >
                       <i className="fas fa-edit mr-1"></i>
                       Edit
                     </Button>
+                    <LoanItemModal item={item}>
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-brand-blue hover:bg-blue-700"
+                      >
+                        <HandHeart className="w-3 h-3 mr-1" />
+                        Loan
+                      </Button>
+                    </LoanItemModal>
                   </div>
                 </CardContent>
               </Card>

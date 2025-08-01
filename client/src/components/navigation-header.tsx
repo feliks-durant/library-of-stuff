@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -6,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
@@ -99,6 +101,32 @@ export default function NavigationHeader({
                   <i className="fas fa-user mr-2"></i>
                   Profile
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/my-items">
+                    <div className="flex items-center w-full">
+                      <i className="fas fa-boxes mr-2"></i>
+                      My Items
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/loan-requests">
+                    <div className="flex items-center w-full">
+                      <i className="fas fa-inbox mr-2"></i>
+                      Loan Requests
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/loans">
+                    <div className="flex items-center w-full">
+                      <i className="fas fa-handshake mr-2"></i>
+                      My Loans
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <i className="fas fa-sign-out-alt mr-2"></i>
                   Logout
