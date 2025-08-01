@@ -368,8 +368,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const loanRequest = await storage.createLoanRequest({
         itemId: validatedData.itemId,
         borrowerId: userId,
-        requestedStartDate: new Date(validatedData.requestedStartDate),
-        requestedEndDate: new Date(validatedData.requestedEndDate),
+        requestedStartDate: validatedData.requestedStartDate,
+        requestedEndDate: validatedData.requestedEndDate,
         message: validatedData.message,
         status: "pending",
       });
