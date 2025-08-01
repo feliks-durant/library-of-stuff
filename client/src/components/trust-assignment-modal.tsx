@@ -42,12 +42,9 @@ export default function TrustAssignmentModal({ isOpen, onClose, user }: TrustAss
 
   const setTrustMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest(`/api/trust`, {
-        method: "POST",
-        body: JSON.stringify({
-          trusteeId: user.id,
-          trustLevel: trustLevel[0],
-        }),
+      return await apiRequest("/api/trust", "POST", {
+        trusteeId: user.id,
+        trustLevel: trustLevel[0],
       });
     },
     onSuccess: () => {
