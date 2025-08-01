@@ -31,14 +31,14 @@ interface LoanWithDetails {
   // Additional fields that would be joined
   itemTitle?: string;
   itemImageUrl?: string;
-  borrowerName?: string;
+  borrowerFirstName?: string;
+  borrowerLastName?: string;
   borrowerUsername?: string;
-  borrowerDiscriminator?: string;
   borrowerEmail?: string;
   borrowerProfileImage?: string;
-  lenderName?: string;
+  lenderFirstName?: string;
+  lenderLastName?: string;
   lenderUsername?: string;
-  lenderDiscriminator?: string;
   lenderEmail?: string;
   lenderProfileImage?: string;
 }
@@ -143,21 +143,28 @@ export default function LoansPage() {
   const LoanCard = ({ loan, type }: { loan: LoanWithDetails; type: "borrowed" | "lent" }) => {
     const otherUser = type === "borrowed" 
       ? { 
-          name: loan.lenderName, 
+          firstName: loan.lenderFirstName,
+          lastName: loan.lenderLastName,
           username: loan.lenderUsername,
           email: loan.lenderEmail, 
           image: loan.lenderProfileImage 
         }
       : { 
-          name: loan.borrowerName, 
+          firstName: loan.borrowerFirstName,
+          lastName: loan.borrowerLastName,
           username: loan.borrowerUsername,
           email: loan.borrowerEmail, 
           image: loan.borrowerProfileImage 
         };
     
-    const displayName = formatDisplayName(otherUser) !== 'Unknown User' 
-      ? formatDisplayName(otherUser) 
-      : otherUser.name || otherUser.email;
+    const fullName = [otherUser.firstName, otherUser.lastName].filter(Boolean).join(' ');
+    const displayName = fullName && otherUser.username 
+      ? `${fullName} @${otherUser.username}`
+      : fullName 
+      ? fullName
+      : otherUser.username 
+      ? `@${otherUser.username}`
+      : otherUser.email;
 
     return (
       <Card key={loan.id}>
@@ -184,7 +191,7 @@ export default function LoansPage() {
                     <AvatarImage src={otherUser.image} />
                     <AvatarFallback className="text-xs">
                       {otherUser.username?.[0]?.toUpperCase() || 
-                       otherUser.name?.charAt(0).toUpperCase() || 
+                       otherUser.firstName?.charAt(0).toUpperCase() || 
                        otherUser.email?.charAt(0).toUpperCase() || 
                        'U'}
                     </AvatarFallback>
@@ -306,7 +313,18 @@ export default function LoansPage() {
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                             <div className="min-w-0 flex-1">
                               <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">
-                                {request.borrowerName || request.borrowerEmail}
+                                {(request.borrowerFirstName || request.borrowerLastName) ? (
+                                  <>
+                                    <span className="text-black">
+                                      {[request.borrowerFirstName, request.borrowerLastName].filter(Boolean).join(' ')}
+                                    </span>
+                                    {request.borrowerUsername && (
+                                      <span className="text-gray-500 ml-1">@{request.borrowerUsername}</span>
+                                    )}
+                                  </>
+                                ) : (
+                                  request.borrowerUsername ? `@${request.borrowerUsername}` : request.borrowerEmail
+                                )}
                               </h3>
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-xs sm:text-sm font-medium text-gray-900 truncate">
