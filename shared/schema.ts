@@ -31,11 +31,14 @@ export const users = pgTable("users", {
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
-  username: varchar("username").unique(), // Discord-style username with auto-generated number
+  username: varchar("username"), // Base username (can be non-unique)
+  discriminator: varchar("discriminator", { length: 4 }), // 4-digit discriminator for uniqueness
   profileImageUrl: varchar("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  usernameDiscriminatorIdx: unique().on(table.username, table.discriminator), // Ensure username#discriminator is unique
+}));
 
 // Items table
 export const items = pgTable("items", {
@@ -269,3 +272,21 @@ export type UpdateLoan = z.infer<typeof updateLoanSchema>;
 export type TrustRequest = typeof trustRequests.$inferSelect;
 export type InsertTrustRequest = z.infer<typeof insertTrustRequestSchema>;
 export type UpdateTrustRequest = z.infer<typeof updateTrustRequestSchema>;
+
+// Helper functions for Discord-style usernames
+export function generateDiscriminator(): string {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+export function formatUsername(username?: string, discriminator?: string): string {
+  if (!username || !discriminator) {
+    return "Unknown User";
+  }
+  return `${username}#${discriminator}`;
+}
+
+export function parseUsername(fullUsername: string): { username: string; discriminator: string } | null {
+  const match = fullUsername.match(/^(.+)#(\d{4})$/);
+  if (!match) return null;
+  return { username: match[1], discriminator: match[2] };
+}
