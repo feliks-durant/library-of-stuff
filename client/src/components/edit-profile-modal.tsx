@@ -25,7 +25,9 @@ import { updateUserProfileSchema } from "@shared/schema";
 import { z } from "zod";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
-const formSchema = updateUserProfileSchema.extend({
+const formSchema = updateUserProfileSchema.pick({
+  email: true,
+}).extend({
   profileImage: z.any().optional(),
 });
 
@@ -42,8 +44,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: user?.firstName ?? "",
-      lastName: user?.lastName ?? "",
       email: user?.email ?? "",
     },
   });
@@ -52,8 +52,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       const formData = new FormData();
       
-      if (data.firstName) formData.append("firstName", data.firstName);
-      if (data.lastName) formData.append("lastName", data.lastName);
       if (data.email) formData.append("email", data.email);
       
       if (data.profileImage?.[0]) {
@@ -112,8 +110,8 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
   if (!user) return null;
 
-  const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-  const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`;
+  const displayName = user?.username || "User";
+  const initials = user?.username?.[0]?.toUpperCase() || "U";
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -129,7 +127,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
               <Avatar className="w-24 h-24 mx-auto mb-4">
                 <AvatarImage 
                   src={user.profileImageUrl || undefined}
-                  alt={fullName}
+                  alt={displayName}
                   className="object-cover"
                 />
                 <AvatarFallback className="text-2xl">
@@ -137,40 +135,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 </AvatarFallback>
               </Avatar>
             </div>
-
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Your first name"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Your last name"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <FormField
               control={form.control}

@@ -33,8 +33,8 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
   if (!user) return null;
 
-  const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-  const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`;
+  const displayName = user.username || "User";
+  const initials = user.username?.[0]?.toUpperCase() || "U";
 
   // Generate QR code URL for user profile
   const currentDomain = window.location.origin;
@@ -71,7 +71,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
             <Avatar className="w-24 h-24">
               <AvatarImage 
                 src={user.profileImageUrl || undefined}
-                alt={fullName}
+                alt={displayName}
                 className="object-cover"
               />
               <AvatarFallback className="text-2xl">
@@ -81,9 +81,8 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
             
             <div className="flex-1">
               <h4 className="text-2xl font-semibold text-gray-900 mb-2">
-                {fullName || "Your Name"}
+                {displayName}
               </h4>
-              <p className="text-gray-600 mb-4">{user.email}</p>
               
               <div className="flex space-x-4">
                 <div className="text-center">

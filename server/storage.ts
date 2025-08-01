@@ -85,7 +85,7 @@ export class DatabaseStorage implements IStorage {
     
     if (!existingUser || (!existingUser.username || !existingUser.discriminator)) {
       // Generate username and discriminator for new users
-      const baseName = userData.firstName || userData.email?.split('@')[0] || 'User';
+      const baseName = userData.email?.split('@')[0] || 'User';
       const { username, discriminator } = await this.generateUniqueUsernameDiscriminator(baseName);
       userData.username = username;
       userData.discriminator = discriminator;
@@ -132,8 +132,8 @@ export class DatabaseStorage implements IStorage {
         ownerId: items.ownerId,
         createdAt: items.createdAt,
         updatedAt: items.updatedAt,
-        ownerFirstName: users.firstName,
-        ownerLastName: users.lastName,
+        ownerUsername: users.username,
+        ownerDiscriminator: users.discriminator,
         ownerProfileImage: users.profileImageUrl,
         userTrustLevel: trustRelationships.trustLevel,
       })
@@ -167,8 +167,8 @@ export class DatabaseStorage implements IStorage {
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       owner: {
-        firstName: item.ownerFirstName,
-        lastName: item.ownerLastName,
+        username: item.ownerUsername,
+        discriminator: item.ownerDiscriminator,
         profileImageUrl: item.ownerProfileImage,
       }
     })) as Item[];
@@ -235,8 +235,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         or(
           ilike(users.username, `%${query}%`),
-          ilike(users.firstName, `%${query}%`),
-          ilike(users.lastName, `%${query}%`)
+          ilike(users.email, `%${query}%`)
         )
       )
       .limit(20);
@@ -277,8 +276,7 @@ export class DatabaseStorage implements IStorage {
     trustLevel: number; 
     username?: string;
     discriminator?: string;
-    firstName?: string;
-    lastName?: string;
+
     email?: string;
     profileImageUrl?: string;
     createdAt?: string;
@@ -290,8 +288,7 @@ export class DatabaseStorage implements IStorage {
         trustLevel: trustRelationships.trustLevel,
         username: users.username,
         discriminator: users.discriminator,
-        firstName: users.firstName,
-        lastName: users.lastName,
+
         email: users.email,
         profileImageUrl: users.profileImageUrl,
         createdAt: trustRelationships.createdAt,
@@ -306,8 +303,7 @@ export class DatabaseStorage implements IStorage {
       trustLevel: conn.trustLevel,
       username: conn.username || undefined,
       discriminator: conn.discriminator || undefined,
-      firstName: conn.firstName || undefined,
-      lastName: conn.lastName || undefined,
+
       email: conn.email || undefined,
       profileImageUrl: conn.profileImageUrl || undefined,
       createdAt: conn.createdAt?.toISOString() || undefined,
