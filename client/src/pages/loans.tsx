@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import NavigationHeader from "@/components/navigation-header";
+import { apiRequest } from "@/lib/queryClient";
 
 interface LoanWithDetails {
   id: string;
@@ -37,6 +38,7 @@ interface LoanWithDetails {
 export default function LoansPage() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -61,6 +63,42 @@ export default function LoansPage() {
   const { data: lentLoans = [], isLoading: lentLoading } = useQuery<LoanWithDetails[]>({
     queryKey: ["/api/loans/my-lent"],
     retry: false,
+  });
+
+  const markAsReturnedMutation = useMutation({
+    mutationFn: async (loanId: string) => {
+      const response = await apiRequest(`/api/loans/${loanId}`, "PATCH", {
+        status: "returned",
+        actualEndDate: new Date().toISOString(),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Item Marked as Returned",
+        description: "The item has been successfully marked as returned.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loans/my-lent"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loans/my-borrowed"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to mark item as returned. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const getStatusColor = (loan: LoanWithDetails) => {
@@ -157,8 +195,13 @@ export default function LoansPage() {
             )}
             
             {loan.status === "active" && type === "lent" && (
-              <Button variant="outline" className="w-full">
-                Mark as Returned
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => markAsReturnedMutation.mutate(loan.id)}
+                disabled={markAsReturnedMutation.isPending}
+              >
+                {markAsReturnedMutation.isPending ? "Marking as Returned..." : "Mark as Returned"}
               </Button>
             )}
           </div>
