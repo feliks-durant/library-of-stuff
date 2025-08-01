@@ -17,8 +17,8 @@ import type { Item } from "@shared/schema";
 interface ItemCardProps {
   item: Item & {
     owner?: {
-      firstName?: string;
-      lastName?: string;
+      username?: string;
+      discriminator?: string;
       profileImageUrl?: string;
     };
   };
@@ -29,12 +29,12 @@ export default function ItemCard({ item }: ItemCardProps) {
   const [showEditModal, setShowEditModal] = useState(false);
   const { user } = useAuth();
 
-  const ownerName = item.owner?.firstName && item.owner?.lastName
-    ? `${item.owner.firstName} ${item.owner.lastName.charAt(0)}.`
+  const ownerName = item.owner?.username && item.owner?.discriminator
+    ? `${item.owner.username}#${item.owner.discriminator}`
     : "Unknown User";
 
-  const ownerInitials = item.owner?.firstName && item.owner?.lastName
-    ? `${item.owner.firstName[0]}${item.owner.lastName[0]}`
+  const ownerInitials = item.owner?.username
+    ? item.owner.username[0].toUpperCase()
     : "?";
 
   const isOwner = user?.id === item.ownerId;

@@ -162,6 +162,7 @@ export class DatabaseStorage implements IStorage {
       description: item.description,
       category: item.category,
       imageUrl: item.imageUrl,
+      qrCode: null, // Add qrCode field for type compatibility
       trustLevel: item.trustLevel,
       ownerId: item.ownerId,
       createdAt: item.createdAt,
@@ -312,10 +313,7 @@ export class DatabaseStorage implements IStorage {
 
   // Loan request operations
   async createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest> {
-    const [newRequest] = await db.insert(loanRequests).values({
-      ...loanRequest,
-      id: nanoid(),
-    }).returning();
+    const [newRequest] = await db.insert(loanRequests).values(loanRequest).returning();
     return newRequest;
   }
 
@@ -369,7 +367,7 @@ export class DatabaseStorage implements IStorage {
         createdAt: loanRequests.createdAt,
         updatedAt: loanRequests.updatedAt,
         itemTitle: items.title,
-        borrowerName: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`,
+        borrowerName: sql<string>`CONCAT(${users.username}, '#', ${users.discriminator})`,
         borrowerEmail: users.email,
         borrowerProfileImage: users.profileImageUrl,
       })
@@ -426,7 +424,7 @@ export class DatabaseStorage implements IStorage {
         createdAt: loans.createdAt,
         itemTitle: items.title,
         itemImageUrl: items.imageUrl,
-        lenderName: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`,
+        lenderName: sql<string>`CONCAT(${users.username}, '#', ${users.discriminator})`,
         lenderEmail: users.email,
         lenderProfileImage: users.profileImageUrl,
       })
@@ -452,7 +450,7 @@ export class DatabaseStorage implements IStorage {
         createdAt: loans.createdAt,
         itemTitle: items.title,
         itemImageUrl: items.imageUrl,
-        borrowerName: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`,
+        borrowerName: sql<string>`CONCAT(${users.username}, '#', ${users.discriminator})`,
         borrowerEmail: users.email,
         borrowerProfileImage: users.profileImageUrl,
       })
@@ -487,10 +485,7 @@ export class DatabaseStorage implements IStorage {
 
   // Trust request operations
   async createTrustRequest(trustRequest: InsertTrustRequest): Promise<TrustRequest> {
-    const [newRequest] = await db.insert(trustRequests).values({
-      ...trustRequest,
-      id: nanoid(),
-    }).returning();
+    const [newRequest] = await db.insert(trustRequests).values(trustRequest).returning();
     return newRequest;
   }
 
