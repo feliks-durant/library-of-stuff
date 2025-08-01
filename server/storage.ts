@@ -103,6 +103,18 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async updateUserProfile(userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'username'>>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
   async createItem(item: InsertItem): Promise<Item> {
     const [newItem] = await db.insert(items).values(item).returning();
     return newItem;
@@ -190,14 +202,7 @@ export class DatabaseStorage implements IStorage {
     return updatedItem;
   }
 
-  async updateUserProfile(id: string, updates: UpdateUserProfile): Promise<User | undefined> {
-    const [updatedUser] = await db
-      .update(users)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(users.id, id))
-      .returning();
-    return updatedUser;
-  }
+
 
   async deleteItem(id: string, userId: string): Promise<boolean> {
     const result = await db
@@ -433,7 +438,7 @@ export class DatabaseStorage implements IStorage {
         lenderFirstName: users.firstName,
         lenderLastName: users.lastName,
         lenderUsername: users.username,
-        lenderDiscriminator: users.discriminator,
+
         lenderEmail: users.email,
         lenderProfileImage: users.profileImageUrl,
       })

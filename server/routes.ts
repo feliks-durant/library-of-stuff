@@ -13,8 +13,11 @@ import {
   insertLoanSchema,
   updateLoanSchema,
   insertTrustRequestSchema,
-  updateTrustRequestSchema
+  updateTrustRequestSchema,
+  users
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -57,6 +60,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Username availability check
+  app.get('/api/users/check-username', isAuthenticated, async (req: any, res) => {
+    try {
+      const { username } = req.query;
+      
+      if (!username || typeof username !== 'string') {
+        return res.status(400).json({ message: "Username is required" });
+      }
+
+      const cleanUsername = username.toLowerCase().trim();
+      
+      // Check basic validation
+      if (cleanUsername.length < 3 || cleanUsername.length > 20) {
+        return res.json({ available: false, reason: "Invalid length" });
+      }
+
+      if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+        return res.json({ available: false, reason: "Invalid characters" });
+      }
+
+      // Check if username exists
+      const existingUser = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.username, cleanUsername));
+
+      res.json({ available: existingUser.length === 0 });
+    } catch (error) {
+      console.error("Error checking username:", error);
+      res.status(500).json({ message: "Failed to check username" });
+    }
+  });
+
+  // Complete onboarding
+  app.post('/api/users/complete-onboarding', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { firstName, lastName, username } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !username) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+
+      const cleanUsername = username.toLowerCase().trim();
+
+      // Final username validation
+      if (cleanUsername.length < 3 || cleanUsername.length > 20) {
+        return res.status(400).json({ message: "Username must be 3-20 characters" });
+      }
+
+      if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+        return res.status(400).json({ message: "Username can only contain letters, numbers, and underscores" });
+      }
+
+      // Check availability one more time
+      const existingUser = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.username, cleanUsername));
+
+      if (existingUser.length > 0) {
+        return res.status(400).json({ message: "Username is already taken" });
+      }
+
+      // Update user profile
+      const updatedUser = await storage.updateUserProfile(userId, {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: cleanUsername,
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error completing onboarding:", error);
+      res.status(500).json({ message: "Failed to complete onboarding" });
     }
   });
 
