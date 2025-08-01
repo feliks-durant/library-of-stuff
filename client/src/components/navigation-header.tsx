@@ -33,91 +33,97 @@ export default function NavigationHeader({
 
   return (
     <header className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-8">
+          {/* Logo Section - Responsive */}
+          <div className="flex items-center min-w-0 flex-1">
             <div className="flex-shrink-0">
               <Link href="/">
-                <h1 className="text-2xl font-bold text-brand-blue hover:text-blue-700 cursor-pointer transition-colors">
-                  <i className="fas fa-boxes mr-2"></i>
-                  Library of Stuff
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-brand-blue hover:text-blue-700 cursor-pointer transition-colors truncate">
+                  <i className="fas fa-boxes mr-1 sm:mr-2"></i>
+                  <span className="hidden xs:inline">Library of Stuff</span>
+                  <span className="xs:hidden">LoS</span>
                 </h1>
               </Link>
             </div>
-
           </div>
 
-          <nav className="flex items-center space-x-4">
+          {/* Navigation Section - Responsive */}
+          <nav className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
+            {/* QR Code Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={onScanQR}
               className="p-2 text-gray-600 hover:text-brand-blue"
+              title="Scan QR Code"
             >
-              <i className="fas fa-qrcode text-xl"></i>
+              <i className="fas fa-qrcode text-lg sm:text-xl"></i>
+              <span className="sr-only">Scan QR</span>
             </Button>
             
-
-            
-            <Button onClick={onAddItem} className="bg-brand-blue hover:bg-blue-700">
-              <i className="fas fa-plus mr-2"></i>
-              Add Item
+            {/* Add Item Button - Responsive */}
+            <Button 
+              onClick={onAddItem} 
+              className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm px-2 sm:px-4"
+            >
+              <i className="fas fa-plus sm:mr-2"></i>
+              <span className="hidden sm:inline ml-1">Add Item</span>
             </Button>
             
-            {/* User Profile Dropdown */}
+            {/* User Profile Dropdown - Responsive */}
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2 text-gray-700 hover:text-brand-blue">
-                  <Avatar className="w-8 h-8">
+                <Button variant="ghost" className="flex items-center space-x-1 sm:space-x-2 text-gray-700 hover:text-brand-blue min-w-0">
+                  <Avatar className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0">
                     <AvatarImage 
                       src={user?.profileImageUrl || undefined} 
                       alt={user ? formatDisplayName(user) : 'User'}
                       className="object-cover"
                     />
-                    <AvatarFallback>
+                    <AvatarFallback className="text-xs">
                       {user?.username?.[0]?.toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden md:block font-medium">
+                  <span className="hidden lg:block font-medium max-w-24 truncate text-sm">
                     {user ? formatDisplayName(user) : 'User'}
                   </span>
-                  <i className="fas fa-chevron-down text-sm"></i>
+                  <i className="fas fa-chevron-down text-xs hidden sm:block"></i>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={onOpenProfile}>
-                  <i className="fas fa-user mr-2"></i>
+              <DropdownMenuContent align="end" className="w-44 sm:w-48">
+                <DropdownMenuItem onClick={onOpenProfile} className="text-sm">
+                  <i className="fas fa-user mr-2 w-4"></i>
                   Profile
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/my-items">
-                    <div className="flex items-center w-full">
-                      <i className="fas fa-boxes mr-2"></i>
+                    <div className="flex items-center w-full text-sm">
+                      <i className="fas fa-boxes mr-2 w-4"></i>
                       My Items
                     </div>
                   </Link>
                 </DropdownMenuItem>
-
                 <DropdownMenuItem asChild>
                   <Link href="/loans">
-                    <div className="flex items-center w-full">
-                      <i className="fas fa-handshake mr-2"></i>
+                    <div className="flex items-center w-full text-sm">
+                      <i className="fas fa-handshake mr-2 w-4"></i>
                       My Loans
                     </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/trust-requests">
-                    <div className="flex items-center w-full">
-                      <i className="fas fa-users mr-2"></i>
+                    <div className="flex items-center w-full text-sm">
+                      <i className="fas fa-users mr-2 w-4"></i>
                       My Connections
                     </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <i className="fas fa-sign-out-alt mr-2"></i>
+                <DropdownMenuItem onClick={handleLogout} className="text-sm">
+                  <i className="fas fa-sign-out-alt mr-2 w-4"></i>
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>

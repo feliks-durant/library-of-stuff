@@ -34,8 +34,7 @@ export function LoanItemModal({ item, children }: LoanItemModalProps) {
   });
 
   const filteredConnections = connections.filter((user: User) => 
-    user.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -148,12 +147,12 @@ export function LoanItemModal({ item, children }: LoanItemModalProps) {
                           )}
                           <div>
                             <div className="font-medium">
-                              {user.firstName && user.lastName 
-                                ? `${user.firstName} ${user.lastName}`
+                              {user.username && user.discriminator 
+                                ? `${user.username}#${user.discriminator}`
                                 : user.email
                               }
                             </div>
-                            {user.firstName && user.lastName && (
+                            {user.username && user.discriminator && (
                               <div className="text-xs text-muted-foreground">{user.email}</div>
                             )}
                           </div>
