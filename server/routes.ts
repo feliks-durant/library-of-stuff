@@ -381,6 +381,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trust request routes
+  app.post('/api/trust-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const trustRequest = await storage.createTrustRequest({
+        requesterId: userId,
+        ...req.body,
+      });
+      res.json(trustRequest);
+    } catch (error) {
+      console.error("Error creating trust request:", error);
+      res.status(500).json({ message: "Failed to create trust request" });
+    }
+  });
+
+  app.get('/api/trust-requests/received', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const requests = await storage.getTrustRequestsReceived(userId);
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching received trust requests:", error);
+      res.status(500).json({ message: "Failed to fetch trust requests" });
+    }
+  });
+
+  app.get('/api/trust-requests/sent', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const requests = await storage.getTrustRequestsSent(userId);
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching sent trust requests:", error);
+      res.status(500).json({ message: "Failed to fetch trust requests" });
+    }
+  });
+
+  app.patch('/api/trust-requests/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updatedRequest = await storage.updateTrustRequest(id, req.body);
+      res.json(updatedRequest);
+    } catch (error) {
+      console.error("Error updating trust request:", error);
+      res.status(500).json({ message: "Failed to update trust request" });
+    }
+  });
+
   // Loan request routes
   app.post('/api/loan-requests', isAuthenticated, async (req: any, res) => {
     try {

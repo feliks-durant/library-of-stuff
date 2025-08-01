@@ -31,6 +31,7 @@ export const users = pgTable("users", {
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
+  username: varchar("username").unique(), // Discord-style username with auto-generated number
   profileImageUrl: varchar("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -43,6 +44,7 @@ export const items = pgTable("items", {
   description: text("description").notNull(),
   category: varchar("category").notNull(),
   imageUrl: varchar("image_url"),
+  qrCode: varchar("qr_code").unique(), // QR code for easy item access
   trustLevel: integer("trust_level").notNull(), // 1-5, trust level required to see this item
   ownerId: varchar("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
@@ -74,6 +76,20 @@ export const loanRequests = pgTable("loan_requests", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Trust requests table - for requesting trust levels from other users
+export const trustRequests = pgTable("trust_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  requesterId: varchar("requester_id").notNull().references(() => users.id, { onDelete: "cascade" }), // person requesting trust
+  targetId: varchar("target_id").notNull().references(() => users.id, { onDelete: "cascade" }), // person being asked for trust
+  requestedLevel: integer("requested_level").notNull(), // 1-5, requested trust level
+  message: text("message"), // optional message from requester
+  status: varchar("status").notNull().default("pending"), // pending, approved, denied
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  unique().on(table.requesterId, table.targetId), // one trust request per pair
+]);
+
 // Active loans table
 export const loans = pgTable("loans", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -94,6 +110,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   items: many(items),
   trustsGiven: many(trustRelationships, { relationName: "truster" }),
   trustsReceived: many(trustRelationships, { relationName: "trustee" }),
+  trustRequestsMade: many(trustRequests, { relationName: "requester" }),
+  trustRequestsReceived: many(trustRequests, { relationName: "target" }),
   loanRequestsMade: many(loanRequests, { relationName: "borrower" }),
   loansAsBorrower: many(loans, { relationName: "borrower" }),
   loansAsLender: many(loans, { relationName: "lender" }),
@@ -118,6 +136,19 @@ export const trustRelationshipsRelations = relations(trustRelationships, ({ one 
     fields: [trustRelationships.trusteeId],
     references: [users.id],
     relationName: "trustee",
+  }),
+}));
+
+export const trustRequestsRelations = relations(trustRequests, ({ one }) => ({
+  requester: one(users, {
+    fields: [trustRequests.requesterId],
+    references: [users.id],
+    relationName: "requester",
+  }),
+  target: one(users, {
+    fields: [trustRequests.targetId],
+    references: [users.id],
+    relationName: "target",
   }),
 }));
 
@@ -206,6 +237,21 @@ export const updateLoanSchema = createInsertSchema(loans).omit({
   updatedAt: true,
 }).partial();
 
+export const insertTrustRequestSchema = createInsertSchema(trustRequests).omit({
+  id: true,
+  requesterId: true, // This will be set from the authenticated user
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateTrustRequestSchema = createInsertSchema(trustRequests).omit({
+  id: true,
+  requesterId: true,
+  targetId: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -221,3 +267,6 @@ export type UpdateLoanRequest = z.infer<typeof updateLoanRequestSchema>;
 export type Loan = typeof loans.$inferSelect;
 export type InsertLoan = z.infer<typeof insertLoanSchema>;
 export type UpdateLoan = z.infer<typeof updateLoanSchema>;
+export type TrustRequest = typeof trustRequests.$inferSelect;
+export type InsertTrustRequest = z.infer<typeof insertTrustRequestSchema>;
+export type UpdateTrustRequest = z.infer<typeof updateTrustRequestSchema>;

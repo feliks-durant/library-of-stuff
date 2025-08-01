@@ -40,6 +40,12 @@ export default function LoansPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const queryClient = useQueryClient();
 
+  // Fetch pending loan requests
+  const { data: loanRequests = [], isLoading: requestsLoading } = useQuery<any[]>({
+    queryKey: ["/api/loan-requests/pending"],
+    retry: false,
+  });
+
   // Redirect to home if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -224,10 +230,14 @@ export default function LoansPage() {
         onOpenProfile={() => {}}
       />
       <div className="container mx-auto p-6 max-w-4xl">
-        <h1 className="text-2xl font-bold mb-6">My Loans</h1>
+        <h1 className="text-2xl font-bold mb-6">Loans & Requests</h1>
         
-        <Tabs defaultValue="borrowed" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="requests" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="requests" className="flex items-center gap-2">
+            <CalendarIcon className="h-4 w-4" />
+            Requests ({loanRequests.filter(req => req.status === 'pending').length})
+          </TabsTrigger>
           <TabsTrigger value="borrowed" className="flex items-center gap-2">
             <HandHeart className="h-4 w-4" />
             Borrowed ({borrowedLoans.length})
@@ -237,6 +247,102 @@ export default function LoansPage() {
             Lent Out ({lentLoans.length})
           </TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="requests" className="mt-6">
+          {requestsLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : loanRequests.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <CalendarIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">No Loan Requests</h3>
+                <p className="text-muted-foreground">
+                  No one has requested to borrow your items yet.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {loanRequests.map((request) => (
+                <Card key={request.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-4">
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage src={request.borrowerProfileImage || undefined} />
+                          <AvatarFallback>
+                            {(request.borrowerName || request.borrowerEmail || "U").charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className="font-semibold text-gray-900">
+                              {request.borrowerName || request.borrowerEmail}
+                            </h3>
+                            <span className="text-sm text-gray-500">•</span>
+                            <span className="text-sm font-medium text-gray-900">{request.itemTitle}</span>
+                            <Badge className={
+                              request.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                              request.status === "approved" ? "bg-green-100 text-green-800" :
+                              "bg-red-100 text-red-800"
+                            }>
+                              {request.status}
+                            </Badge>
+                          </div>
+                          
+                          <div className="text-sm text-gray-600 mb-2">
+                            <CalendarIcon className="w-4 h-4 inline mr-1" />
+                            {format(new Date(request.requestedStartDate), "MMM d")} - {" "}
+                            {format(new Date(request.requestedEndDate), "MMM d, yyyy")}
+                          </div>
+                          
+                          {request.message && (
+                            <p className="text-gray-600 mb-3">{request.message}</p>
+                          )}
+                          
+                          <p className="text-sm text-gray-500">
+                            Requested {format(new Date(request.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {request.status === "pending" && (
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              // Handle approve logic
+                              console.log("Approve request:", request.id);
+                            }}
+                            className="bg-brand-blue hover:bg-blue-700"
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Handle deny logic  
+                              console.log("Deny request:", request.id);
+                            }}
+                            className="text-red-600 hover:bg-red-50"
+                          >
+                            Deny
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
         
         <TabsContent value="borrowed" className="mt-6">
           {borrowedLoading ? (

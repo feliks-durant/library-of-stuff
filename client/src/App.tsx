@@ -11,6 +11,7 @@ import TrustAssignment from "@/pages/trust-assignment";
 import MyItems from "@/pages/my-items";
 import LoanRequests from "@/pages/loan-requests";
 import Loans from "@/pages/loans";
+import TrustRequests from "@/pages/trust-requests";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -25,6 +26,7 @@ function Router() {
           <Route path="/my-items" component={MyItems} />
           <Route path="/loan-requests" component={LoanRequests} />
           <Route path="/loans" component={Loans} />
+          <Route path="/trust-requests" component={TrustRequests} />
           <Route path="/trust/:userId" component={TrustAssignment} />
         </>
       )}

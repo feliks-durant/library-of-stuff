@@ -2,6 +2,7 @@ import {
   users,
   items,
   trustRelationships,
+  trustRequests,
   loanRequests,
   loans,
   type User,
@@ -11,6 +12,9 @@ import {
   type UpdateItem,
   type TrustRelationship,
   type InsertTrustRelationship,
+  type TrustRequest,
+  type InsertTrustRequest,
+  type UpdateTrustRequest,
   type UpdateUserProfile,
   type LoanRequest,
   type InsertLoanRequest,
@@ -44,6 +48,15 @@ export interface IStorage {
   setTrustLevel(trustRelationship: InsertTrustRelationship): Promise<TrustRelationship>;
   getTrustLevel(trusterId: string, trusteeId: string): Promise<number>;
   getUserConnections(userId: string): Promise<Array<{ trusteeId: string; trustLevel: number }>>;
+  
+  // Trust request operations
+  createTrustRequest(trustRequest: InsertTrustRequest): Promise<TrustRequest>;
+  getTrustRequestsReceived(userId: string): Promise<TrustRequest[]>;
+  getTrustRequestsSent(userId: string): Promise<TrustRequest[]>;
+  updateTrustRequest(id: string, updates: UpdateTrustRequest): Promise<TrustRequest | undefined>;
+  
+  // Username generation
+  generateUniqueUsername(baseName: string): Promise<string>;
   
   // Loan request operations
   createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest>;
@@ -434,6 +447,77 @@ export class DatabaseStorage implements IStorage {
         )
       );
     return loan;
+  }
+
+  // Trust request operations
+  async createTrustRequest(trustRequest: InsertTrustRequest): Promise<TrustRequest> {
+    const [newRequest] = await db.insert(trustRequests).values({
+      ...trustRequest,
+      id: nanoid(),
+    }).returning();
+    return newRequest;
+  }
+
+  async getTrustRequestsReceived(userId: string): Promise<TrustRequest[]> {
+    return await db
+      .select()
+      .from(trustRequests)
+      .where(eq(trustRequests.targetId, userId))
+      .orderBy(desc(trustRequests.createdAt));
+  }
+
+  async getTrustRequestsSent(userId: string): Promise<TrustRequest[]> {
+    return await db
+      .select()
+      .from(trustRequests)
+      .where(eq(trustRequests.requesterId, userId))
+      .orderBy(desc(trustRequests.createdAt));
+  }
+
+  async updateTrustRequest(id: string, updates: UpdateTrustRequest): Promise<TrustRequest | undefined> {
+    const [updated] = await db
+      .update(trustRequests)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(trustRequests.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Username generation
+  async generateUniqueUsername(baseName: string): Promise<string> {
+    // Clean the base name (remove spaces, special chars, make lowercase)
+    const cleanBaseName = baseName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    // Try the base name first
+    const existingUser = await db
+      .select({ username: users.username })
+      .from(users)
+      .where(eq(users.username, cleanBaseName));
+    
+    if (existingUser.length === 0) {
+      return cleanBaseName;
+    }
+    
+    // Generate Discord-style username with random 4-digit number
+    let attempts = 0;
+    while (attempts < 100) {
+      const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit number
+      const candidateUsername = `${cleanBaseName}#${randomNum}`;
+      
+      const existing = await db
+        .select({ username: users.username })
+        .from(users)
+        .where(eq(users.username, candidateUsername));
+      
+      if (existing.length === 0) {
+        return candidateUsername;
+      }
+      attempts++;
+    }
+    
+    // Fallback: append random string
+    const randomSuffix = nanoid(6);
+    return `${cleanBaseName}#${randomSuffix}`;
   }
 }
 

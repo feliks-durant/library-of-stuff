@@ -138,6 +138,14 @@ export default function NavigationHeader({
                     </div>
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/trust-requests">
+                    <div className="flex items-center w-full">
+                      <i className="fas fa-heart mr-2"></i>
+                      Trust Requests
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <i className="fas fa-sign-out-alt mr-2"></i>
