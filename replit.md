@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### August 1, 2025 - My Items Card UI Improvements and Modal Implementation
+- Replaced Edit/Loan buttons with clickable item cards for better user experience
+- Created MyItemDetailModal component with comprehensive item management features
+- Added availability status display (Available/Unavailable based on active loans)
+- Implemented hide toggle functionality for controlling item visibility
+- Added expandable loan history section with borrower interaction
+- Fixed Trust Assignment Modal integration with proper user data fetching
+- Enhanced card hover effects with scaling animation for better visual feedback
+
 ### August 1, 2025 - Image Upload and Static File Serving Fix
 - Fixed broken image loading by correcting static file serving configuration
 - Moved upload directory from dist/public/uploads to root uploads folder

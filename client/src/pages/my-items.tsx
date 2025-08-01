@@ -31,6 +31,12 @@ export default function MyItems() {
   const [showTrustModal, setShowTrustModal] = useState(false);
   const [trustUserId, setTrustUserId] = useState<string | null>(null);
 
+  // Fetch user data for trust modal
+  const { data: trustUser } = useQuery({
+    queryKey: [`/api/users/${trustUserId}`],
+    enabled: !!trustUserId,
+  });
+
   const { data: items = [], isLoading } = useQuery<Item[]>({
     queryKey: ["/api/items/my"],
   });
@@ -273,14 +279,16 @@ export default function MyItems() {
       )}
 
       {/* Trust Assignment Modal */}
-      <TrustAssignmentModal
-        isOpen={showTrustModal}
-        onClose={() => {
-          setShowTrustModal(false);
-          setTrustUserId(null);
-        }}
-        userId={trustUserId}
-      />
+      {trustUserId && trustUser && (
+        <TrustAssignmentModal
+          isOpen={showTrustModal}
+          onClose={() => {
+            setShowTrustModal(false);
+            setTrustUserId(null);
+          }}
+          user={trustUser}
+        />
+      )}
       
       <AddItemModal
         isOpen={showAddItemModal}
