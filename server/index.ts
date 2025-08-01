@@ -37,6 +37,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Serve static files (uploaded images) BEFORE everything else
+  const path = await import("path");
+  app.use('/uploads', express.static(path.resolve("uploads")));
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

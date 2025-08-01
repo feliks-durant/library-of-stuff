@@ -23,7 +23,7 @@ import path from "path";
 import fs from "fs";
 
 // Configure multer for file uploads
-const uploadDir = path.resolve(import.meta.dirname, "../dist/public/uploads");
+const uploadDir = path.resolve("uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -45,9 +45,6 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Serve static files (uploaded images)
-  app.use('/uploads', express.static(path.resolve(import.meta.dirname, "../dist/public/uploads")));
-  
   // Auth middleware
   await setupAuth(app);
 

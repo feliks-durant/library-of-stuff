@@ -10,6 +10,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### August 1, 2025 - Image Upload and Static File Serving Fix
+- Fixed broken image loading by correcting static file serving configuration
+- Moved upload directory from dist/public/uploads to root uploads folder
+- Repositioned static file middleware before Vite middleware to prevent route conflicts
+- Verified image serving functionality with proper HTTP headers and content types
+
 ### August 1, 2025 - Item Card UI Improvements
 - Removed "Request" and "View Details" buttons from ItemCard components
 - Made entire card clickable to open item detail modal
