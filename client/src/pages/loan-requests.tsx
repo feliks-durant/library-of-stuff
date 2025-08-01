@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import NavigationHeader from "@/components/navigation-header";
 
 interface LoanRequestWithDetails {
   id: string;
@@ -110,8 +111,16 @@ export default function LoanRequestsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">Pending Loan Requests</h1>
+    <div className="min-h-screen bg-gray-50">
+      <NavigationHeader 
+        searchQuery=""
+        onSearchChange={() => {}}
+        onAddItem={() => {}}
+        onScanQR={() => {}}
+        onOpenProfile={() => {}}
+      />
+      <div className="container mx-auto p-6 max-w-4xl">
+        <h1 className="text-2xl font-bold mb-6">Pending Loan Requests</h1>
       
       {requests.length === 0 ? (
         <Card>
@@ -199,6 +208,7 @@ export default function LoanRequestsPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

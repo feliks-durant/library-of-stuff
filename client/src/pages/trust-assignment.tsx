@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import type { User } from "@shared/schema";
+import NavigationHeader from "@/components/navigation-header";
 
 export default function TrustAssignment() {
   const { userId } = useParams();
@@ -122,7 +123,14 @@ export default function TrustAssignment() {
   const description = getTrustDescription(trustLevel[0]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
+      <NavigationHeader 
+        searchQuery=""
+        onSearchChange={() => {}}
+        onAddItem={() => {}}
+        onScanQR={() => {}}
+        onOpenProfile={() => {}}
+      />
       <div className="max-w-md mx-auto p-6 h-full flex flex-col">
         <div className="flex items-center mb-8">
           <Button
