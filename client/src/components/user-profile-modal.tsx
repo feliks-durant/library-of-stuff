@@ -93,9 +93,9 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                   <h4 className="text-2xl font-semibold text-black mb-1">
                     {user.firstName} {user.lastName}
                   </h4>
-                  {user.username && user.discriminator && (
+                  {user.username && (
                     <p className="text-sm text-gray-500 mb-2">
-                      @{user.username}#{user.discriminator}
+                      @{user.username}
                     </p>
                   )}
                 </>

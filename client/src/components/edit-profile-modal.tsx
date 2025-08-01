@@ -29,7 +29,6 @@ const formSchema = updateUserProfileSchema.pick({
   firstName: true,
   lastName: true,
   username: true,
-  discriminator: true,
 }).extend({
   profileImage: z.any().optional(),
 });
@@ -50,7 +49,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
       username: user?.username ?? "",
-      discriminator: user?.discriminator ?? "",
     },
   });
 
@@ -61,7 +59,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
       if (data.firstName) formData.append("firstName", data.firstName);
       if (data.lastName) formData.append("lastName", data.lastName);
       if (data.username) formData.append("username", data.username);
-      if (data.discriminator) formData.append("discriminator", data.discriminator);
       
       if (data.profileImage?.[0]) {
         formData.append("profileImage", data.profileImage[0]);
@@ -181,42 +178,22 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="JohnDoe"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="discriminator"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Discriminator</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="1234"
-                        maxLength={4}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username (unique)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="johndoe"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

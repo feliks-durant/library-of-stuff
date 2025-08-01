@@ -151,8 +151,8 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
           {user.firstName && user.lastName ? (
             <>
               <h3 className="font-semibold text-black mb-1">{user.firstName} {user.lastName}</h3>
-              {user.username && user.discriminator && (
-                <p className="text-sm text-gray-500 mb-3">@{user.username}#{user.discriminator}</p>
+              {user.username && (
+                <p className="text-sm text-gray-500 mb-3">@{user.username}</p>
               )}
             </>
           ) : (

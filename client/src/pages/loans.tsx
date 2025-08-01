@@ -145,14 +145,12 @@ export default function LoansPage() {
       ? { 
           name: loan.lenderName, 
           username: loan.lenderUsername,
-          discriminator: loan.lenderDiscriminator,
           email: loan.lenderEmail, 
           image: loan.lenderProfileImage 
         }
       : { 
           name: loan.borrowerName, 
           username: loan.borrowerUsername,
-          discriminator: loan.borrowerDiscriminator,
           email: loan.borrowerEmail, 
           image: loan.borrowerProfileImage 
         };

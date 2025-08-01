@@ -56,7 +56,7 @@ export interface IStorage {
   updateTrustRequest(id: string, updates: UpdateTrustRequest): Promise<TrustRequest | undefined>;
   
   // Username generation
-  generateUniqueUsernameDiscriminator(baseName: string): Promise<{ username: string; discriminator: string }>;
+  generateUniqueUsername(baseName: string): Promise<string>;
   
   // Loan request operations
   createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest>;
@@ -80,15 +80,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Check if this is a new user (no username/discriminator yet)
+    // Check if this is a new user
     const existingUser = await this.getUser(userData.id!);
     
-    if (!existingUser || (!existingUser.username || !existingUser.discriminator)) {
-      // Generate username and discriminator for new users
-      const baseName = userData.email?.split('@')[0] || 'User';
-      const { username, discriminator } = await this.generateUniqueUsernameDiscriminator(baseName);
-      userData.username = username;
-      userData.discriminator = discriminator;
+    if (!existingUser && !userData.username) {
+      // Generate unique username for new users
+      const baseName = userData.firstName || userData.email?.split('@')[0] || 'user';
+      userData.username = await this.generateUniqueUsername(baseName);
     }
 
     const [user] = await db
@@ -135,7 +133,7 @@ export class DatabaseStorage implements IStorage {
         ownerFirstName: users.firstName,
         ownerLastName: users.lastName,
         ownerUsername: users.username,
-        ownerDiscriminator: users.discriminator,
+
         ownerProfileImage: users.profileImageUrl,
         userTrustLevel: trustRelationships.trustLevel,
       })
@@ -173,7 +171,6 @@ export class DatabaseStorage implements IStorage {
         firstName: item.ownerFirstName,
         lastName: item.ownerLastName,
         username: item.ownerUsername,
-        discriminator: item.ownerDiscriminator,
         profileImageUrl: item.ownerProfileImage,
       }
     })) as Item[];
@@ -282,7 +279,7 @@ export class DatabaseStorage implements IStorage {
     firstName?: string;
     lastName?: string;
     username?: string;
-    discriminator?: string;
+
     email?: string;
     profileImageUrl?: string;
     createdAt?: string;
@@ -295,7 +292,7 @@ export class DatabaseStorage implements IStorage {
         firstName: users.firstName,
         lastName: users.lastName,
         username: users.username,
-        discriminator: users.discriminator,
+
         email: users.email,
         profileImageUrl: users.profileImageUrl,
         createdAt: trustRelationships.createdAt,
@@ -311,7 +308,7 @@ export class DatabaseStorage implements IStorage {
       firstName: conn.firstName || undefined,
       lastName: conn.lastName || undefined,
       username: conn.username || undefined,
-      discriminator: conn.discriminator || undefined,
+
       email: conn.email || undefined,
       profileImageUrl: conn.profileImageUrl || undefined,
       createdAt: conn.createdAt?.toISOString() || undefined,
@@ -377,7 +374,6 @@ export class DatabaseStorage implements IStorage {
         borrowerFirstName: users.firstName,
         borrowerLastName: users.lastName,
         borrowerUsername: users.username,
-        borrowerDiscriminator: users.discriminator,
         borrowerEmail: users.email,
         borrowerProfileImage: users.profileImageUrl,
       })
@@ -466,7 +462,6 @@ export class DatabaseStorage implements IStorage {
         borrowerFirstName: users.firstName,
         borrowerLastName: users.lastName,
         borrowerUsername: users.username,
-        borrowerDiscriminator: users.discriminator,
         borrowerEmail: users.email,
         borrowerProfileImage: users.profileImageUrl,
       })
@@ -543,35 +538,40 @@ export class DatabaseStorage implements IStorage {
       );
   }
 
-  // Username generation
-  async generateUniqueUsernameDiscriminator(baseName: string): Promise<{ username: string; discriminator: string }> {
+  // Username generation (deprecated - now using unique usernames)
+  async generateUniqueUsername(baseName: string): Promise<string> {
     // Clean the base name (remove spaces, special chars, keep alphanumeric)
-    const cleanBaseName = baseName.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20) || 'User';
+    const cleanBaseName = baseName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().slice(0, 20) || 'user';
     
-    // Generate unique discriminator for this username
+    // Try the base name first
+    const existing = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, cleanBaseName));
+    
+    if (existing.length === 0) {
+      return cleanBaseName;
+    }
+    
+    // If taken, try with numbers
     let attempts = 0;
-    while (attempts < 100) {
-      const discriminator = String(Math.floor(1000 + Math.random() * 9000));
+    while (attempts < 1000) {
+      const candidate = `${cleanBaseName}${Math.floor(Math.random() * 9999)}`;
       
-      const existing = await db
+      const existingCandidate = await db
         .select({ id: users.id })
         .from(users)
-        .where(
-          and(
-            eq(users.username, cleanBaseName),
-            eq(users.discriminator, discriminator)
-          )
-        );
+        .where(eq(users.username, candidate));
       
-      if (existing.length === 0) {
-        return { username: cleanBaseName, discriminator };
+      if (existingCandidate.length === 0) {
+        return candidate;
       }
       attempts++;
     }
     
-    // Fallback: use nanoid for discriminator
-    const fallbackDiscriminator = nanoid(4);
-    return { username: cleanBaseName, discriminator: fallbackDiscriminator };
+    // Fallback: use timestamp suffix
+    const timestamp = Date.now().toString().slice(-4);
+    return `${cleanBaseName}${timestamp}`;
   }
 }
 

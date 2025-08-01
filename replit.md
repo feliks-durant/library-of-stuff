@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### August 1, 2025 - Unique Username System Implementation
+- Transitioned from Discord-style username#discriminator to unique username system
+- Enforced unique username constraint in database with automatic migration of duplicate usernames
+- Updated all UI components to display firstName/lastName in black and @username in gray
+- Removed discriminator field from all database queries and schemas
+- Updated edit profile form to show username as unique field with validation
+- Maintained @ symbol as clean username indicator without numeric discriminators
+- Both firstName/lastName and username now displayed for better user recognition
+
 ### August 1, 2025 - Search Bar and CSS Import Fixes
 - Moved search bar from NavigationHeader to Browse page only for better UX
 - Fixed CSS import order error by moving @import statements to top of index.css

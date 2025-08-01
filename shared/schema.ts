@@ -31,14 +31,11 @@ export const users = pgTable("users", {
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
-  username: varchar("username"), // Base username (can be non-unique)
-  discriminator: varchar("discriminator", { length: 4 }), // 4-digit discriminator for uniqueness
+  username: varchar("username").unique(), // Unique username, no discriminator needed
   profileImageUrl: varchar("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-  usernameDiscriminatorIdx: unique().on(table.username, table.discriminator), // Ensure username#discriminator is unique
-}));
+});
 
 // Items table
 export const items = pgTable("items", {
@@ -273,45 +270,29 @@ export type TrustRequest = typeof trustRequests.$inferSelect;
 export type InsertTrustRequest = z.infer<typeof insertTrustRequestSchema>;
 export type UpdateTrustRequest = z.infer<typeof updateTrustRequestSchema>;
 
-// Utility functions for Discord-style usernames
-export function formatUsername(user: { username?: string | null; discriminator?: string | null } | { username?: string; discriminator?: string }): string {
-  if (!user.username || !user.discriminator) {
+// Utility functions for username display
+export function formatUsername(user: { username?: string | null }): string {
+  if (!user.username) {
     return 'Unknown User';
   }
-  return `${user.username}#${user.discriminator}`;
+  return user.username;
 }
 
-// Display name priority: firstName lastName > username#discriminator > username > Unknown User
+// Display name priority: firstName lastName > username > Unknown User
 export function formatDisplayName(user: { 
   firstName?: string | null; 
   lastName?: string | null; 
   username?: string | null; 
-  discriminator?: string | null; 
 }): string {
   // First priority: firstName + lastName
   if (user.firstName && user.lastName) {
     return `${user.firstName} ${user.lastName}`;
   }
   
-  // Second priority: username#discriminator
-  if (user.username && user.discriminator) {
-    return `${user.username}#${user.discriminator}`;
-  }
-  
-  // Third priority: just username
+  // Second priority: username
   if (user.username) {
     return user.username;
   }
   
   return 'Unknown User';
-}
-
-export function generateDiscriminator(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
-}
-
-export function parseUsername(fullUsername: string): { username: string; discriminator: string } | null {
-  const match = fullUsername.match(/^(.+)#(\d{4})$/);
-  if (!match) return null;
-  return { username: match[1], discriminator: match[2] };
 }
