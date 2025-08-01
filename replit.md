@@ -10,6 +10,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### August 1, 2025 - Search Bar and CSS Import Fixes
+- Moved search bar from NavigationHeader to Browse page only for better UX
+- Fixed CSS import order error by moving @import statements to top of index.css
+- Removed "My Items" section from user profile modal per user request
+- Updated all NavigationHeader calls across pages to remove search functionality
+
 ### August 1, 2025 - Trust Request System Simplification
 - Simplified trust request flow: Users now request trust generally without specifying levels
 - Target users approve requests via Trust Assignment Modal (choose 1-5 trust level)  
