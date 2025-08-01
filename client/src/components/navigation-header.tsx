@@ -114,14 +114,7 @@ export default function NavigationHeader({
                     </div>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/loan-requests">
-                    <div className="flex items-center w-full">
-                      <i className="fas fa-inbox mr-2"></i>
-                      Loan Requests
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
+
                 <DropdownMenuItem asChild>
                   <Link href="/loans">
                     <div className="flex items-center w-full">
