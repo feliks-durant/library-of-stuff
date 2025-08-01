@@ -250,8 +250,6 @@ export default function LoansPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <NavigationHeader 
-        searchQuery=""
-        onSearchChange={() => {}}
         onAddItem={() => setShowAddItemModal(true)}
         onScanQR={() => setShowQRScanner(true)}
         onOpenProfile={() => setShowProfileModal(true)}

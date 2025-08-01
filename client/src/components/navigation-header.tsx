@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -14,16 +14,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { formatDisplayName } from "@shared/schema";
 
 interface NavigationHeaderProps {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
   onAddItem: () => void;
   onScanQR: () => void;
   onOpenProfile: () => void;
 }
 
 export default function NavigationHeader({
-  searchQuery,
-  onSearchChange,
   onAddItem,
   onScanQR,
   onOpenProfile,
@@ -48,20 +44,7 @@ export default function NavigationHeader({
                 </h1>
               </Link>
             </div>
-            
-            {/* Desktop Search Bar */}
-            <div className="hidden md:block flex-1 max-w-lg">
-              <div className="relative">
-                <Input
-                  type="search"
-                  placeholder="Search items you can borrow..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="pl-10 pr-4 border-gray-300 focus:ring-2 focus:ring-brand-blue focus:border-transparent"
-                />
-                <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              </div>
-            </div>
+
           </div>
 
           <nav className="flex items-center space-x-4">
@@ -143,19 +126,7 @@ export default function NavigationHeader({
         </div>
       </div>
 
-      {/* Mobile Search */}
-      <div className="md:hidden px-4 pb-4">
-        <div className="relative">
-          <Input
-            type="search"
-            placeholder="Search items..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 pr-4 border-gray-300 focus:ring-2 focus:ring-brand-blue focus:border-transparent"
-          />
-          <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        </div>
-      </div>
+
     </header>
   );
 }

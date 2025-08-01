@@ -7,6 +7,7 @@ import QRScannerModal from "@/components/qr-scanner-modal";
 import UserProfileModal from "@/components/user-profile-modal";
 import TrustAssignmentModal from "@/components/trust-assignment-modal";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -268,8 +269,6 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50">
         <NavigationHeader 
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
           onAddItem={() => setShowAddModal(true)}
           onScanQR={() => setShowQRModal(true)}
           onOpenProfile={() => setShowProfileModal(true)}
@@ -295,8 +294,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <NavigationHeader 
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
         onAddItem={() => setShowAddModal(true)}
         onScanQR={() => setShowQRModal(true)}
         onOpenProfile={() => setShowProfileModal(true)}
@@ -308,9 +305,23 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Discover Items You Can Borrow
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
             Browse through items shared by your trusted network. Only items you're trusted to borrow will appear.
           </p>
+          
+          {/* Search Bar */}
+          <div className="max-w-lg mx-auto">
+            <div className="relative">
+              <Input
+                type="search"
+                placeholder="Search items you can borrow..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 border-gray-300 focus:ring-2 focus:ring-brand-blue focus:border-transparent"
+              />
+              <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+          </div>
         </div>
 
         {/* Filters - only show when not searching */}
