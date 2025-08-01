@@ -56,7 +56,7 @@ export interface IStorage {
   updateTrustRequest(id: string, updates: UpdateTrustRequest): Promise<TrustRequest | undefined>;
   
   // Username generation
-  generateUniqueUsername(baseName: string): Promise<string>;
+  generateUniqueUsernameDiscriminator(baseName: string): Promise<{ username: string; discriminator: string }>;
   
   // Loan request operations
   createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest>;
@@ -80,6 +80,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    // Check if this is a new user (no username/discriminator yet)
+    const existingUser = await this.getUser(userData.id!);
+    
+    if (!existingUser || (!existingUser.username || !existingUser.discriminator)) {
+      // Generate username and discriminator for new users
+      const baseName = userData.firstName || userData.email?.split('@')[0] || 'User';
+      const { username, discriminator } = await this.generateUniqueUsernameDiscriminator(baseName);
+      userData.username = username;
+      userData.discriminator = discriminator;
+    }
+
     const [user] = await db
       .insert(users)
       .values(userData)
@@ -223,7 +234,7 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .where(
         or(
-          ilike(users.email, `%${query}%`),
+          ilike(users.username, `%${query}%`),
           ilike(users.firstName, `%${query}%`),
           ilike(users.lastName, `%${query}%`)
         )
@@ -264,6 +275,8 @@ export class DatabaseStorage implements IStorage {
   async getUserConnections(userId: string): Promise<Array<{ 
     trusteeId: string; 
     trustLevel: number; 
+    username?: string;
+    discriminator?: string;
     firstName?: string;
     lastName?: string;
     email?: string;
@@ -275,6 +288,8 @@ export class DatabaseStorage implements IStorage {
       .select({
         trusteeId: trustRelationships.trusteeId,
         trustLevel: trustRelationships.trustLevel,
+        username: users.username,
+        discriminator: users.discriminator,
         firstName: users.firstName,
         lastName: users.lastName,
         email: users.email,
@@ -289,6 +304,8 @@ export class DatabaseStorage implements IStorage {
     return connections.map(conn => ({
       trusteeId: conn.trusteeId,
       trustLevel: conn.trustLevel,
+      username: conn.username || undefined,
+      discriminator: conn.discriminator || undefined,
       firstName: conn.firstName || undefined,
       lastName: conn.lastName || undefined,
       email: conn.email || undefined,
@@ -520,40 +537,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Username generation
-  async generateUniqueUsername(baseName: string): Promise<string> {
-    // Clean the base name (remove spaces, special chars, make lowercase)
-    const cleanBaseName = baseName.toLowerCase().replace(/[^a-z0-9]/g, '');
+  async generateUniqueUsernameDiscriminator(baseName: string): Promise<{ username: string; discriminator: string }> {
+    // Clean the base name (remove spaces, special chars, keep alphanumeric)
+    const cleanBaseName = baseName.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20) || 'User';
     
-    // Try the base name first
-    const existingUser = await db
-      .select({ username: users.username })
-      .from(users)
-      .where(eq(users.username, cleanBaseName));
-    
-    if (existingUser.length === 0) {
-      return cleanBaseName;
-    }
-    
-    // Generate Discord-style username with random 4-digit number
+    // Generate unique discriminator for this username
     let attempts = 0;
     while (attempts < 100) {
-      const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit number
-      const candidateUsername = `${cleanBaseName}#${randomNum}`;
+      const discriminator = String(Math.floor(1000 + Math.random() * 9000));
       
       const existing = await db
-        .select({ username: users.username })
+        .select({ id: users.id })
         .from(users)
-        .where(eq(users.username, candidateUsername));
+        .where(
+          and(
+            eq(users.username, cleanBaseName),
+            eq(users.discriminator, discriminator)
+          )
+        );
       
       if (existing.length === 0) {
-        return candidateUsername;
+        return { username: cleanBaseName, discriminator };
       }
       attempts++;
     }
     
-    // Fallback: append random string
-    const randomSuffix = nanoid(6);
-    return `${cleanBaseName}#${randomSuffix}`;
+    // Fallback: use nanoid for discriminator
+    const fallbackDiscriminator = nanoid(4);
+    return { username: cleanBaseName, discriminator: fallbackDiscriminator };
   }
 }
 

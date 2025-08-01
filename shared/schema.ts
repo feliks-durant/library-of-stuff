@@ -273,16 +273,16 @@ export type TrustRequest = typeof trustRequests.$inferSelect;
 export type InsertTrustRequest = z.infer<typeof insertTrustRequestSchema>;
 export type UpdateTrustRequest = z.infer<typeof updateTrustRequestSchema>;
 
-// Helper functions for Discord-style usernames
-export function generateDiscriminator(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+// Utility functions for Discord-style usernames
+export function formatUsername(user: { username?: string | null; discriminator?: string | null } | { username?: string; discriminator?: string }): string {
+  if (!user.username || !user.discriminator) {
+    return 'Unknown User';
+  }
+  return `${user.username}#${user.discriminator}`;
 }
 
-export function formatUsername(username?: string, discriminator?: string): string {
-  if (!username || !discriminator) {
-    return "Unknown User";
-  }
-  return `${username}#${discriminator}`;
+export function generateDiscriminator(): string {
+  return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
 export function parseUsername(fullUsername: string): { username: string; discriminator: string } | null {
