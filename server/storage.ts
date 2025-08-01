@@ -20,7 +20,7 @@ import {
   type UpdateLoan,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, desc, ne, sql } from "drizzle-orm";
+import { eq, and, gte, desc, ne, sql, or, ilike } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 export interface IStorage {
@@ -38,6 +38,7 @@ export interface IStorage {
   deleteItem(id: string, userId: string): Promise<boolean>;
   searchItems(userId: string, query: string): Promise<Item[]>;
   searchUserItems(userId: string, query: string): Promise<Item[]>;
+  searchUsers(query: string): Promise<User[]>;
   
   // Trust operations
   setTrustLevel(trustRelationship: InsertTrustRelationship): Promise<TrustRelationship>;
@@ -199,6 +200,24 @@ export class DatabaseStorage implements IStorage {
       item.description.toLowerCase().includes(lowercaseQuery) ||
       item.category.toLowerCase().includes(lowercaseQuery)
     );
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const lowercaseQuery = query.toLowerCase();
+    
+    const searchResults = await db
+      .select()
+      .from(users)
+      .where(
+        or(
+          ilike(users.email, `%${query}%`),
+          ilike(users.firstName, `%${query}%`),
+          ilike(users.lastName, `%${query}%`)
+        )
+      )
+      .limit(20);
+    
+    return searchResults;
   }
 
   async setTrustLevel(trustRelationship: InsertTrustRelationship): Promise<TrustRelationship> {

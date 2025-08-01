@@ -7,7 +7,56 @@ import QRScannerModal from "@/components/qr-scanner-modal";
 import UserProfileModal from "@/components/user-profile-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Item } from "@shared/schema";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
+import { User as UserIcon } from 'lucide-react';
+import type { Item, User } from "@shared/schema";
+
+// User Card Component
+function UserCard({ user }: { user: User }) {
+  const [showTrustModal, setShowTrustModal] = useState(false);
+  
+  const userName = user.firstName && user.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user.email || "Unknown User";
+
+  const userInitials = user.firstName && user.lastName
+    ? `${user.firstName[0]}${user.lastName[0]}`
+    : user.email ? user.email[0].toUpperCase() : "?";
+
+  return (
+    <>
+      <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 overflow-hidden">
+        <CardContent className="p-6 text-center">
+          <Avatar className="w-16 h-16 mx-auto mb-4">
+            <AvatarImage 
+              src={user.profileImageUrl || undefined}
+              alt={userName}
+              className="object-cover"
+            />
+            <AvatarFallback className="text-lg">
+              {userInitials}
+            </AvatarFallback>
+          </Avatar>
+          
+          <h3 className="font-semibold text-gray-900 mb-2">{userName}</h3>
+          <p className="text-gray-600 text-sm mb-4">{user.email}</p>
+          
+          <Button
+            onClick={() => setShowTrustModal(true)}
+            className="w-full bg-brand-blue hover:bg-blue-700"
+          >
+            <UserIcon className="w-4 h-4 mr-2" />
+            Set Trust Level
+          </Button>
+        </CardContent>
+      </Card>
+      
+      {/* Trust Assignment Modal would go here */}
+    </>
+  );
+}
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +65,7 @@ export default function Home() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [searchTab, setSearchTab] = useState("items");
 
   const { data: items = [], isLoading } = useQuery<Item[]>({
     queryKey: ["/api/items"],
@@ -27,6 +77,15 @@ export default function Home() {
     retry: false,
     onError: (error) => {
       console.error('Search error:', error);
+    }
+  });
+
+  const { data: userSearchResults = [], error: userSearchError } = useQuery<User[]>({
+    queryKey: ["/api/users/search", { q: searchQuery }],
+    enabled: searchQuery.length > 0,
+    retry: false,
+    onError: (error) => {
+      console.error('User search error:', error);
     }
   });
 
@@ -135,8 +194,48 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Items Grid */}
-        {sortedItems.length === 0 ? (
+        {/* Search Results or Items Grid */}
+        {searchQuery ? (
+          // Show search results with tabs
+          <Tabs value={searchTab} onValueChange={setSearchTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="items">
+                Items ({searchResults.length})
+              </TabsTrigger>
+              <TabsTrigger value="users">
+                Users ({userSearchResults.length})
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="items" className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {searchResults.map((item) => (
+                  <ItemCard key={item.id} item={item} />
+                ))}
+              </div>
+              {searchResults.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">No items found for "{searchQuery}"</p>
+                  <p className="text-gray-400 mt-2">Try a different search term.</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="users" className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {userSearchResults.map((user) => (
+                  <UserCard key={user.id} user={user} />
+                ))}
+              </div>
+              {userSearchResults.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">No users found for "{searchQuery}"</p>
+                  <p className="text-gray-400 mt-2">Try a different search term.</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        ) : sortedItems.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
               <i className="fas fa-boxes text-gray-400 text-2xl"></i>

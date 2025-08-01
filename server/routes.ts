@@ -80,6 +80,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/users/search', isAuthenticated, async (req: any, res) => {
+    try {
+      const query = req.query.q as string;
+      
+      console.log('User search request received:', { query, queryParams: req.query });
+      
+      if (!query || query.trim() === '') {
+        console.log('Empty search query, returning empty array');
+        return res.json([]);
+      }
+
+      const users = await storage.searchUsers(query);
+      console.log('User search results:', users.length, 'users found for query:', query);
+      res.json(users);
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ message: "Failed to search users" });
+    }
+  });
+
   app.get('/api/items', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
