@@ -31,8 +31,8 @@ export default function Home() {
   });
 
   // Debug logging
-  console.log('Search query:', searchQuery);
   if (searchQuery.length > 0) {
+    console.log('Search query:', searchQuery);
     console.log('Search results:', searchResults);
     console.log('Search error:', searchError);
   }

@@ -187,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const items = await storage.searchItems(userId, query);
-      console.log('Search results:', items.length, 'items found');
+      console.log('Search results:', items.length, 'items found for query:', query);
       res.json(items);
     } catch (error) {
       console.error("Error searching items:", error);
