@@ -736,11 +736,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       
       // Get all loans for this item (both active and completed)
-      const loanHistory = await db
-        .select()
-        .from(loans)
-        .where(eq(loans.itemId, itemId))
-        .orderBy(desc(loans.startDate));
+      const loanHistory = await storage.getLoansForItem(itemId);
       
       res.json(loanHistory);
     } catch (error) {

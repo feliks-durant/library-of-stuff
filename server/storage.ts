@@ -69,6 +69,7 @@ export interface IStorage {
   createLoan(loan: InsertLoan): Promise<Loan>;
   getLoansForUser(userId: string): Promise<Loan[]>;
   getLoansForOwner(ownerId: string): Promise<Loan[]>;
+  getLoansForItem(itemId: string): Promise<Loan[]>;
   updateLoan(id: string, updates: UpdateLoan): Promise<Loan | undefined>;
   getActiveLoanForItem(itemId: string): Promise<Loan | undefined>;
 }
@@ -484,6 +485,14 @@ export class DatabaseStorage implements IStorage {
       .where(eq(loans.id, id))
       .returning();
     return updatedLoan;
+  }
+
+  async getLoansForItem(itemId: string): Promise<Loan[]> {
+    return await db
+      .select()
+      .from(loans)
+      .where(eq(loans.itemId, itemId))
+      .orderBy(desc(loans.startDate));
   }
 
   async getActiveLoanForItem(itemId: string): Promise<Loan | undefined> {

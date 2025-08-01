@@ -186,7 +186,7 @@ export function MyItemDetailModal({
               disabled={isUnavailable}
             >
               <Users className="h-4 w-4" />
-              {isUnavailable ? "Item Loaned Out" : "Manage Loans"}
+              {isUnavailable ? "Item Loaned Out" : "Loan Item"}
             </Button>
           </div>
 
