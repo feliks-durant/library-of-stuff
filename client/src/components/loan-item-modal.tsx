@@ -99,10 +99,17 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form validation:', {
+      startDate,
+      endDate,
+      selectedBorrower,
+      searchQuery
+    });
+    
     if (!startDate || !endDate || !selectedBorrower) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: `Please fill in all required fields. Missing: ${!startDate ? 'Start Date ' : ''}${!endDate ? 'End Date ' : ''}${!selectedBorrower ? 'Borrower' : ''}`,
         variant: "destructive",
       });
       return;
