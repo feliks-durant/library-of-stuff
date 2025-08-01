@@ -350,7 +350,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/loan-requests', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const validatedData = insertLoanRequestSchema.parse(req.body);
+      console.log('Raw request body:', req.body);
+      
+      // Convert date strings to Date objects before validation
+      const bodyWithDates = {
+        ...req.body,
+        requestedStartDate: new Date(req.body.requestedStartDate),
+        requestedEndDate: new Date(req.body.requestedEndDate)
+      };
+      
+      const validatedData = insertLoanRequestSchema.parse(bodyWithDates);
       
       // Check if item exists and user has access to it
       const items = await storage.getVisibleItems(userId);
