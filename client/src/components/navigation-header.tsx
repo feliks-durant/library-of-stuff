@@ -126,8 +126,8 @@ export default function NavigationHeader({
                 <DropdownMenuItem asChild>
                   <Link href="/trust-requests">
                     <div className="flex items-center w-full">
-                      <i className="fas fa-heart mr-2"></i>
-                      Trust Requests
+                      <i className="fas fa-users mr-2"></i>
+                      My Connections
                     </div>
                   </Link>
                 </DropdownMenuItem>
