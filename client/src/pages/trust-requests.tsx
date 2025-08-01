@@ -14,6 +14,9 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { useAuth } from "@/hooks/useAuth";
 import NavigationHeader from "@/components/navigation-header";
 import TrustAssignmentModal from "@/components/trust-assignment-modal";
+import AddItemModal from "@/components/add-item-modal";
+import QRScannerModal from "@/components/qr-scanner-modal";
+import UserProfileModal from "@/components/user-profile-modal";
 import { apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
 import { formatDisplayName } from "@shared/schema";
@@ -54,6 +57,9 @@ export default function MyConnectionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [activeTab, setActiveTab] = useState("requests");
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -174,9 +180,9 @@ export default function MyConnectionsPage() {
         <NavigationHeader 
           searchQuery=""
           onSearchChange={() => {}}
-          onAddItem={() => {}}
-          onScanQR={() => {}}
-          onOpenProfile={() => {}}
+          onAddItem={() => setShowAddItemModal(true)}
+          onScanQR={() => setShowQRScanner(true)}
+          onOpenProfile={() => setShowProfileModal(true)}
         />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center py-12">
@@ -195,9 +201,9 @@ export default function MyConnectionsPage() {
       <NavigationHeader 
         searchQuery=""
         onSearchChange={() => {}}
-        onAddItem={() => {}}
-        onScanQR={() => {}}
-        onOpenProfile={() => {}}
+        onAddItem={() => setShowAddItemModal(true)}
+        onScanQR={() => setShowQRScanner(true)}
+        onOpenProfile={() => setShowProfileModal(true)}
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -408,6 +414,21 @@ export default function MyConnectionsPage() {
           onTrustAssigned={handleTrustAssigned}
         />
       )}
+      
+      <AddItemModal
+        isOpen={showAddItemModal}
+        onClose={() => setShowAddItemModal(false)}
+      />
+      
+      <QRScannerModal
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+      />
+      
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </div>
   );
 }

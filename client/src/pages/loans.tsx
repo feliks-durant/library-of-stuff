@@ -9,8 +9,11 @@ import { format, differenceInDays } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import NavigationHeader from "@/components/navigation-header";
+import AddItemModal from "@/components/add-item-modal";
+import QRScannerModal from "@/components/qr-scanner-modal";
+import UserProfileModal from "@/components/user-profile-modal";
 import { apiRequest } from "@/lib/queryClient";
 import { formatDisplayName } from "@shared/schema";
 
@@ -44,6 +47,9 @@ export default function LoansPage() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
   const queryClient = useQueryClient();
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Fetch pending loan requests
   const { data: loanRequests = [], isLoading: requestsLoading } = useQuery<any[]>({
@@ -246,9 +252,9 @@ export default function LoansPage() {
       <NavigationHeader 
         searchQuery=""
         onSearchChange={() => {}}
-        onAddItem={() => {}}
-        onScanQR={() => {}}
-        onOpenProfile={() => {}}
+        onAddItem={() => setShowAddItemModal(true)}
+        onScanQR={() => setShowQRScanner(true)}
+        onOpenProfile={() => setShowProfileModal(true)}
       />
       <div className="container mx-auto p-6 max-w-4xl">
         <h1 className="text-2xl font-bold mb-6">Loans & Requests</h1>
@@ -418,6 +424,21 @@ export default function LoansPage() {
         </TabsContent>
         </Tabs>
       </div>
+      
+      <AddItemModal
+        isOpen={showAddItemModal}
+        onClose={() => setShowAddItemModal(false)}
+      />
+      
+      <QRScannerModal
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+      />
+      
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </div>
   );
 }

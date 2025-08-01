@@ -4,6 +4,9 @@ import { Link } from "wouter";
 import NavigationHeader from "@/components/navigation-header";
 import EditItemModal from "@/components/edit-item-modal";
 import { LoanItemModal } from "@/components/loan-item-modal";
+import AddItemModal from "@/components/add-item-modal";
+import QRScannerModal from "@/components/qr-scanner-modal";
+import UserProfileModal from "@/components/user-profile-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +19,9 @@ export default function MyItems() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const { data: items = [], isLoading } = useQuery<Item[]>({
     queryKey: ["/api/items/my"],
@@ -49,9 +55,9 @@ export default function MyItems() {
         <NavigationHeader 
           searchQuery=""
           onSearchChange={() => {}}
-          onAddItem={() => {}}
-          onScanQR={() => {}}
-          onOpenProfile={() => {}}
+          onAddItem={() => setShowAddItemModal(true)}
+          onScanQR={() => setShowQRScanner(true)}
+          onOpenProfile={() => setShowProfileModal(true)}
         />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -76,9 +82,9 @@ export default function MyItems() {
       <NavigationHeader 
         searchQuery=""
         onSearchChange={() => {}}
-        onAddItem={() => {}}
-        onScanQR={() => {}}
-        onOpenProfile={() => {}}
+        onAddItem={() => setShowAddItemModal(true)}
+        onScanQR={() => setShowQRScanner(true)}
+        onOpenProfile={() => setShowProfileModal(true)}
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -235,6 +241,21 @@ export default function MyItems() {
         isOpen={!!editingItemId}
         onClose={() => setEditingItemId(null)}
         itemId={editingItemId}
+      />
+      
+      <AddItemModal
+        isOpen={showAddItemModal}
+        onClose={() => setShowAddItemModal(false)}
+      />
+      
+      <QRScannerModal
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+      />
+      
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
       />
     </div>
   );
