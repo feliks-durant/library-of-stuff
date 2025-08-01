@@ -162,10 +162,12 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
                   placeholder="Search by name or email to select borrower..."
                   value={searchQuery}
                   onChange={(e) => {
-                    setSearchQuery(e.target.value);
+                    const newValue = e.target.value;
+                    setSearchQuery(newValue);
                     setShowDropdown(true);
-                    // Clear selection if user is typing new search
-                    if (e.target.value !== searchQuery) {
+                    // Only clear selection if user manually clears the search or types something different from selected user
+                    if (newValue === "" || (selectedBorrower && newValue !== searchQuery)) {
+                      console.log('Clearing selectedBorrower due to text change');
                       setSelectedBorrower("");
                     }
                   }}
@@ -187,6 +189,7 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
                         key={user.id}
                         className="flex items-center gap-3 p-3 hover:bg-accent cursor-pointer border-b last:border-b-0"
                         onClick={() => {
+                          console.log('Selecting user:', user.id, user);
                           setSelectedBorrower(user.id);
                           setSearchQuery(user.firstName && user.lastName ? 
                             `${user.firstName} ${user.lastName}` : 
