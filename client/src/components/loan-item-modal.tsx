@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -32,8 +32,22 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
   const [endDate, setEndDate] = useState<Date>();
   const [selectedBorrower, setSelectedBorrower] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Fetch user connections for borrower selection
   const { data: connections = [] } = useQuery<User[]>({
@@ -41,10 +55,15 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
     enabled: open,
   });
 
-  const filteredConnections = connections.filter((user: User) => 
-    user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredConnections = connections.filter((user: User) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      user.firstName?.toLowerCase().includes(query) ||
+      user.lastName?.toLowerCase().includes(query) ||
+      user.username?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query)
+    );
+  });
 
   const createLoanMutation = useMutation({
     mutationFn: async (data: {
@@ -129,53 +148,70 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
           
           <div className="space-y-2">
             <Label>Borrower *</Label>
-            <div className="space-y-2">
+            <div ref={searchRef} className="relative">
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by name or email..."
+                  placeholder="Search by name or email to select borrower..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowDropdown(true);
+                    // Clear selection if user is typing new search
+                    if (e.target.value !== searchQuery) {
+                      setSelectedBorrower("");
+                    }
+                  }}
+                  onFocus={() => setShowDropdown(true)}
                   className="pl-8"
                 />
               </div>
-              <Select value={selectedBorrower} onValueChange={setSelectedBorrower}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a person to lend to" />
-                </SelectTrigger>
-                <SelectContent>
+              
+              {/* Dropdown results that appear when typing */}
+              {showDropdown && searchQuery && (
+                <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                   {filteredConnections.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground">
-                      {searchQuery ? "No matching connections" : "No trusted connections found"}
+                    <div className="p-3 text-sm text-muted-foreground">
+                      No matching connections found
                     </div>
                   ) : (
                     filteredConnections.map((user: User) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        <div className="flex items-center gap-2">
-                          {user.profileImageUrl && (
-                            <img 
-                              src={user.profileImageUrl} 
-                              alt=""
-                              className="w-6 h-6 rounded-full object-cover"
-                            />
-                          )}
-                          <div>
-                            <div className="font-medium">
-                              {user.username && user.discriminator 
-                                ? `${user.username}#${user.discriminator}`
-                                : user.email
-                              }
-                            </div>
-                            {user.username && user.discriminator && (
-                              <div className="text-xs text-muted-foreground">{user.email}</div>
-                            )}
+                      <div
+                        key={user.id}
+                        className="flex items-center gap-3 p-3 hover:bg-accent cursor-pointer border-b last:border-b-0"
+                        onClick={() => {
+                          setSelectedBorrower(user.id);
+                          setSearchQuery(user.firstName && user.lastName ? 
+                            `${user.firstName} ${user.lastName}` : 
+                            user.email || '');
+                          setShowDropdown(false);
+                        }}
+                      >
+                        {user.profileImageUrl && (
+                          <img 
+                            src={user.profileImageUrl} 
+                            alt=""
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <div className="font-medium">
+                            {user.firstName && user.lastName ? 
+                              `${user.firstName} ${user.lastName}` : 
+                              user.email
+                            }
                           </div>
+                          {user.username && (
+                            <div className="text-xs text-muted-foreground">
+                              @{user.username}
+                            </div>
+                          )}
                         </div>
-                      </SelectItem>
+                      </div>
                     ))
                   )}
-                </SelectContent>
-              </Select>
+                </div>
+              )}
             </div>
           </div>
           
