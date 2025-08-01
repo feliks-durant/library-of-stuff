@@ -507,7 +507,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
-      const validatedData = updateLoanSchema.parse(req.body);
+      
+      // Manual validation and conversion instead of using schema to avoid date issues
+      const updateData: any = {};
+      
+      if (req.body.status) {
+        updateData.status = req.body.status;
+      }
+      
+      if (req.body.actualEndDate) {
+        updateData.actualEndDate = new Date(req.body.actualEndDate);
+      }
+      
+      if (req.body.notes !== undefined) {
+        updateData.notes = req.body.notes;
+      }
       
       // Get the loan to check ownership (either borrower or lender)
       const borrowedLoans = await storage.getLoansForUser(userId);
@@ -518,7 +532,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Loan not found" });
       }
       
-      const updatedLoan = await storage.updateLoan(id, validatedData);
+      const updatedLoan = await storage.updateLoan(id, updateData);
       res.json(updatedLoan);
     } catch (error) {
       console.error("Error updating loan:", error);
