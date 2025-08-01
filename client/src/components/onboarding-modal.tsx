@@ -30,8 +30,8 @@ const onboardingSchema = z.object({
   username: z.string()
     .trim()
     .min(3, "Username must be at least 3 characters")
-    .max(20, "Username must be no more than 20 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores")
+    .max(30, "Username must be no more than 30 characters")
+    .regex(/^[a-zA-Z0-9._-]+$/, "Username can only contain letters, numbers, periods, dashes, and underscores")
     .toLowerCase(),
 });
 
@@ -121,7 +121,7 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     setUsernameStatus('idle');
 
     // Only check if username meets minimum requirements
-    if (value.length >= 3 && /^[a-zA-Z0-9_]+$/.test(value)) {
+    if (value.length >= 3 && value.length <= 30 && /^[a-zA-Z0-9._-]+$/.test(value)) {
       setUsernameStatus('checking');
       
       // Debounce the check

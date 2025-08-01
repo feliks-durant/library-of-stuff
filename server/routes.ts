@@ -17,7 +17,7 @@ import {
   users
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -75,19 +75,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cleanUsername = username.toLowerCase().trim();
       
       // Check basic validation
-      if (cleanUsername.length < 3 || cleanUsername.length > 20) {
+      if (cleanUsername.length < 3 || cleanUsername.length > 30) {
         return res.json({ available: false, reason: "Invalid length" });
       }
 
-      if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+      if (!/^[a-zA-Z0-9._-]+$/.test(cleanUsername)) {
         return res.json({ available: false, reason: "Invalid characters" });
       }
 
-      // Check if username exists
+      // Check if username exists (case-insensitive)
       const existingUser = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.username, cleanUsername));
+        .where(sql`LOWER(${users.username}) = LOWER(${cleanUsername})`);
 
       res.json({ available: existingUser.length === 0 });
     } catch (error) {
@@ -110,19 +110,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cleanUsername = username.toLowerCase().trim();
 
       // Final username validation
-      if (cleanUsername.length < 3 || cleanUsername.length > 20) {
-        return res.status(400).json({ message: "Username must be 3-20 characters" });
+      if (cleanUsername.length < 3 || cleanUsername.length > 30) {
+        return res.status(400).json({ message: "Username must be 3-30 characters" });
       }
 
-      if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
-        return res.status(400).json({ message: "Username can only contain letters, numbers, and underscores" });
+      if (!/^[a-zA-Z0-9._-]+$/.test(cleanUsername)) {
+        return res.status(400).json({ message: "Username can only contain letters, numbers, periods, dashes, and underscores" });
       }
 
-      // Check availability one more time
+      // Check availability one more time (case-insensitive)
       const existingUser = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.username, cleanUsername));
+        .where(sql`LOWER(${users.username}) = LOWER(${cleanUsername})`);
 
       if (existingUser.length > 0) {
         return res.status(400).json({ message: "Username is already taken" });

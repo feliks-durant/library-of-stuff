@@ -545,14 +545,14 @@ export class DatabaseStorage implements IStorage {
 
   // Username generation (deprecated - now using unique usernames)
   async generateUniqueUsername(baseName: string): Promise<string> {
-    // Clean the base name (remove spaces, special chars, keep alphanumeric)
-    const cleanBaseName = baseName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().slice(0, 20) || 'user';
+    // Clean the base name to only contain allowed characters (letters, numbers, periods, dashes, underscores)
+    const cleanBaseName = baseName.replace(/[^a-zA-Z0-9._-]/g, '').toLowerCase().slice(0, 25) || 'user';
     
-    // Try the base name first
+    // Try the base name first (case-insensitive check)
     const existing = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.username, cleanBaseName));
+      .where(sql`LOWER(${users.username}) = LOWER(${cleanBaseName})`);
     
     if (existing.length === 0) {
       return cleanBaseName;
@@ -561,12 +561,19 @@ export class DatabaseStorage implements IStorage {
     // If taken, try with numbers
     let attempts = 0;
     while (attempts < 1000) {
-      const candidate = `${cleanBaseName}${Math.floor(Math.random() * 9999)}`;
+      let candidate = `${cleanBaseName}${Math.floor(Math.random() * 9999)}`;
+      
+      // Respect 30 character limit
+      if (candidate.length > 30) {
+        const maxBaseLength = 30 - 4; // Reserve 4 chars for number
+        const truncatedBase = cleanBaseName.slice(0, maxBaseLength);
+        candidate = `${truncatedBase}${Math.floor(Math.random() * 9999)}`;
+      }
       
       const existingCandidate = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.username, candidate));
+        .where(sql`LOWER(${users.username}) = LOWER(${candidate})`);
       
       if (existingCandidate.length === 0) {
         return candidate;
@@ -576,7 +583,9 @@ export class DatabaseStorage implements IStorage {
     
     // Fallback: use timestamp suffix
     const timestamp = Date.now().toString().slice(-4);
-    return `${cleanBaseName}${timestamp}`;
+    const maxBaseLength = 30 - timestamp.length;
+    const truncatedBase = cleanBaseName.slice(0, maxBaseLength);
+    return `${truncatedBase}${timestamp}`;
   }
 }
 
