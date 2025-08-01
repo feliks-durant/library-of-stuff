@@ -15,7 +15,7 @@ import { User as UserIcon } from 'lucide-react';
 import type { Item, User } from "@shared/schema";
 
 // User Card Component
-function UserCard({ user }: { user: User }) {
+function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel?: number }) {
   const [showTrustModal, setShowTrustModal] = useState(false);
   
   const userName = user.firstName && user.lastName
@@ -42,14 +42,21 @@ function UserCard({ user }: { user: User }) {
           </Avatar>
           
           <h3 className="font-semibold text-gray-900 mb-2">{userName}</h3>
-          <p className="text-gray-600 text-sm mb-4">{user.email}</p>
+          <p className="text-gray-600 text-sm mb-2">{user.email}</p>
+          {existingTrustLevel && (
+            <div className="mb-3">
+              <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                Trust Level: {existingTrustLevel}
+              </span>
+            </div>
+          )}
           
           <Button
             onClick={() => setShowTrustModal(true)}
             className="w-full bg-brand-blue hover:bg-blue-700"
           >
             <UserIcon className="w-4 h-4 mr-2" />
-            Set Trust Level
+            {existingTrustLevel ? 'Update Trust Level' : 'Set Trust Level'}
           </Button>
         </CardContent>
       </Card>
@@ -71,41 +78,36 @@ export default function Home() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [searchTab, setSearchTab] = useState("items");
+  const [relationshipFilter, setRelationshipFilter] = useState("all");
 
   const { data: items = [], isLoading } = useQuery<Item[]>({
     queryKey: ["/api/items"],
   });
 
-  const { data: searchResults = [], error: searchError } = useQuery<Item[]>({
+  const { data: searchResults = [] } = useQuery<Item[]>({
     queryKey: ["/api/items/search", { q: searchQuery }],
     enabled: searchQuery.length > 0,
     retry: false,
-    onError: (error) => {
-      console.error('Search error:', error);
-    }
   });
 
-  const { data: userSearchResults = [], error: userSearchError } = useQuery<User[]>({
+  const { data: userSearchResults = [] } = useQuery<User[]>({
     queryKey: ["/api/users/search", { q: searchQuery }],
     enabled: searchQuery.length > 0,
     retry: false,
-    onError: (error) => {
-      console.error('User search error:', error);
-    }
   });
 
-  // Debug logging
-  if (searchQuery.length > 0) {
-    console.log('Search query:', searchQuery);
-    console.log('Search results:', searchResults);
-    console.log('Search error:', searchError);
-  }
+  // Get user connections to show existing trust levels
+  const { data: userConnections = [] } = useQuery<Array<{ trusteeId: string; trustLevel: number }>>({
+    queryKey: ["/api/users/connections"],
+    enabled: searchTab === "users",
+  });
 
+  // Process and sort items
   const filteredItems = searchQuery ? searchResults : items;
-
+  
   const categoryFilteredItems = categoryFilter === "all" 
     ? filteredItems 
-    : filteredItems.filter(item => item.category === categoryFilter);
+    : filteredItems.filter((item: Item) => item.category === categoryFilter);
 
   const sortedItems = [...categoryFilteredItems].sort((a, b) => {
     if (sortBy === "alphabetical") {
@@ -113,6 +115,32 @@ export default function Home() {
     }
     return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
   });
+
+  // Process and sort users with existing trust levels
+  const usersWithTrust = userSearchResults.map((user: User) => {
+    const connection = userConnections.find((conn: any) => conn.trusteeId === user.id);
+    return {
+      ...user,
+      existingTrustLevel: connection?.trustLevel
+    };
+  });
+
+  // Sort users: those with existing relationships first
+  const sortedUsers = [...usersWithTrust].sort((a, b) => {
+    if (a.existingTrustLevel && !b.existingTrustLevel) return -1;
+    if (!a.existingTrustLevel && b.existingTrustLevel) return 1;
+    if (a.existingTrustLevel && b.existingTrustLevel) {
+      return b.existingTrustLevel - a.existingTrustLevel; // Higher trust first
+    }
+    return 0; // Keep original order for users without trust
+  });
+
+  // Filter users based on relationship filter
+  const filteredUsers = relationshipFilter === "all" 
+    ? sortedUsers 
+    : relationshipFilter === "existing" 
+      ? sortedUsers.filter(user => user.existingTrustLevel)
+      : sortedUsers.filter(user => !user.existingTrustLevel);
 
   if (isLoading) {
     return (
@@ -163,41 +191,43 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="mb-6 flex flex-wrap items-center justify-between">
-          <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="tools">Tools & Hardware</SelectItem>
-                <SelectItem value="electronics">Electronics</SelectItem>
-                <SelectItem value="sports">Sports & Recreation</SelectItem>
-                <SelectItem value="household">Household Items</SelectItem>
-                <SelectItem value="vehicles">Vehicles</SelectItem>
-                <SelectItem value="books">Books & Media</SelectItem>
-                <SelectItem value="clothing">Clothing & Accessories</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Filters - only show when not searching */}
+        {!searchQuery && (
+          <div className="mb-6 flex flex-wrap items-center justify-between">
+            <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="tools">Tools & Hardware</SelectItem>
+                  <SelectItem value="electronics">Electronics</SelectItem>
+                  <SelectItem value="sports">Sports & Recreation</SelectItem>
+                  <SelectItem value="household">Household Items</SelectItem>
+                  <SelectItem value="vehicles">Vehicles</SelectItem>
+                  <SelectItem value="books">Books & Media</SelectItem>
+                  <SelectItem value="clothing">Clothing & Accessories</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recent">Recently Added</SelectItem>
-                <SelectItem value="alphabetical">Alphabetical</SelectItem>
-              </SelectContent>
-            </Select>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Recently Added</SelectItem>
+                  <SelectItem value="alphabetical">Alphabetical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="text-sm text-gray-600">
+              {sortedItems.length} items available to borrow
+            </div>
           </div>
-          
-          <div className="text-sm text-gray-600">
-            {sortedItems.length} items available to borrow
-          </div>
-        </div>
+        )}
 
         {/* Search Results or Items Grid */}
         {searchQuery ? (
@@ -205,37 +235,93 @@ export default function Home() {
           <Tabs value={searchTab} onValueChange={setSearchTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="items">
-                Items ({searchResults.length})
+                Items ({searchResults?.length || 0})
               </TabsTrigger>
               <TabsTrigger value="users">
-                Users ({userSearchResults.length})
+                Users ({userSearchResults?.length || 0})
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="items" className="space-y-6">
+              {/* Item-specific filters */}
+              <div className="mb-6 flex flex-wrap items-center justify-between">
+                <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="tools">Tools & Hardware</SelectItem>
+                      <SelectItem value="electronics">Electronics</SelectItem>
+                      <SelectItem value="sports">Sports & Recreation</SelectItem>
+                      <SelectItem value="household">Household Items</SelectItem>
+                      <SelectItem value="vehicles">Vehicles</SelectItem>
+                      <SelectItem value="books">Books & Media</SelectItem>
+                      <SelectItem value="clothing">Clothing & Accessories</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="recent">Recently Added</SelectItem>
+                      <SelectItem value="alphabetical">Alphabetical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="text-sm text-gray-600">
+                  {sortedItems.length} items available to borrow
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {searchResults.map((item) => (
+                {sortedItems.map((item) => (
                   <ItemCard key={item.id} item={item} />
                 ))}
               </div>
-              {searchResults.length === 0 && (
+              {sortedItems.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">No items found for "{searchQuery}"</p>
-                  <p className="text-gray-400 mt-2">Try a different search term.</p>
+                  <p className="text-gray-400 mt-2">Try a different search term or adjust your filters.</p>
                 </div>
               )}
             </TabsContent>
             
             <TabsContent value="users" className="space-y-6">
+              {/* User-specific filters */}
+              <div className="mb-6 flex flex-wrap items-center justify-between">
+                <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                  <Select value={relationshipFilter} onValueChange={setRelationshipFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="All Users" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Users</SelectItem>
+                      <SelectItem value="existing">Existing Relationships</SelectItem>
+                      <SelectItem value="new">New Users</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="text-sm text-gray-600">
+                  {filteredUsers.length} users found
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {userSearchResults.map((user) => (
-                  <UserCard key={user.id} user={user} />
+                {filteredUsers.map((user) => (
+                  <UserCard key={user.id} user={user} existingTrustLevel={user.existingTrustLevel} />
                 ))}
               </div>
-              {userSearchResults.length === 0 && (
+              {filteredUsers.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">No users found for "{searchQuery}"</p>
-                  <p className="text-gray-400 mt-2">Try a different search term.</p>
+                  <p className="text-gray-400 mt-2">Try a different search term or adjust your filter.</p>
                 </div>
               )}
             </TabsContent>

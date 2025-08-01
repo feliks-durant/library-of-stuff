@@ -263,6 +263,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/users/connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const trusterId = req.user.claims.sub;
+      const connections = await storage.getUserConnections(trusterId);
+      res.json(connections);
+    } catch (error) {
+      console.error("Error getting user connections:", error);
+      res.status(500).json({ message: "Failed to get user connections" });
+    }
+  });
+
   // User routes
   app.get('/api/users/:id', isAuthenticated, async (req: any, res) => {
     try {

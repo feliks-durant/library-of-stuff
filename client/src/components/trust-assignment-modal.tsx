@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,21 @@ export default function TrustAssignmentModal({ isOpen, onClose, user }: TrustAss
   const [trustLevel, setTrustLevel] = useState([3]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Get existing trust level
+  const { data: existingTrust } = useQuery<{ trustLevel: number }>({
+    queryKey: ["/api/trust", user.id],
+    enabled: isOpen,
+  });
+
+  // Update trust level when modal opens or existing trust changes
+  useEffect(() => {
+    if (existingTrust?.trustLevel) {
+      setTrustLevel([existingTrust.trustLevel]);
+    } else {
+      setTrustLevel([3]); // Default to 3 if no existing trust
+    }
+  }, [existingTrust, isOpen]);
 
   const userName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`

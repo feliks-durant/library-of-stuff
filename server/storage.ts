@@ -43,7 +43,7 @@ export interface IStorage {
   // Trust operations
   setTrustLevel(trustRelationship: InsertTrustRelationship): Promise<TrustRelationship>;
   getTrustLevel(trusterId: string, trusteeId: string): Promise<number>;
-  getUserConnections(userId: string): Promise<User[]>;
+  getUserConnections(userId: string): Promise<Array<{ trusteeId: string; trustLevel: number }>>;
   
   // Loan request operations
   createLoanRequest(loanRequest: InsertLoanRequest): Promise<LoanRequest>;
@@ -248,20 +248,14 @@ export class DatabaseStorage implements IStorage {
     return trust?.trustLevel || 0;
   }
 
-  async getUserConnections(userId: string): Promise<User[]> {
-    // Get users who have trust relationships with this user
+  async getUserConnections(userId: string): Promise<Array<{ trusteeId: string; trustLevel: number }>> {
+    // Get trust relationships where this user is the truster
     const connections = await db
       .select({
-        id: users.id,
-        email: users.email,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        profileImageUrl: users.profileImageUrl,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
+        trusteeId: trustRelationships.trusteeId,
+        trustLevel: trustRelationships.trustLevel,
       })
       .from(trustRelationships)
-      .innerJoin(users, eq(trustRelationships.trusteeId, users.id))
       .where(eq(trustRelationships.trusterId, userId));
     
     return connections;
