@@ -21,6 +21,7 @@ export default function MyItems() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+  const [visibilityFilter, setVisibilityFilter] = useState("all");
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [loaningItemId, setLoaningItemId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
@@ -52,7 +53,13 @@ export default function MyItems() {
     ? filteredItems 
     : filteredItems.filter(item => item.category === categoryFilter);
 
-  const sortedItems = [...categoryFilteredItems].sort((a, b) => {
+  const visibilityFilteredItems = visibilityFilter === "all"
+    ? categoryFilteredItems
+    : visibilityFilter === "visible"
+      ? categoryFilteredItems.filter(item => !item.isHidden)
+      : categoryFilteredItems.filter(item => item.isHidden);
+
+  const sortedItems = [...visibilityFilteredItems].sort((a, b) => {
     if (sortBy === "alphabetical") {
       return a.title.localeCompare(b.title);
     }
@@ -173,10 +180,26 @@ export default function MyItems() {
                   <SelectItem value="alphabetical">Alphabetical</SelectItem>
                 </SelectContent>
               </Select>
+
+              <Select value={visibilityFilter} onValueChange={setVisibilityFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="All Items" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Items</SelectItem>
+                  <SelectItem value="visible">Visible Items</SelectItem>
+                  <SelectItem value="hidden">Hidden Items</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="text-sm text-gray-600">
               {sortedItems.length} items
+              {visibilityFilter === "all" && items.filter(item => item.isHidden).length > 0 && (
+                <span className="ml-2 text-gray-500">
+                  ({items.filter(item => item.isHidden).length} hidden)
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -208,7 +231,7 @@ export default function MyItems() {
             {sortedItems.map((item) => (
               <Card 
                 key={item.id} 
-                className="bg-white rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 border border-gray-200 overflow-hidden cursor-pointer"
+                className="bg-white rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 border border-gray-200 overflow-hidden cursor-pointer relative"
                 onClick={() => handleItemClick(item)}
               >
                 {/* Item Image */}
@@ -226,10 +249,26 @@ export default function MyItems() {
                       <i className="fas fa-box text-gray-400 text-4xl"></i>
                     </div>
                   )}
+                  
+                  {/* Hidden Item Indicator */}
+                  {item.isHidden && (
+                    <div className="absolute top-2 right-2">
+                      <Badge variant="secondary" className="bg-gray-600 text-white">
+                        Hidden
+                      </Badge>
+                    </div>
+                  )}
                 </div>
                 
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2">{item.title}</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                    {item.isHidden && (
+                      <Badge variant="outline" className="text-xs border-gray-400 text-gray-600">
+                        Hidden
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                     {item.description}
                   </p>
