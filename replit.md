@@ -8,6 +8,16 @@ Library of Stuff is a trust-based item sharing platform that allows users to sha
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### August 1, 2025 - Trust Request System Simplification
+- Simplified trust request flow: Users now request trust generally without specifying levels
+- Target users approve requests via Trust Assignment Modal (choose 1-5 trust level)  
+- Removed requestedLevel field from trust_requests database table
+- Fixed "Request Trust" button to hide when user already has trust level assigned
+- Integrated automatic trust request approval when trust level is set
+- Updated Trust Requests page to use existing Trust Assignment Modal for approvals
+
 ## System Architecture
 
 ### Frontend Architecture

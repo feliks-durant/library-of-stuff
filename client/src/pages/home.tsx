@@ -170,14 +170,16 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
               {existingTrustLevel ? 'Update Trust Level' : 'Set Trust Level'}
             </Button>
             
-            <Button
-              onClick={() => setShowRequestModal(true)}
-              variant="outline"
-              className="w-full"
-            >
-              <Heart className="w-4 h-4 mr-2" />
-              Request Trust
-            </Button>
+            {!existingTrustLevel && (
+              <Button
+                onClick={() => setShowRequestModal(true)}
+                variant="outline"
+                className="w-full"
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Request Trust
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
