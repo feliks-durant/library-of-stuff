@@ -118,14 +118,19 @@ export default function LoansPage() {
     },
   });
 
+  const [pendingApproval, setPendingApproval] = useState<string | null>(null);
+  const [pendingDenial, setPendingDenial] = useState<string | null>(null);
+
   const approveLoanRequestMutation = useMutation({
     mutationFn: async (requestId: string) => {
+      setPendingApproval(requestId);
       const response = await apiRequest(`/api/loan-requests/${requestId}`, "PATCH", {
         status: "approved",
       });
       return response.json();
     },
     onSuccess: () => {
+      setPendingApproval(null);
       toast({
         title: "Request Approved",
         description: "The loan request has been approved and a loan has been created.",
@@ -134,6 +139,7 @@ export default function LoansPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/loans/my-lent"] });
     },
     onError: (error) => {
+      setPendingApproval(null);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -155,12 +161,14 @@ export default function LoansPage() {
 
   const denyLoanRequestMutation = useMutation({
     mutationFn: async (requestId: string) => {
+      setPendingDenial(requestId);
       const response = await apiRequest(`/api/loan-requests/${requestId}`, "PATCH", {
         status: "denied",
       });
       return response.json();
     },
     onSuccess: () => {
+      setPendingDenial(null);
       toast({
         title: "Request Denied",
         description: "The loan request has been denied.",
@@ -168,6 +176,7 @@ export default function LoansPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/loan-requests/pending"] });
     },
     onError: (error) => {
+      setPendingDenial(null);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -433,19 +442,19 @@ export default function LoansPage() {
                           <Button
                             size="sm"
                             onClick={() => approveLoanRequestMutation.mutate(request.id)}
-                            disabled={approveLoanRequestMutation.isPending}
+                            disabled={pendingApproval !== null || pendingDenial !== null}
                             className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm"
                           >
-                            {approveLoanRequestMutation.isPending ? "Approving..." : "Approve"}
+                            {pendingApproval === request.id ? "Approving..." : "Approve"}
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => denyLoanRequestMutation.mutate(request.id)}
-                            disabled={denyLoanRequestMutation.isPending}
+                            disabled={pendingApproval !== null || pendingDenial !== null}
                             className="text-red-600 hover:bg-red-50 text-xs sm:text-sm"
                           >
-                            {denyLoanRequestMutation.isPending ? "Denying..." : "Deny"}
+                            {pendingDenial === request.id ? "Denying..." : "Deny"}
                           </Button>
                         </div>
                       )}
