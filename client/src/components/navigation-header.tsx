@@ -49,13 +49,13 @@ export default function NavigationHeader({
           </div>
 
           {/* Navigation Section - Responsive */}
-          <nav className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
+          <nav className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4 flex-shrink-0">
             {/* QR Code Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={onScanQR}
-              className="p-2 text-gray-600 hover:text-brand-blue"
+              className="px-4 py-2 text-gray-600 hover:text-brand-blue min-w-[48px]"
               title="Scan QR Code"
             >
               <i className="fas fa-qrcode text-lg sm:text-xl"></i>
@@ -65,7 +65,7 @@ export default function NavigationHeader({
             {/* Add Item Button - Responsive */}
             <Button 
               onClick={onAddItem} 
-              className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm px-2 sm:px-4"
+              className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm px-4 sm:px-6 min-w-[64px] sm:min-w-[120px]"
             >
               <i className="fas fa-plus sm:mr-2"></i>
               <span className="hidden sm:inline ml-1">Add Item</span>

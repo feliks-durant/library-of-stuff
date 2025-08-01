@@ -24,6 +24,15 @@ Preferred communication style: Simple, everyday language.
 - Integrated automatic trust request approval when trust level is set
 - Updated Trust Requests page to use existing Trust Assignment Modal for approvals
 
+### August 1, 2025 - Username Display and Header Responsive Fixes
+- Fixed username display throughout application to properly show Discord-style format (Username#1234)
+- Updated ItemCard component and all backend queries to use username/discriminator instead of firstName/lastName
+- Implemented responsive navigation header design preventing element overlap on small screens
+- Added custom 'xs' breakpoint (475px) to Tailwind configuration
+- Header now shows abbreviated "LoS" logo on very small screens
+- Buttons resize appropriately with larger touch targets on mobile devices
+- User dropdown shows username only on large screens to prevent text overflow
+
 ## System Architecture
 
 ### Frontend Architecture
