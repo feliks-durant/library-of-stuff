@@ -47,11 +47,11 @@ export default function TrustAssignmentModal({ isOpen, onClose, user, onTrustAss
 
   const userName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`
-    : user.email || "Unknown User";
+    : "Unknown User";
 
   const userInitials = user.firstName && user.lastName
     ? `${user.firstName[0]}${user.lastName[0]}`
-    : user.email ? user.email[0].toUpperCase() : "?";
+    : "?";
 
   const currentTrustLevel = trustLevels.find(level => level.level === trustLevel[0])!;
   const TrustIcon = currentTrustLevel.icon;
@@ -109,7 +109,6 @@ export default function TrustAssignmentModal({ isOpen, onClose, user, onTrustAss
             </Avatar>
             <div>
               <h3 className="font-semibold text-gray-900">{userName}</h3>
-              <p className="text-gray-600 text-sm">{user.email}</p>
             </div>
           </div>
 

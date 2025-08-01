@@ -38,7 +38,6 @@ interface Connection {
   trustLevel: number;
   firstName?: string;
   lastName?: string;
-  email?: string;
   profileImageUrl?: string;
   createdAt?: string;
 }
@@ -242,14 +241,14 @@ export default function MyConnectionsPage() {
                           <Avatar className="w-12 h-12">
                             <AvatarImage src={request.requesterProfileImage || undefined} />
                             <AvatarFallback>
-                              {(request.requesterName || request.requesterEmail || "U").charAt(0).toUpperCase()}
+                              {(request.requesterName || "U").charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
                               <h3 className="font-semibold text-gray-900">
-                                {request.requesterName || request.requesterEmail}
+                                {request.requesterName || "Anonymous User"}
                               </h3>
                               {getStatusBadge(request.status)}
                             </div>
@@ -272,7 +271,7 @@ export default function MyConnectionsPage() {
                                 id: request.requesterId, 
                                 firstName: request.requesterName?.split(' ')[0] || '', 
                                 lastName: request.requesterName?.split(' ')[1] || '',
-                                email: request.requesterEmail || '',
+                                email: '',
                                 profileImageUrl: request.requesterProfileImage || undefined
                               } as User)}
                               className="bg-brand-blue hover:bg-blue-700"
@@ -364,7 +363,6 @@ export default function MyConnectionsPage() {
                           <h3 className="font-semibold text-gray-900">
                             {connection.firstName} {connection.lastName}
                           </h3>
-                          <p className="text-sm text-gray-600">{connection.email}</p>
                           
                           <div className="mt-3">
                             <Badge className={getTrustLevelBadge(connection.trustLevel)}>
@@ -378,7 +376,7 @@ export default function MyConnectionsPage() {
                                 id: connection.trusteeId,
                                 firstName: connection.firstName || '',
                                 lastName: connection.lastName || '',
-                                email: connection.email || '',
+                                email: '',
                                 profileImageUrl: connection.profileImageUrl || '',
                               } as User)}
                               variant="outline"
