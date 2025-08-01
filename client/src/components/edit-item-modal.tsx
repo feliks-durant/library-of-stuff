@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -39,7 +39,6 @@ interface EditItemModalProps {
 }
 
 export default function EditItemModal({ isOpen, onClose, itemId }: EditItemModalProps) {
-  const [trustLevel, setTrustLevel] = useState([2]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -66,7 +65,6 @@ export default function EditItemModal({ isOpen, onClose, itemId }: EditItemModal
         category: item.category,
         trustLevel: item.trustLevel,
       });
-      setTrustLevel([item.trustLevel]);
     }
   }, [item, form]);
 
@@ -78,7 +76,7 @@ export default function EditItemModal({ isOpen, onClose, itemId }: EditItemModal
       if (data.title) formData.append("title", data.title);
       if (data.description) formData.append("description", data.description);
       if (data.category) formData.append("category", data.category);
-      formData.append("trustLevel", trustLevel[0].toString());
+      formData.append("trustLevel", item.trustLevel.toString());
       
       if (data.image?.[0]) {
         formData.append("image", data.image[0]);
@@ -132,7 +130,6 @@ export default function EditItemModal({ isOpen, onClose, itemId }: EditItemModal
 
   const handleClose = () => {
     form.reset();
-    setTrustLevel([2]);
     onClose();
   };
 
@@ -220,27 +217,7 @@ export default function EditItemModal({ isOpen, onClose, itemId }: EditItemModal
               )}
             />
 
-            <div>
-              <FormLabel className="text-sm font-medium">Trust Level Required</FormLabel>
-              <div className="space-y-3 mt-2">
-                <div className="flex items-center space-x-3">
-                  <Slider
-                    value={trustLevel}
-                    onValueChange={setTrustLevel}
-                    max={5}
-                    min={1}
-                    step={1}
-                    className="flex-1"
-                  />
-                  <span className="w-12 text-center font-medium text-brand-blue">
-                    {trustLevel[0]}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Higher levels mean only your most trusted contacts can see this item.
-                </p>
-              </div>
-            </div>
+
 
             {item.imageUrl && (
               <div>

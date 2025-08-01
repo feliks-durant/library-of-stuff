@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Collapsible,
@@ -49,6 +50,7 @@ export function MyItemDetailModal({
 }: MyItemDetailModalProps) {
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
   const [isHidden, setIsHidden] = useState(item?.isHidden || false);
+  const [trustLevel, setTrustLevel] = useState([item?.trustLevel || 2]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -130,10 +132,73 @@ export function MyItemDetailModal({
     toggleVisibilityMutation.mutate(checked);
   };
 
+  // Update trust level mutation
+  const updateTrustLevelMutation = useMutation({
+    mutationFn: async (newTrustLevel: number) => {
+      if (!item) throw new Error("No item");
+      
+      const formData = new FormData();
+      formData.append("trustLevel", newTrustLevel.toString());
+      formData.append("title", item.title);
+      formData.append("description", item.description);
+      formData.append("category", item.category);
+      
+      const response = await fetch(`/api/items/${item.id}`, {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`${response.status}: ${text}`);
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/items/my"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/items", item?.id] });
+      toast({
+        title: "Trust level updated",
+        description: `Trust level changed to ${trustLevel[0]}`,
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      console.error("Error updating trust level:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update trust level. Please try again.",
+        variant: "destructive",
+      });
+      // Revert trust level on error
+      if (item) {
+        setTrustLevel([item.trustLevel]);
+      }
+    },
+  });
+
+  const handleTrustLevelChange = (newLevel: number[]) => {
+    setTrustLevel(newLevel);
+    updateTrustLevelMutation.mutate(newLevel[0]);
+  };
+
   // Update isHidden state when item changes
   useEffect(() => {
     if (item) {
       setIsHidden(item.isHidden || false);
+      setTrustLevel([item.trustLevel]);
     }
   }, [item]);
 
@@ -192,10 +257,26 @@ export function MyItemDetailModal({
             </Label>
           </div>
 
-          {/* Trust Level Required */}
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold">Trust Level Required:</h3>
-            <Badge variant="outline">{item.trustLevel}</Badge>
+          {/* Trust Level Slider */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Trust Level Required: {trustLevel[0]}</Label>
+            <div className="flex items-center space-x-3">
+              <Slider
+                value={trustLevel}
+                onValueChange={handleTrustLevelChange}
+                max={5}
+                min={1}
+                step={1}
+                className="flex-1"
+                disabled={updateTrustLevelMutation.isPending}
+              />
+              <span className="w-12 text-center font-medium text-blue-600">
+                {trustLevel[0]}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600">
+              Higher levels mean only your most trusted contacts can see this item.
+            </p>
           </div>
 
           {/* Action Buttons */}
