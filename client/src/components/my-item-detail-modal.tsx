@@ -64,6 +64,28 @@ export function MyItemDetailModal({
     enabled: !!item?.id,
   });
 
+  // Get borrower information for loan history
+  const borrowerIds = Array.from(new Set(loanHistory.map(loan => loan.borrowerId)));
+  const { data: borrowers = [] } = useQuery({
+    queryKey: ['/api/users/batch', borrowerIds],
+    enabled: borrowerIds.length > 0,
+    queryFn: async () => {
+      if (borrowerIds.length === 0) return [];
+      const responses = await Promise.all(
+        borrowerIds.map(id => 
+          apiRequest(`/api/users/${id}`, 'GET').then(res => res.json())
+        )
+      );
+      return responses;
+    }
+  });
+
+  // Create a map for easy borrower lookup
+  const borrowerMap = borrowers.reduce((acc: any, borrower: any) => {
+    acc[borrower.id] = borrower;
+    return acc;
+  }, {});
+
   // Toggle item visibility mutation
   const toggleVisibilityMutation = useMutation({
     mutationFn: async (hidden: boolean) => {
@@ -214,25 +236,45 @@ export function MyItemDetailModal({
               {loanHistory.length === 0 ? (
                 <p className="text-gray-500 text-sm">No loan history yet.</p>
               ) : (
-                loanHistory.map((loan) => (
-                  <div key={loan.id} className="border rounded-lg p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Avatar 
-                          className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-500"
-                          onClick={() => onTrustClick(loan.borrowerId)}
-                        >
-                          <AvatarFallback>
-                            <User className="h-4 w-4" />
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">
-                            Borrower ID: {loan.borrowerId}
-                          </p>
-                          <p className="text-sm text-gray-500">Click avatar to set trust level</p>
+                loanHistory.map((loan) => {
+                  const borrower = borrowerMap[loan.borrowerId];
+                  const borrowerName = borrower 
+                    ? (borrower.firstName && borrower.lastName 
+                        ? `${borrower.firstName} ${borrower.lastName}` 
+                        : borrower.email)
+                    : `User ${loan.borrowerId}`;
+                  const borrowerUsername = borrower?.username;
+                  const borrowerInitials = borrower 
+                    ? (borrower.firstName && borrower.lastName 
+                        ? `${borrower.firstName[0]}${borrower.lastName[0]}` 
+                        : borrower.email?.[0] || 'U')
+                    : 'U';
+
+                  return (
+                    <div key={loan.id} className="border rounded-lg p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Avatar 
+                            className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-500"
+                            onClick={() => onTrustClick(loan.borrowerId)}
+                          >
+                            <AvatarImage 
+                              src={borrower?.profileImageUrl || undefined}
+                              alt={borrowerName}
+                            />
+                            <AvatarFallback>
+                              {borrowerInitials.toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-black">
+                              {borrowerName}
+                            </p>
+                            {borrowerUsername && (
+                              <p className="text-sm text-gray-500">@{borrowerUsername}</p>
+                            )}
+                          </div>
                         </div>
-                      </div>
                       <Badge variant={loan.status === "active" ? "default" : "secondary"}>
                         {loan.status}
                       </Badge>
@@ -265,9 +307,10 @@ export function MyItemDetailModal({
                           </p>
                         </div>
                       </div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </CollapsibleContent>
           </Collapsible>
