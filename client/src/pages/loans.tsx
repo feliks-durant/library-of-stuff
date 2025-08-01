@@ -118,6 +118,75 @@ export default function LoansPage() {
     },
   });
 
+  const approveLoanRequestMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      const response = await apiRequest(`/api/loan-requests/${requestId}`, "PATCH", {
+        status: "approved",
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Request Approved",
+        description: "The loan request has been approved and a loan has been created.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loan-requests/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loans/my-lent"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to approve request. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const denyLoanRequestMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      const response = await apiRequest(`/api/loan-requests/${requestId}`, "PATCH", {
+        status: "denied",
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Request Denied",
+        description: "The loan request has been denied.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loan-requests/pending"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to deny request. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const getStatusColor = (loan: LoanWithDetails) => {
     if (loan.status === "returned") return "bg-green-100 text-green-800";
     if (loan.status === "overdue") return "bg-red-100 text-red-800";
@@ -363,24 +432,20 @@ export default function LoansPage() {
                         <div className="flex gap-2 flex-shrink-0">
                           <Button
                             size="sm"
-                            onClick={() => {
-                              // Handle approve logic
-                              console.log("Approve request:", request.id);
-                            }}
+                            onClick={() => approveLoanRequestMutation.mutate(request.id)}
+                            disabled={approveLoanRequestMutation.isPending}
                             className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm"
                           >
-                            Approve
+                            {approveLoanRequestMutation.isPending ? "Approving..." : "Approve"}
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => {
-                              // Handle deny logic  
-                              console.log("Deny request:", request.id);
-                            }}
+                            onClick={() => denyLoanRequestMutation.mutate(request.id)}
+                            disabled={denyLoanRequestMutation.isPending}
                             className="text-red-600 hover:bg-red-50 text-xs sm:text-sm"
                           >
-                            Deny
+                            {denyLoanRequestMutation.isPending ? "Denying..." : "Deny"}
                           </Button>
                         </div>
                       )}

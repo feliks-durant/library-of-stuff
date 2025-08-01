@@ -600,7 +600,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
-      const validatedData = updateLoanRequestSchema.parse(req.body);
+      const { status } = req.body;
+      
+      if (!status || !['approved', 'denied'].includes(status)) {
+        return res.status(400).json({ message: "Invalid status. Must be 'approved' or 'denied'" });
+      }
       
       // Get the loan request to check ownership
       const requests = await storage.getLoanRequestsByOwner(userId);
@@ -609,14 +613,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Loan request not found" });
       }
       
-      // If approving the request, create a loan
-      if (validatedData.status === 'approved') {
-        const item = await storage.getItem(request.itemId);
-        if (!item) {
-          return res.status(404).json({ message: "Item not found" });
-        }
-        
-        // Create the loan
+      // Update the loan request status
+      const updatedRequest = await storage.updateLoanRequest(id, { status });
+      
+      // If approved, create a loan record
+      if (status === 'approved') {
         await storage.createLoan({
           itemId: request.itemId,
           borrowerId: request.borrowerId,
@@ -627,7 +628,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const updatedRequest = await storage.updateLoanRequest(id, validatedData);
       res.json(updatedRequest);
     } catch (error) {
       console.error("Error updating loan request:", error);
