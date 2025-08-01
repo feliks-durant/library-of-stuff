@@ -78,8 +78,8 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
 
     createRequestMutation.mutate({
       itemId: item.id,
-      requestedStartDate: startDate,
-      requestedEndDate: endDate,
+      requestedStartDate: startDate.toISOString(),
+      requestedEndDate: endDate.toISOString(),
       message: message || undefined,
     });
   };

@@ -543,23 +543,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/loan-requests', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const validatedData = insertLoanRequestSchema.parse(req.body);
+      
+      // Manual validation to handle date conversion and borrowerId
+      const { itemId, requestedStartDate, requestedEndDate, message } = req.body;
+      
+      if (!itemId || !requestedStartDate || !requestedEndDate) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
       
       // Check if item exists and user has access to it
       const items = await storage.getVisibleItems(userId);
-      const item = items.find(i => i.id === validatedData.itemId);
+      const item = items.find(i => i.id === itemId);
       if (!item) {
         return res.status(404).json({ message: "Item not found or not accessible" });
       }
       
       const loanRequest = await storage.createLoanRequest({
-        itemId: validatedData.itemId,
+        itemId,
         borrowerId: userId,
-        requestedStartDate: validatedData.requestedStartDate,
-        requestedEndDate: validatedData.requestedEndDate,
-        message: validatedData.message,
-        status: validatedData.status || "pending",
-      } as any);
+        requestedStartDate: new Date(requestedStartDate),
+        requestedEndDate: new Date(requestedEndDate),
+        message,
+        status: "pending",
+      });
       res.json(loanRequest);
     } catch (error) {
       console.error("Error creating loan request:", error);
