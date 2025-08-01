@@ -104,11 +104,13 @@ export function LoanRequestModal({ item, children }: LoanRequestModalProps) {
               <Label>Start Date</Label>
               <Button
                 variant="outline"
-                className="w-full justify-start text-left font-normal bg-muted cursor-default"
+                className="w-full justify-start text-left font-normal bg-muted cursor-default text-sm"
                 disabled
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(startDate, "PPP")} (Today)
+                <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate">
+                  {format(startDate, "MMM d, yyyy")} (Today)
+                </span>
               </Button>
             </div>
             
