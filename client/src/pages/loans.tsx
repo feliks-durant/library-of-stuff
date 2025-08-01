@@ -179,8 +179,8 @@ export default function LoansPage() {
                 <CardTitle className="text-lg">
                   {loan.itemTitle || "Unknown Item"}
                 </CardTitle>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Avatar className="w-5 h-5">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                  <Avatar className="w-5 h-5 flex-shrink-0">
                     <AvatarImage src={otherUser.image} />
                     <AvatarFallback className="text-xs">
                       {otherUser.username?.[0]?.toUpperCase() || 
@@ -189,7 +189,7 @@ export default function LoansPage() {
                        'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <span>
+                  <span className="truncate">
                     {type === "borrowed" ? "from" : "to"} {displayName}
                   </span>
                 </div>
@@ -292,57 +292,64 @@ export default function LoansPage() {
             <div className="space-y-4">
               {loanRequests.map((request) => (
                 <Card key={request.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4">
-                        <Avatar className="w-12 h-12">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="flex items-start space-x-3 min-w-0 flex-1">
+                        <Avatar className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                           <AvatarImage src={request.borrowerProfileImage || undefined} />
                           <AvatarFallback>
                             {(request.borrowerName || request.borrowerEmail || "U").charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="font-semibold text-gray-900">
-                              {request.borrowerName || request.borrowerEmail}
-                            </h3>
-                            <span className="text-sm text-gray-500">•</span>
-                            <span className="text-sm font-medium text-gray-900">{request.itemTitle}</span>
-                            <Badge className={
-                              request.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                              request.status === "approved" ? "bg-green-100 text-green-800" :
-                              "bg-red-100 text-red-800"
-                            }>
-                              {request.status}
-                            </Badge>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">
+                                {request.borrowerName || request.borrowerEmail}
+                              </h3>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                                  {request.itemTitle}
+                                </span>
+                                <Badge className={`text-xs ${
+                                  request.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                                  request.status === "approved" ? "bg-green-100 text-green-800" :
+                                  "bg-red-100 text-red-800"
+                                }`}>
+                                  {request.status}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
                           
-                          <div className="text-sm text-gray-600 mb-2">
-                            <CalendarIcon className="w-4 h-4 inline mr-1" />
-                            {format(new Date(request.requestedStartDate), "MMM d")} - {" "}
-                            {format(new Date(request.requestedEndDate), "MMM d, yyyy")}
+                          <div className="text-xs sm:text-sm text-gray-600 mb-2">
+                            <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+                            <span className="truncate">
+                              {format(new Date(request.requestedStartDate), "MMM d")} - {" "}
+                              {format(new Date(request.requestedEndDate), "MMM d, yyyy")}
+                            </span>
                           </div>
                           
                           {request.message && (
-                            <p className="text-gray-600 mb-3">{request.message}</p>
+                            <p className="text-gray-600 mb-3 text-xs sm:text-sm line-clamp-2">{request.message}</p>
                           )}
                           
-                          <p className="text-sm text-gray-500">
+                          <p className="text-xs text-gray-500">
                             Requested {format(new Date(request.createdAt), "MMM d, yyyy 'at' h:mm a")}
                           </p>
                         </div>
                       </div>
                       
                       {request.status === "pending" && (
-                        <div className="flex space-x-2">
+                        <div className="flex gap-2 flex-shrink-0">
                           <Button
                             size="sm"
                             onClick={() => {
                               // Handle approve logic
                               console.log("Approve request:", request.id);
                             }}
-                            className="bg-brand-blue hover:bg-blue-700"
+                            className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm"
                           >
                             Approve
                           </Button>
@@ -353,7 +360,7 @@ export default function LoansPage() {
                               // Handle deny logic  
                               console.log("Deny request:", request.id);
                             }}
-                            className="text-red-600 hover:bg-red-50"
+                            className="text-red-600 hover:bg-red-50 text-xs sm:text-sm"
                           >
                             Deny
                           </Button>
