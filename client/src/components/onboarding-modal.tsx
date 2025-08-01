@@ -50,6 +50,7 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
 
   const form = useForm<OnboardingForm>({
     resolver: zodResolver(onboardingSchema),
+    mode: "onChange", // Enable validation on change
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -120,11 +121,14 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     // Reset status
     setUsernameStatus('idle');
 
-    // Only check if username meets minimum requirements
+    // Trigger form validation immediately for real-time feedback
+    setTimeout(() => form.trigger('username'), 0);
+
+    // Only check availability if username meets all requirements
     if (value.length >= 3 && value.length <= 30 && /^[a-zA-Z0-9._-]+$/.test(value)) {
       setUsernameStatus('checking');
       
-      // Debounce the check
+      // Debounce the availability check
       const timeout = setTimeout(() => {
         checkUsernameMutation.mutate(value.toLowerCase());
       }, 500);
@@ -262,7 +266,7 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
                       </div>
                     </div>
                   </FormControl>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground mb-1">
                     3-30 characters • Letters, numbers, periods, dashes, and underscores only
                   </div>
                   {(usernameStatus !== 'idle' || form.formState.errors.username) && (
@@ -270,7 +274,6 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
                       {getUsernameMessage()}
                     </p>
                   )}
-                  <FormMessage />
                 </FormItem>
               )}
             />
