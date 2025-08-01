@@ -186,11 +186,12 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
                   ) : (
                     filteredConnections.map((user: User) => (
                       <div
-                        key={user.id}
+                        key={user.trusteeId || user.id}
                         className="flex items-center gap-3 p-3 hover:bg-accent cursor-pointer border-b last:border-b-0"
                         onClick={() => {
-                          console.log('Selecting user:', user.id, user);
-                          setSelectedBorrower(user.id);
+                          const userId = user.trusteeId || user.id;
+                          console.log('Selecting user:', userId, user);
+                          setSelectedBorrower(userId);
                           setSearchQuery(user.firstName && user.lastName ? 
                             `${user.firstName} ${user.lastName}` : 
                             user.email || '');
