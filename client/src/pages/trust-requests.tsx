@@ -16,6 +16,7 @@ import NavigationHeader from "@/components/navigation-header";
 import TrustAssignmentModal from "@/components/trust-assignment-modal";
 import { apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
+import { formatUsername } from "@shared/schema";
 
 interface TrustRequestWithDetails {
   id: string;
@@ -36,6 +37,8 @@ interface TrustRequestWithDetails {
 interface Connection {
   trusteeId: string;
   trustLevel: number;
+  username?: string;
+  discriminator?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -80,14 +83,14 @@ export default function MyConnectionsPage() {
   // Filter and sort connections
   const filteredConnections = connections.filter(connection =>
     searchQuery === "" || 
-    `${connection.firstName} ${connection.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+    formatUsername(connection).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const sortedConnections = [...filteredConnections].sort((a, b) => {
     switch (sortBy) {
       case "name":
-        const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
-        const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+        const nameA = formatUsername(a).toLowerCase();
+        const nameB = formatUsername(b).toLowerCase();
         return nameA.localeCompare(nameB);
       case "trust":
         return b.trustLevel - a.trustLevel;
@@ -351,17 +354,17 @@ export default function MyConnectionsPage() {
                         <Avatar className="w-12 h-12">
                           <AvatarImage 
                             src={connection.profileImageUrl || undefined}
-                            alt={`${connection.firstName} ${connection.lastName}`}
+                            alt={formatUsername(connection)}
                             className="object-cover"
                           />
                           <AvatarFallback>
-                            {connection.firstName?.[0]}{connection.lastName?.[0]}
+                            {connection.username?.[0]?.toUpperCase() || 'U'}
                           </AvatarFallback>
                         </Avatar>
                         
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900">
-                            {connection.firstName} {connection.lastName}
+                            {formatUsername(connection)}
                           </h3>
                           
                           <div className="mt-3">

@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import NavigationHeader from "@/components/navigation-header";
 import { apiRequest } from "@/lib/queryClient";
+import { formatUsername } from "@shared/schema";
 
 interface LoanWithDetails {
   id: string;
@@ -28,9 +29,13 @@ interface LoanWithDetails {
   itemTitle?: string;
   itemImageUrl?: string;
   borrowerName?: string;
+  borrowerUsername?: string;
+  borrowerDiscriminator?: string;
   borrowerEmail?: string;
   borrowerProfileImage?: string;
   lenderName?: string;
+  lenderUsername?: string;
+  lenderDiscriminator?: string;
   lenderEmail?: string;
   lenderProfileImage?: string;
 }
@@ -131,8 +136,24 @@ export default function LoansPage() {
 
   const LoanCard = ({ loan, type }: { loan: LoanWithDetails; type: "borrowed" | "lent" }) => {
     const otherUser = type === "borrowed" 
-      ? { name: loan.lenderName, email: loan.lenderEmail, image: loan.lenderProfileImage }
-      : { name: loan.borrowerName, email: loan.borrowerEmail, image: loan.borrowerProfileImage };
+      ? { 
+          name: loan.lenderName, 
+          username: loan.lenderUsername,
+          discriminator: loan.lenderDiscriminator,
+          email: loan.lenderEmail, 
+          image: loan.lenderProfileImage 
+        }
+      : { 
+          name: loan.borrowerName, 
+          username: loan.borrowerUsername,
+          discriminator: loan.borrowerDiscriminator,
+          email: loan.borrowerEmail, 
+          image: loan.borrowerProfileImage 
+        };
+    
+    const displayName = formatUsername(otherUser) !== 'Unknown User' 
+      ? formatUsername(otherUser) 
+      : otherUser.name || otherUser.email;
 
     return (
       <Card key={loan.id}>
@@ -158,14 +179,14 @@ export default function LoansPage() {
                   <Avatar className="w-5 h-5">
                     <AvatarImage src={otherUser.image} />
                     <AvatarFallback className="text-xs">
-                      {otherUser.name ? 
-                        otherUser.name.charAt(0).toUpperCase() : 
-                        otherUser.email?.charAt(0).toUpperCase()
-                      }
+                      {otherUser.username?.[0]?.toUpperCase() || 
+                       otherUser.name?.charAt(0).toUpperCase() || 
+                       otherUser.email?.charAt(0).toUpperCase() || 
+                       'U'}
                     </AvatarFallback>
                   </Avatar>
                   <span>
-                    {type === "borrowed" ? "from" : "to"} {otherUser.name || otherUser.email}
+                    {type === "borrowed" ? "from" : "to"} {displayName}
                   </span>
                 </div>
               </div>

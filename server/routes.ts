@@ -11,7 +11,9 @@ import {
   insertLoanRequestSchema,
   updateLoanRequestSchema,
   insertLoanSchema,
-  updateLoanSchema 
+  updateLoanSchema,
+  insertTrustRequestSchema,
+  updateTrustRequestSchema
 } from "@shared/schema";
 import multer from "multer";
 import path from "path";
@@ -394,12 +396,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/trust-requests', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { targetId, message } = req.body;
+      const validatedData = insertTrustRequestSchema.parse(req.body);
       const trustRequest = await storage.createTrustRequest({
         requesterId: userId,
-        targetId,
-        message,
-      });
+        targetId: validatedData.targetId,
+        message: validatedData.message,
+      } as any);
       res.json(trustRequest);
     } catch (error) {
       console.error("Error creating trust request:", error);
@@ -444,20 +446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/loan-requests', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      console.log('Raw request body:', req.body);
-      
-      // Manual validation and conversion instead of using schema
-      if (!req.body.itemId || !req.body.requestedStartDate || !req.body.requestedEndDate) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-      
-      const validatedData = {
-        itemId: req.body.itemId,
-        requestedStartDate: new Date(req.body.requestedStartDate),
-        requestedEndDate: new Date(req.body.requestedEndDate),
-        message: req.body.message || null,
-        status: "pending"
-      };
+      const validatedData = insertLoanRequestSchema.parse(req.body);
       
       // Check if item exists and user has access to it
       const items = await storage.getVisibleItems(userId);
@@ -466,17 +455,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Item not found or not accessible" });
       }
       
-      // Allow loan requests even if item is already on loan
-      // const activeLoan = await storage.getActiveLoanForItem(validatedData.itemId);
-      // if (activeLoan) {
-      //   return res.status(400).json({ message: "Item is already on loan" });
-      // }
-      
       const loanRequest = await storage.createLoanRequest({
-        ...validatedData,
+        itemId: validatedData.itemId,
         borrowerId: userId,
-        status: "pending",
-      });
+        requestedStartDate: validatedData.requestedStartDate,
+        requestedEndDate: validatedData.requestedEndDate,
+        message: validatedData.message,
+        status: validatedData.status || "pending",
+      } as any);
       res.json(loanRequest);
     } catch (error) {
       console.error("Error creating loan request:", error);

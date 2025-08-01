@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import type { Item, User } from "@shared/schema";
+import { formatUsername } from "@shared/schema";
 
 // Trust Request Modal Component
 function TrustRequestModal({ 
@@ -43,7 +44,7 @@ function TrustRequestModal({
       queryClient.invalidateQueries({ queryKey: ["/api/trust-requests/sent"] });
       toast({
         title: "Trust request sent",
-        description: `You have requested trust from ${user.firstName} ${user.lastName}`,
+        description: `You have requested trust from ${formatUsername(user)}`,
       });
       onClose();
       setMessage("");
@@ -68,9 +69,7 @@ function TrustRequestModal({
     },
   });
 
-  const userName = user.firstName && user.lastName
-    ? `${user.firstName} ${user.lastName}`
-    : "Unknown User";
+  const userName = formatUsername(user);
 
   const handleSubmit = () => {
     createTrustRequestMutation.mutate({
@@ -128,13 +127,8 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
   const [showTrustModal, setShowTrustModal] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   
-  const userName = user.firstName && user.lastName
-    ? `${user.firstName} ${user.lastName}`
-    : "Unknown User";
-
-  const userInitials = user.firstName && user.lastName
-    ? `${user.firstName[0]}${user.lastName[0]}`
-    : "?";
+  const userName = formatUsername(user);
+  const userInitials = user.username?.[0]?.toUpperCase() || "U";
 
   return (
     <>
