@@ -24,7 +24,7 @@ import {
   type UpdateLoan,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, desc, ne, sql, or, ilike } from "drizzle-orm";
+import { eq, and, gte, desc, ne, sql, or, ilike, isNull } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 export interface IStorage {
@@ -139,14 +139,15 @@ export class DatabaseStorage implements IStorage {
         description: items.description,
         category: items.category,
         imageUrl: items.imageUrl,
+        qrCode: items.qrCode,
         trustLevel: items.trustLevel,
+        isHidden: items.isHidden,
         ownerId: items.ownerId,
         createdAt: items.createdAt,
         updatedAt: items.updatedAt,
         ownerFirstName: users.firstName,
         ownerLastName: users.lastName,
         ownerUsername: users.username,
-
         ownerProfileImage: users.profileImageUrl,
         userTrustLevel: trustRelationships.trustLevel,
       })
@@ -164,7 +165,9 @@ export class DatabaseStorage implements IStorage {
           // Don't show user's own items
           ne(items.ownerId, userId),
           // Only show items where user's trust level >= item's required trust level
-          gte(trustRelationships.trustLevel, items.trustLevel)
+          gte(trustRelationships.trustLevel, items.trustLevel),
+          // Don't show hidden items
+          or(eq(items.isHidden, false), isNull(items.isHidden))
         )
       )
       .orderBy(desc(items.createdAt));
@@ -175,8 +178,9 @@ export class DatabaseStorage implements IStorage {
       description: item.description,
       category: item.category,
       imageUrl: item.imageUrl,
-      qrCode: null, // Add qrCode field for type compatibility
+      qrCode: item.qrCode,
       trustLevel: item.trustLevel,
+      isHidden: item.isHidden,
       ownerId: item.ownerId,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,

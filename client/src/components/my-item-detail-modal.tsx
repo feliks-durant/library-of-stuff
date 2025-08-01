@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +48,7 @@ export function MyItemDetailModal({
   onTrustClick 
 }: MyItemDetailModalProps) {
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
-  const [isHidden, setIsHidden] = useState(false); // Will be updated when item visibility feature is added
+  const [isHidden, setIsHidden] = useState(item?.isHidden || false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -107,6 +107,13 @@ export function MyItemDetailModal({
     setIsHidden(checked);
     toggleVisibilityMutation.mutate(checked);
   };
+
+  // Update isHidden state when item changes
+  useEffect(() => {
+    if (item) {
+      setIsHidden(item.isHidden || false);
+    }
+  }, [item]);
 
   if (!item) return null;
 

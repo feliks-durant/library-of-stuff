@@ -9,6 +9,7 @@ import {
   integer,
   real,
   unique,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -46,6 +47,7 @@ export const items = pgTable("items", {
   imageUrl: varchar("image_url"),
   qrCode: varchar("qr_code").unique(), // QR code for easy item access
   trustLevel: integer("trust_level").notNull(), // 1-5, trust level required to see this item
+  isHidden: boolean("is_hidden").default(false), // Whether item is hidden from public view
   ownerId: varchar("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
