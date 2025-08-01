@@ -88,13 +88,21 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
             </Avatar>
             
             <div className="flex-1">
-              <h4 className="text-2xl font-semibold text-gray-900 mb-1">
-                {displayName}
-              </h4>
-              {user.firstName && user.lastName && user.username && user.discriminator && (
-                <p className="text-sm text-gray-500 mb-2">
-                  @{user.username}#{user.discriminator}
-                </p>
+              {user.firstName && user.lastName ? (
+                <>
+                  <h4 className="text-2xl font-semibold text-black mb-1">
+                    {user.firstName} {user.lastName}
+                  </h4>
+                  {user.username && user.discriminator && (
+                    <p className="text-sm text-gray-500 mb-2">
+                      @{user.username}#{user.discriminator}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <h4 className="text-2xl font-semibold text-gray-900 mb-1">
+                  {displayName}
+                </h4>
               )}
               
               <div className="flex space-x-4">

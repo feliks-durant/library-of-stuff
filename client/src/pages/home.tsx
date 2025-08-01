@@ -148,7 +148,16 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
             </AvatarFallback>
           </Avatar>
           
-          <h3 className="font-semibold text-gray-900 mb-4">{userName}</h3>
+          {user.firstName && user.lastName ? (
+            <>
+              <h3 className="font-semibold text-black mb-1">{user.firstName} {user.lastName}</h3>
+              {user.username && user.discriminator && (
+                <p className="text-sm text-gray-500 mb-3">@{user.username}#{user.discriminator}</p>
+              )}
+            </>
+          ) : (
+            <h3 className="font-semibold text-gray-900 mb-4">{userName}</h3>
+          )}
           {existingTrustLevel && (
             <div className="mb-3">
               <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
