@@ -10,6 +10,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### August 1, 2025 - Item Card UI Improvements
+- Removed "Request" and "View Details" buttons from ItemCard components
+- Made entire card clickable to open item detail modal
+- Enhanced card hover effects with subtle scaling animation
+- Created separate ItemDetailModal component for better code organization
+- Updated owner display to show firstName/lastName in black, @username in gray
+
+### August 1, 2025 - Enhanced Username Validation
+- Added comprehensive username rule explanations in onboarding modal
+- Implemented real-time form validation with immediate error feedback
+- Fixed case-insensitive username availability checking
+- Updated validation rules: 3-30 characters, letters/numbers/periods/dashes/underscores only
+- Enhanced error message display with color-coded feedback system
+
 ### August 1, 2025 - Unique Username System Implementation
 - Transitioned from Discord-style username#discriminator to unique username system
 - Enforced unique username constraint in database with automatic migration of duplicate usernames

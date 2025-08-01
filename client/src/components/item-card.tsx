@@ -1,17 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import ItemDetailModal from "@/components/item-detail-modal";
 import EditItemModal from "@/components/edit-item-modal";
-import { LoanRequestModal } from "@/components/loan-request-modal";
-import { HandHeart } from "lucide-react";
 import type { Item } from "@shared/schema";
 
 interface ItemCardProps {
@@ -24,19 +16,20 @@ interface ItemCardProps {
       profileImageUrl?: string;
     };
   };
+  onClick?: () => void; // Optional click handler prop
 }
 
-export default function ItemCard({ item }: ItemCardProps) {
+export default function ItemCard({ item, onClick }: ItemCardProps) {
   const [showDetails, setShowDetails] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const { user } = useAuth();
 
-  // Show real name if available, fallback to username#discriminator  
+  // Show firstName/lastName in black, @username in gray
   const ownerDisplayName = item.owner?.firstName && item.owner?.lastName
     ? `${item.owner.firstName} ${item.owner.lastName}`
-    : item.owner?.username && item.owner?.discriminator
-    ? `${item.owner.username}#${item.owner.discriminator}`
     : "Unknown User";
+  
+  const ownerUsername = item.owner?.username ? `@${item.owner.username}` : "";
 
   const ownerInitials = item.owner?.firstName && item.owner?.lastName
     ? `${item.owner.firstName[0]}${item.owner.lastName[0]}`.toUpperCase()
@@ -45,12 +38,23 @@ export default function ItemCard({ item }: ItemCardProps) {
     : "?";
 
   const isOwner = user?.id === item.ownerId;
+
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      setShowDetails(true);
+    }
+  };
   
 
 
   return (
     <>
-      <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 overflow-hidden">
+      <Card 
+        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-200 overflow-hidden cursor-pointer hover:scale-[1.02]"
+        onClick={handleCardClick}
+      >
         {/* Item Image */}
         <div className="w-full h-48 overflow-hidden">
           {item.imageUrl ? (
@@ -79,140 +83,33 @@ export default function ItemCard({ item }: ItemCardProps) {
             {item.description}
           </p>
           
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <Avatar className="w-6 h-6">
-                <AvatarImage 
-                  src={item.owner?.profileImageUrl || undefined}
-                  alt={ownerDisplayName}
-                  className="object-cover"
-                />
-                <AvatarFallback className="text-xs">
-                  {ownerInitials}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-gray-500">{ownerDisplayName}</span>
+          <div className="flex items-center space-x-2">
+            <Avatar className="w-6 h-6">
+              <AvatarImage 
+                src={item.owner?.profileImageUrl || undefined}
+                alt={ownerDisplayName}
+                className="object-cover"
+              />
+              <AvatarFallback className="text-xs">
+                {ownerInitials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col leading-tight">
+              <span className="text-sm text-gray-900">{ownerDisplayName}</span>
+              {ownerUsername && (
+                <span className="text-xs text-gray-500">{ownerUsername}</span>
+              )}
             </div>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowDetails(true)}
-              className="text-brand-blue hover:text-blue-700 text-sm font-medium p-0"
-            >
-              View Details
-            </Button>
-          </div>
-          
-          {/* Loan Action Buttons */}
-          <div className="flex gap-2">
-            {!isOwner && (
-              <LoanRequestModal item={item}>
-                <Button size="sm" className="flex-1 bg-brand-blue hover:bg-blue-700">
-                  <HandHeart className="w-4 h-4 mr-1" />
-                  Request
-                </Button>
-              </LoanRequestModal>
-            )}
-            
-
-            
-            {isOwner && (
-              <Button 
-                size="sm"
-                onClick={() => setShowEditModal(true)}
-                variant="outline"
-                className="flex-1 border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white"
-              >
-                <i className="fas fa-edit mr-1"></i>
-                Edit
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Item Details Modal */}
-      <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{item.title}</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            {/* Item Image */}
-            <div className="w-full h-48 rounded-lg overflow-hidden">
-              {item.imageUrl ? (
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <i className="fas fa-box text-gray-400 text-4xl"></i>
-                </div>
-              )}
-            </div>
-            
-            {/* Item Details */}
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-gray-900 mb-1">Description</h4>
-                <p className="text-gray-600 text-sm">{item.description}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-900 mb-1">Category</h4>
-                <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full capitalize">
-                  {item.category}
-                </span>
-              </div>
-              
-              <div className="flex items-center space-x-3 pt-2">
-                <Avatar className="w-10 h-10">
-                  <AvatarImage 
-                    src={item.owner?.profileImageUrl || undefined}
-                    alt={ownerDisplayName}
-                    className="object-cover"
-                  />
-                  <AvatarFallback>
-                    {ownerInitials}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">Shared by</p>
-                  <p className="text-gray-600 text-sm">{ownerDisplayName}</p>
-                </div>
-              </div>
-              
-              <div className="pt-4 border-t space-y-2">
-                {!isOwner && (
-                  <LoanRequestModal item={item}>
-                    <Button className="w-full bg-brand-blue hover:bg-blue-700">
-                      <HandHeart className="w-4 h-4 mr-2" />
-                      Request to Borrow
-                    </Button>
-                  </LoanRequestModal>
-                )}
-                
-                {isOwner && (
-                  <Button 
-                    onClick={() => {
-                      setShowDetails(false);
-                      setShowEditModal(true);
-                    }}
-                    className="w-full bg-brand-blue hover:bg-blue-700"
-                  >
-                    <i className="fas fa-edit mr-2"></i>
-                    Edit Item
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ItemDetailModal 
+        item={item}
+        isOpen={showDetails}
+        onClose={() => setShowDetails(false)}
+      />
 
       {/* Edit Item Modal */}
       {isOwner && (

@@ -27,11 +27,15 @@ import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 const onboardingSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
   lastName: z.string().trim().min(1, "Last name is required"),
-  username: z.string()
+  username: z
+    .string()
     .trim()
     .min(3, "Username must be at least 3 characters")
     .max(30, "Username must be no more than 30 characters")
-    .regex(/^[a-zA-Z0-9._-]+$/, "Username can only contain letters, numbers, periods, dashes, and underscores")
+    .regex(
+      /^[a-zA-Z0-9._-]+$/,
+      "Username can only contain letters, numbers, periods, dashes, and underscores",
+    )
     .toLowerCase(),
 });
 
@@ -43,8 +47,11 @@ interface OnboardingModalProps {
 }
 
 export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
-  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
-  const [usernameCheckTimeout, setUsernameCheckTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [usernameStatus, setUsernameStatus] = useState<
+    "idle" | "checking" | "available" | "taken"
+  >("idle");
+  const [usernameCheckTimeout, setUsernameCheckTimeout] =
+    useState<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -60,23 +67,30 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
 
   const checkUsernameMutation = useMutation({
     mutationFn: async (username: string) => {
-      const response = await apiRequest(`/api/users/check-username?username=${encodeURIComponent(username)}`, "GET");
+      const response = await apiRequest(
+        `/api/users/check-username?username=${encodeURIComponent(username)}`,
+        "GET",
+      );
       return response.json();
     },
     onSuccess: (data) => {
-      setUsernameStatus(data.available ? 'available' : 'taken');
+      setUsernameStatus(data.available ? "available" : "taken");
     },
     onError: (error) => {
       if (!isUnauthorizedError(error)) {
         console.error("Username check error:", error);
-        setUsernameStatus('idle');
+        setUsernameStatus("idle");
       }
     },
   });
 
   const completeOnboardingMutation = useMutation({
     mutationFn: async (data: OnboardingForm) => {
-      const response = await apiRequest("/api/users/complete-onboarding", "POST", data);
+      const response = await apiRequest(
+        "/api/users/complete-onboarding",
+        "POST",
+        data,
+      );
       return response.json();
     },
     onSuccess: () => {
@@ -99,11 +113,11 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
         }, 500);
         return;
       }
-      
-      const errorMessage = error.message.includes("username") 
+
+      const errorMessage = error.message.includes("username")
         ? "Username is already taken. Please choose a different one."
         : "Failed to complete setup. Please try again.";
-      
+
       toast({
         title: "Setup Failed",
         description: errorMessage,
@@ -119,20 +133,24 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     }
 
     // Reset status
-    setUsernameStatus('idle');
+    setUsernameStatus("idle");
 
     // Trigger form validation immediately for real-time feedback
-    setTimeout(() => form.trigger('username'), 0);
+    setTimeout(() => form.trigger("username"), 0);
 
     // Only check availability if username meets all requirements
-    if (value.length >= 3 && value.length <= 30 && /^[a-zA-Z0-9._-]+$/.test(value)) {
-      setUsernameStatus('checking');
-      
+    if (
+      value.length >= 3 &&
+      value.length <= 30 &&
+      /^[a-zA-Z0-9._-]+$/.test(value)
+    ) {
+      setUsernameStatus("checking");
+
       // Debounce the availability check
       const timeout = setTimeout(() => {
         checkUsernameMutation.mutate(value.toLowerCase());
       }, 500);
-      
+
       setUsernameCheckTimeout(timeout);
     }
   };
@@ -142,8 +160,8 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     if (Object.keys(form.formState.errors).length > 0) {
       return; // Let form validation handle the errors
     }
-    
-    if (usernameStatus !== 'available') {
+
+    if (usernameStatus !== "available") {
       toast({
         title: "Username Required",
         description: "Please choose an available username before continuing.",
@@ -151,17 +169,17 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
       });
       return;
     }
-    
+
     completeOnboardingMutation.mutate(data);
   };
 
   const getUsernameIcon = () => {
     switch (usernameStatus) {
-      case 'checking':
+      case "checking":
         return <Loader2 className="h-4 w-4 animate-spin text-gray-500" />;
-      case 'available':
+      case "available":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'taken':
+      case "taken":
         return <XCircle className="h-4 w-4 text-red-500" />;
       default:
         return null;
@@ -173,13 +191,13 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     if (errors) {
       return errors.message;
     }
-    
+
     switch (usernameStatus) {
-      case 'checking':
+      case "checking":
         return "Checking availability...";
-      case 'available':
+      case "available":
         return "Username is available!";
-      case 'taken':
+      case "taken":
         return "Username is already taken";
       default:
         return "";
@@ -189,16 +207,16 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
   const getUsernameMessageColor = () => {
     const errors = form.formState.errors.username;
     if (errors) {
-      return 'text-red-600';
+      return "text-red-600";
     }
-    
+
     switch (usernameStatus) {
-      case 'available':
-        return 'text-green-600';
-      case 'taken':
-        return 'text-red-600';
+      case "available":
+        return "text-green-600";
+      case "taken":
+        return "text-red-600";
       default:
-        return 'text-gray-500';
+        return "text-gray-500";
     }
   };
 
@@ -206,7 +224,9 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md [&>.close]:hidden">
         <DialogHeader>
-          <DialogTitle className="text-center">Welcome to Library of Stuff!</DialogTitle>
+          <DialogTitle className="text-center">
+            Welcome to Library of Stuff!
+          </DialogTitle>
           <p className="text-sm text-muted-foreground text-center">
             Let's set up your profile to get started
           </p>
@@ -267,9 +287,14 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
                     </div>
                   </FormControl>
                   <div className="text-xs text-muted-foreground mb-1">
-                    3-30 characters • Letters, numbers, periods, dashes, and underscores only
+                    <p>•3-30 characters</p>
+                    <p>
+                      •Letters, numbers, periods (.), dashes (-), and
+                      underscores (_) only
+                    </p>
                   </div>
-                  {(usernameStatus !== 'idle' || form.formState.errors.username) && (
+                  {(usernameStatus !== "idle" ||
+                    form.formState.errors.username) && (
                     <p className={`text-xs ${getUsernameMessageColor()}`}>
                       {getUsernameMessage()}
                     </p>
@@ -278,12 +303,12 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
               )}
             />
 
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               disabled={
-                completeOnboardingMutation.isPending || 
-                usernameStatus !== 'available' ||
+                completeOnboardingMutation.isPending ||
+                usernameStatus !== "available" ||
                 Object.keys(form.formState.errors).length > 0
               }
             >
