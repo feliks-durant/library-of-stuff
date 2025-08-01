@@ -63,7 +63,7 @@ export default function ItemCard({ item }: ItemCardProps) {
             {item.description}
           </p>
           
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <Avatar className="w-6 h-6">
                 <AvatarImage 
@@ -86,6 +86,30 @@ export default function ItemCard({ item }: ItemCardProps) {
             >
               View Details
             </Button>
+          </div>
+          
+          {/* Loan Action Buttons */}
+          <div className="flex gap-2">
+            {!isOwner && (
+              <LoanRequestModal item={item}>
+                <Button size="sm" className="flex-1 bg-brand-blue hover:bg-blue-700">
+                  <HandHeart className="w-4 h-4 mr-1" />
+                  Request
+                </Button>
+              </LoanRequestModal>
+            )}
+            
+            {isOwner && (
+              <Button 
+                size="sm"
+                onClick={() => setShowEditModal(true)}
+                variant="outline"
+                className="flex-1 border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white"
+              >
+                <i className="fas fa-edit mr-1"></i>
+                Edit
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
