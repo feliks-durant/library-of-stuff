@@ -266,6 +266,7 @@ export class DatabaseStorage implements IStorage {
     trustLevel: number; 
     firstName?: string;
     lastName?: string;
+    email?: string;
     profileImageUrl?: string;
     createdAt?: string;
   }>> {
@@ -276,6 +277,7 @@ export class DatabaseStorage implements IStorage {
         trustLevel: trustRelationships.trustLevel,
         firstName: users.firstName,
         lastName: users.lastName,
+        email: users.email,
         profileImageUrl: users.profileImageUrl,
         createdAt: trustRelationships.createdAt,
       })
@@ -289,6 +291,7 @@ export class DatabaseStorage implements IStorage {
       trustLevel: conn.trustLevel,
       firstName: conn.firstName || undefined,
       lastName: conn.lastName || undefined,
+      email: conn.email || undefined,
       profileImageUrl: conn.profileImageUrl || undefined,
       createdAt: conn.createdAt?.toISOString() || undefined,
     }));

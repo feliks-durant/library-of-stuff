@@ -38,6 +38,7 @@ interface Connection {
   trustLevel: number;
   firstName?: string;
   lastName?: string;
+  email?: string;
   profileImageUrl?: string;
   createdAt?: string;
 }
@@ -79,8 +80,7 @@ export default function MyConnectionsPage() {
   // Filter and sort connections
   const filteredConnections = connections.filter(connection =>
     searchQuery === "" || 
-    `${connection.firstName} ${connection.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    connection.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    `${connection.firstName} ${connection.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const sortedConnections = [...filteredConnections].sort((a, b) => {
