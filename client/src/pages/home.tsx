@@ -70,7 +70,7 @@ function TrustRequestModal({
 
   const userName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`
-    : user.email || "Unknown User";
+    : "Unknown User";
 
   const handleSubmit = () => {
     createTrustRequestMutation.mutate({
@@ -130,11 +130,11 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
   
   const userName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`
-    : user.email || "Unknown User";
+    : "Unknown User";
 
   const userInitials = user.firstName && user.lastName
     ? `${user.firstName[0]}${user.lastName[0]}`
-    : user.email ? user.email[0].toUpperCase() : "?";
+    : "?";
 
   return (
     <>
@@ -151,8 +151,7 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
             </AvatarFallback>
           </Avatar>
           
-          <h3 className="font-semibold text-gray-900 mb-2">{userName}</h3>
-          <p className="text-gray-600 text-sm mb-4">{user.email}</p>
+          <h3 className="font-semibold text-gray-900 mb-4">{userName}</h3>
           {existingTrustLevel && (
             <div className="mb-3">
               <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
