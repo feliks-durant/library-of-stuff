@@ -20,7 +20,7 @@ import {
   type UpdateLoan,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, desc, ne } from "drizzle-orm";
+import { eq, and, gte, desc, ne, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -417,14 +417,6 @@ export class DatabaseStorage implements IStorage {
         )
       );
     return loan;
-  }
-
-  async getActiveLoanForItem(itemId: string): Promise<Loan | undefined> {
-    const [activeLoan] = await db
-      .select()
-      .from(loans)
-      .where(and(eq(loans.itemId, itemId), eq(loans.status, "active")));
-    return activeLoan;
   }
 }
 
