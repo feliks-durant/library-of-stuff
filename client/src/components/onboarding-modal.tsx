@@ -134,6 +134,11 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
   };
 
   const onSubmit = (data: OnboardingForm) => {
+    // Check if there are any form validation errors
+    if (Object.keys(form.formState.errors).length > 0) {
+      return; // Let form validation handle the errors
+    }
+    
     if (usernameStatus !== 'available') {
       toast({
         title: "Username Required",
@@ -160,6 +165,11 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
   };
 
   const getUsernameMessage = () => {
+    const errors = form.formState.errors.username;
+    if (errors) {
+      return errors.message;
+    }
+    
     switch (usernameStatus) {
       case 'checking':
         return "Checking availability...";
@@ -169,6 +179,22 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
         return "Username is already taken";
       default:
         return "";
+    }
+  };
+
+  const getUsernameMessageColor = () => {
+    const errors = form.formState.errors.username;
+    if (errors) {
+      return 'text-red-600';
+    }
+    
+    switch (usernameStatus) {
+      case 'available':
+        return 'text-green-600';
+      case 'taken':
+        return 'text-red-600';
+      default:
+        return 'text-gray-500';
     }
   };
 
@@ -236,12 +262,11 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
                       </div>
                     </div>
                   </FormControl>
-                  {usernameStatus !== 'idle' && (
-                    <p className={`text-xs ${
-                      usernameStatus === 'available' ? 'text-green-600' : 
-                      usernameStatus === 'taken' ? 'text-red-600' : 
-                      'text-gray-500'
-                    }`}>
+                  <div className="text-xs text-muted-foreground">
+                    3-30 characters • Letters, numbers, periods, dashes, and underscores only
+                  </div>
+                  {(usernameStatus !== 'idle' || form.formState.errors.username) && (
+                    <p className={`text-xs ${getUsernameMessageColor()}`}>
                       {getUsernameMessage()}
                     </p>
                   )}
@@ -253,7 +278,11 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={completeOnboardingMutation.isPending || usernameStatus !== 'available'}
+              disabled={
+                completeOnboardingMutation.isPending || 
+                usernameStatus !== 'available' ||
+                Object.keys(form.formState.errors).length > 0
+              }
             >
               {completeOnboardingMutation.isPending ? (
                 <>
