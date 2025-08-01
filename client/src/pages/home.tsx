@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import NavigationHeader from "@/components/navigation-header";
 import ItemCard from "@/components/item-card";
 import AddItemModal from "@/components/add-item-modal";
@@ -11,12 +11,139 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { User as UserIcon } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { User as UserIcon, Heart } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
+import { apiRequest } from "@/lib/queryClient";
 import type { Item, User } from "@shared/schema";
+
+// Trust Request Modal Component
+function TrustRequestModal({ 
+  isOpen, 
+  onClose, 
+  user 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  user: User;
+}) {
+  const [requestedLevel, setRequestedLevel] = useState(3);
+  const [message, setMessage] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const createTrustRequestMutation = useMutation({
+    mutationFn: async (requestData: { targetId: string; requestedLevel: number; message?: string }) => {
+      const response = await apiRequest("/api/trust-requests", "POST", requestData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/trust-requests/sent"] });
+      toast({
+        title: "Trust request sent",
+        description: `You have requested trust level ${requestedLevel} from ${user.firstName} ${user.lastName}`,
+      });
+      onClose();
+      setMessage("");
+      setRequestedLevel(3);
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to send trust request. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const userName = user.firstName && user.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user.email || "Unknown User";
+
+  const handleSubmit = () => {
+    createTrustRequestMutation.mutate({
+      targetId: user.id,
+      requestedLevel,
+      message: message || undefined,
+    });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Request Trust from {userName}</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="trustLevel" className="text-sm font-medium">
+              Requested Trust Level
+            </Label>
+            <Select value={requestedLevel.toString()} onValueChange={(value) => setRequestedLevel(parseInt(value))}>
+              <SelectTrigger className="w-full mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Level 1 - Basic</SelectItem>
+                <SelectItem value="2">Level 2 - Low</SelectItem>
+                <SelectItem value="3">Level 3 - Medium</SelectItem>
+                <SelectItem value="4">Level 4 - High</SelectItem>
+                <SelectItem value="5">Level 5 - Maximum</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="message" className="text-sm font-medium">
+              Message (Optional)
+            </Label>
+            <Textarea
+              id="message"
+              placeholder="Why are you requesting this trust level?"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="mt-1"
+              rows={3}
+            />
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={createTrustRequestMutation.isPending}
+            className="bg-brand-blue hover:bg-blue-700"
+          >
+            {createTrustRequestMutation.isPending ? "Sending..." : "Send Request"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 // User Card Component
 function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel?: number }) {
   const [showTrustModal, setShowTrustModal] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
   
   const userName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`
@@ -42,7 +169,7 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
           </Avatar>
           
           <h3 className="font-semibold text-gray-900 mb-2">{userName}</h3>
-          <p className="text-gray-600 text-sm mb-2">{user.email}</p>
+          <p className="text-gray-600 text-sm mb-4">{user.email}</p>
           {existingTrustLevel && (
             <div className="mb-3">
               <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
@@ -51,19 +178,36 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
             </div>
           )}
           
-          <Button
-            onClick={() => setShowTrustModal(true)}
-            className="w-full bg-brand-blue hover:bg-blue-700"
-          >
-            <UserIcon className="w-4 h-4 mr-2" />
-            {existingTrustLevel ? 'Update Trust Level' : 'Set Trust Level'}
-          </Button>
+          <div className="space-y-2">
+            <Button
+              onClick={() => setShowTrustModal(true)}
+              className="w-full bg-brand-blue hover:bg-blue-700"
+            >
+              <UserIcon className="w-4 h-4 mr-2" />
+              {existingTrustLevel ? 'Update Trust Level' : 'Set Trust Level'}
+            </Button>
+            
+            <Button
+              onClick={() => setShowRequestModal(true)}
+              variant="outline"
+              className="w-full"
+            >
+              <Heart className="w-4 h-4 mr-2" />
+              Request Trust
+            </Button>
+          </div>
         </CardContent>
       </Card>
       
       <TrustAssignmentModal 
         isOpen={showTrustModal}
         onClose={() => setShowTrustModal(false)}
+        user={user}
+      />
+      
+      <TrustRequestModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
         user={user}
       />
     </>
