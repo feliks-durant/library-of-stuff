@@ -633,23 +633,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/loans', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const validatedData = insertLoanSchema.parse(req.body);
+      
+      // Manual validation to handle date conversion and lenderId
+      const { itemId, borrowerId, startDate, expectedEndDate, status } = req.body;
+      
+      if (!itemId || !borrowerId || !startDate || !expectedEndDate) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
       
       // Check if user owns the item
-      const item = await storage.getItem(validatedData.itemId);
+      const item = await storage.getItem(itemId);
       if (!item || item.ownerId !== userId) {
         return res.status(404).json({ message: "Item not found or not owned by user" });
       }
       
       // Check if item is already on loan
-      const activeLoan = await storage.getActiveLoanForItem(validatedData.itemId);
+      const activeLoan = await storage.getActiveLoanForItem(itemId);
       if (activeLoan) {
         return res.status(400).json({ message: "Item is already on loan" });
       }
       
       const loan = await storage.createLoan({
-        ...validatedData,
+        itemId,
+        borrowerId,
         lenderId: userId,
+        startDate: new Date(startDate),
+        expectedEndDate: new Date(expectedEndDate),
+        status: status || 'active',
       });
       res.json(loan);
     } catch (error) {

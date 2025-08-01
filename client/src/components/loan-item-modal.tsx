@@ -129,8 +129,9 @@ export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose:
     createLoanMutation.mutate({
       itemId: item.id,
       borrowerId: selectedBorrower,
-      startDate: startDate,
-      expectedEndDate: endDate,
+      startDate: startDate.toISOString(),
+      expectedEndDate: endDate.toISOString(),
+      status: 'active',
     });
   };
 
