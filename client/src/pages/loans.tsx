@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import NavigationHeader from "@/components/navigation-header";
 import { apiRequest } from "@/lib/queryClient";
-import { formatUsername } from "@shared/schema";
+import { formatDisplayName } from "@shared/schema";
 
 interface LoanWithDetails {
   id: string;
@@ -151,8 +151,8 @@ export default function LoansPage() {
           image: loan.borrowerProfileImage 
         };
     
-    const displayName = formatUsername(otherUser) !== 'Unknown User' 
-      ? formatUsername(otherUser) 
+    const displayName = formatDisplayName(otherUser) !== 'Unknown User' 
+      ? formatDisplayName(otherUser) 
       : otherUser.name || otherUser.email;
 
     return (

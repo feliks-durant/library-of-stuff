@@ -281,6 +281,14 @@ export function formatUsername(user: { username?: string | null; discriminator?:
   return `${user.username}#${user.discriminator}`;
 }
 
+// Display just the username for UI (cleaner look)
+export function formatDisplayName(user: { username?: string | null; discriminator?: string | null } | { username?: string; discriminator?: string }): string {
+  if (!user.username) {
+    return 'Unknown User';
+  }
+  return user.username;
+}
+
 export function generateDiscriminator(): string {
   return Math.floor(1000 + Math.random() * 9000).toString();
 }

@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { formatUsername } from "@shared/schema";
+import { formatDisplayName } from "@shared/schema";
 
 interface NavigationHeaderProps {
   searchQuery: string;
@@ -88,7 +88,7 @@ export default function NavigationHeader({
                   <Avatar className="w-8 h-8">
                     <AvatarImage 
                       src={user?.profileImageUrl || undefined} 
-                      alt={formatUsername(user)}
+                      alt={user ? formatDisplayName(user) : 'User'}
                       className="object-cover"
                     />
                     <AvatarFallback>
@@ -96,7 +96,7 @@ export default function NavigationHeader({
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden md:block font-medium">
-                    {formatUsername(user)}
+                    {user ? formatDisplayName(user) : 'User'}
                   </span>
                   <i className="fas fa-chevron-down text-sm"></i>
                 </Button>

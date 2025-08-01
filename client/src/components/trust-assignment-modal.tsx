@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
+import { formatDisplayName } from "@shared/schema";
 import { Heart, Star, Shield, Crown, Gem } from "lucide-react";
 
 interface TrustAssignmentModalProps {
@@ -45,13 +46,8 @@ export default function TrustAssignmentModal({ isOpen, onClose, user, onTrustAss
     }
   }, [existingTrust, isOpen]);
 
-  const userName = user.firstName && user.lastName
-    ? `${user.firstName} ${user.lastName}`
-    : "Unknown User";
-
-  const userInitials = user.firstName && user.lastName
-    ? `${user.firstName[0]}${user.lastName[0]}`
-    : "?";
+  const userName = formatDisplayName(user);
+  const userInitials = user.username?.[0]?.toUpperCase() || "U";
 
   const currentTrustLevel = trustLevels.find(level => level.level === trustLevel[0])!;
   const TrustIcon = currentTrustLevel.icon;

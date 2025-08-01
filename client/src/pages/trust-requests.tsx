@@ -16,7 +16,7 @@ import NavigationHeader from "@/components/navigation-header";
 import TrustAssignmentModal from "@/components/trust-assignment-modal";
 import { apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
-import { formatUsername } from "@shared/schema";
+import { formatDisplayName } from "@shared/schema";
 
 interface TrustRequestWithDetails {
   id: string;
@@ -83,14 +83,14 @@ export default function MyConnectionsPage() {
   // Filter and sort connections
   const filteredConnections = connections.filter(connection =>
     searchQuery === "" || 
-    formatUsername(connection).toLowerCase().includes(searchQuery.toLowerCase())
+    formatDisplayName(connection).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const sortedConnections = [...filteredConnections].sort((a, b) => {
     switch (sortBy) {
       case "name":
-        const nameA = formatUsername(a).toLowerCase();
-        const nameB = formatUsername(b).toLowerCase();
+        const nameA = formatDisplayName(a).toLowerCase();
+        const nameB = formatDisplayName(b).toLowerCase();
         return nameA.localeCompare(nameB);
       case "trust":
         return b.trustLevel - a.trustLevel;
@@ -354,7 +354,7 @@ export default function MyConnectionsPage() {
                         <Avatar className="w-12 h-12">
                           <AvatarImage 
                             src={connection.profileImageUrl || undefined}
-                            alt={formatUsername(connection)}
+                            alt={formatDisplayName(connection)}
                             className="object-cover"
                           />
                           <AvatarFallback>
@@ -364,7 +364,7 @@ export default function MyConnectionsPage() {
                         
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900">
-                            {formatUsername(connection)}
+                            {formatDisplayName(connection)}
                           </h3>
                           
                           <div className="mt-3">
