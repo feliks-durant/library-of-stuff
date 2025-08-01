@@ -14,12 +14,20 @@ import type { Item, User } from "@shared/schema";
 import { Input } from "@/components/ui/input";
 
 interface LoanItemModalProps {
-  item: Item;
-  children: React.ReactNode;
+  item: Item | null;
+  children?: React.ReactNode;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function LoanItemModal({ item, children }: LoanItemModalProps) {
-  const [open, setOpen] = useState(false);
+export function LoanItemModal({ item, children, isOpen: externalIsOpen, onClose: externalOnClose }: LoanItemModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  // Use external state if provided, otherwise use internal state
+  const open = externalIsOpen !== undefined ? externalIsOpen : internalOpen;
+  const setOpen = externalOnClose !== undefined ? 
+    (value: boolean) => { if (!value) externalOnClose(); } : 
+    setInternalOpen;
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [selectedBorrower, setSelectedBorrower] = useState<string>("");
@@ -90,6 +98,8 @@ export function LoanItemModal({ item, children }: LoanItemModalProps) {
       return;
     }
 
+    if (!item) return;
+    
     createLoanMutation.mutate({
       itemId: item.id,
       borrowerId: selectedBorrower,
@@ -98,11 +108,15 @@ export function LoanItemModal({ item, children }: LoanItemModalProps) {
     });
   };
 
+  if (!item) return null;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      {children && (
+        <DialogTrigger asChild>
+          {children}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Loan Item</DialogTitle>
@@ -110,7 +124,7 @@ export function LoanItemModal({ item, children }: LoanItemModalProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label>Item</Label>
-            <Input value={item.title} disabled />
+            <Input value={item?.title || ''} disabled />
           </div>
           
           <div className="space-y-2">
