@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Upload, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const onboardingSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
@@ -52,6 +53,8 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
   >("idle");
   const [usernameCheckTimeout, setUsernameCheckTimeout] =
     useState<NodeJS.Timeout | null>(null);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -86,11 +89,24 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
 
   const completeOnboardingMutation = useMutation({
     mutationFn: async (data: OnboardingForm) => {
-      const response = await apiRequest(
-        "/api/users/complete-onboarding",
-        "POST",
-        data,
-      );
+      const formData = new FormData();
+      formData.append("firstName", data.firstName);
+      formData.append("lastName", data.lastName);
+      formData.append("username", data.username);
+      
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
+      const response = await fetch("/api/users/complete-onboarding", {
+        method: "POST",
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -153,6 +169,45 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
 
       setUsernameCheckTimeout(timeout);
     }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image under 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setProfileImage(file);
+    
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setProfileImagePreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setProfileImage(null);
+    setProfileImagePreview(null);
   };
 
   const onSubmit = (data: OnboardingForm) => {
@@ -302,6 +357,61 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
                 </FormItem>
               )}
             />
+
+            {/* Profile Picture Upload Section */}
+            <div className="space-y-3">
+              <FormLabel className="text-sm font-medium">
+                Profile Picture <span className="text-xs text-muted-foreground">(optional)</span>
+              </FormLabel>
+              
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage src={profileImagePreview || undefined} />
+                  <AvatarFallback>
+                    <User className="h-8 w-8 text-muted-foreground" />
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="flex flex-col space-y-2">
+                  <div className="flex space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById('profile-image-input')?.click()}
+                      className="flex items-center space-x-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      <span>Upload Photo</span>
+                    </Button>
+                    
+                    {profileImage && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={removeImage}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG, GIF or WebP. Max 5MB.
+                  </p>
+                </div>
+              </div>
+              
+              <input
+                id="profile-image-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </div>
 
             <Button
               type="submit"

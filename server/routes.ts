@@ -93,8 +93,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Complete onboarding
-  app.post('/api/users/complete-onboarding', isAuthenticated, async (req: any, res) => {
+  // Complete onboarding with optional profile image
+  app.post('/api/users/complete-onboarding', isAuthenticated, upload.single('profileImage'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { firstName, lastName, username } = req.body;
@@ -125,20 +125,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username is already taken" });
       }
 
-      // Update user profile
-      const updatedUser = await storage.updateUserProfile(userId, {
+      // Prepare update data
+      const updateData: any = {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         username: cleanUsername,
-      });
+      };
+
+      // Add profile image URL if file was uploaded
+      if (req.file) {
+        updateData.profileImageUrl = `/uploads/${req.file.filename}`;
+      }
+
+      // Update user profile
+      const updatedUser = await storage.updateUserProfile(userId, updateData);
 
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
 
       res.json(updatedUser);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error completing onboarding:", error);
+      
+      // Handle multer errors
+      if (error.message === 'Only image files are allowed') {
+        return res.status(400).json({ message: "Only image files are allowed" });
+      }
+      
       res.status(500).json({ message: "Failed to complete onboarding" });
     }
   });

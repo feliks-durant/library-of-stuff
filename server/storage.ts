@@ -31,7 +31,7 @@ export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  updateUserProfile(id: string, updates: UpdateUserProfile): Promise<User | undefined>;
+  updateUserProfile(id: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'username' | 'profileImageUrl'>>): Promise<User | undefined>;
   
   // Item operations
   createItem(item: InsertItem): Promise<Item>;
@@ -103,7 +103,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserProfile(userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'username'>>): Promise<User | undefined> {
+  async updateUserProfile(userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'username' | 'profileImageUrl'>>): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({
