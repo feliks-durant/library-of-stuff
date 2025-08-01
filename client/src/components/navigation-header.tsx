@@ -40,10 +40,12 @@ export default function NavigationHeader({
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-brand-blue">
-                <i className="fas fa-boxes mr-2"></i>
-                Library of Stuff
-              </h1>
+              <Link href="/">
+                <h1 className="text-2xl font-bold text-brand-blue hover:text-blue-700 cursor-pointer transition-colors">
+                  <i className="fas fa-boxes mr-2"></i>
+                  Library of Stuff
+                </h1>
+              </Link>
             </div>
             
             {/* Desktop Search Bar */}
@@ -71,17 +73,7 @@ export default function NavigationHeader({
               <i className="fas fa-qrcode text-xl"></i>
             </Button>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="p-2 text-gray-600 hover:text-brand-blue"
-            >
-              <Link href="/">
-                <i className="fas fa-arrow-left mr-2"></i>
-                Browse Items
-              </Link>
-            </Button>
+
             
             <Button onClick={onAddItem} className="bg-brand-blue hover:bg-blue-700">
               <i className="fas fa-plus mr-2"></i>
