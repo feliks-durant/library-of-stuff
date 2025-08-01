@@ -59,6 +59,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Items routes
+  app.get('/api/items/search', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const query = req.query.q as string;
+      
+      console.log('Search request received:', { userId, query, queryParams: req.query });
+      
+      if (!query || query.trim() === '') {
+        console.log('Empty search query, returning empty array');
+        return res.json([]);
+      }
+
+      const items = await storage.searchItems(userId, query);
+      console.log('Search results:', items.length, 'items found for query:', query);
+      res.json(items);
+    } catch (error) {
+      console.error("Error searching items:", error);
+      res.status(500).json({ message: "Failed to search items" });
+    }
+  });
+
   app.get('/api/items', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -171,27 +192,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting item:", error);
       res.status(500).json({ message: "Failed to delete item" });
-    }
-  });
-
-  app.get('/api/items/search', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const query = req.query.q as string;
-      
-      console.log('Search request received:', { userId, query, queryParams: req.query });
-      
-      if (!query || query.trim() === '') {
-        console.log('Empty search query, returning empty array');
-        return res.json([]);
-      }
-
-      const items = await storage.searchItems(userId, query);
-      console.log('Search results:', items.length, 'items found for query:', query);
-      res.json(items);
-    } catch (error) {
-      console.error("Error searching items:", error);
-      res.status(500).json({ message: "Failed to search items" });
     }
   });
 
