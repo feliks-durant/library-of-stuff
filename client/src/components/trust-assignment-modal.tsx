@@ -19,11 +19,11 @@ interface TrustAssignmentModalProps {
 }
 
 const trustLevels = [
-  { level: 1, icon: Heart, color: "text-gray-400", bg: "bg-gray-100", title: "Basic Trust", description: "Can borrow small, everyday items" },
-  { level: 2, icon: Star, color: "text-blue-500", bg: "bg-blue-100", title: "Trusted Friend", description: "Can borrow most personal items" },
-  { level: 3, icon: Shield, color: "text-green-500", bg: "bg-green-100", title: "Close Friend", description: "Can borrow valuable items" },
-  { level: 4, icon: Crown, color: "text-purple-500", bg: "bg-purple-100", title: "Family-Level Trust", description: "Can borrow expensive or precious items" },
-  { level: 5, icon: Gem, color: "text-orange-500", bg: "bg-orange-100", title: "Complete Trust", description: "Can borrow anything you own" },
+  { level: 1, icon: Heart, color: "text-red-600", bg: "bg-red-100", title: "Basic Trust", description: "Can borrow small, everyday items" },
+  { level: 2, icon: Star, color: "text-orange-600", bg: "bg-orange-100", title: "Trusted Friend", description: "Can borrow most personal items" },
+  { level: 3, icon: Shield, color: "text-yellow-600", bg: "bg-yellow-100", title: "Close Friend", description: "Can borrow valuable items" },
+  { level: 4, icon: Crown, color: "text-green-600", bg: "bg-green-100", title: "Family-Level Trust", description: "Can borrow expensive or precious items" },
+  { level: 5, icon: Gem, color: "text-blue-600", bg: "bg-blue-100", title: "Complete Trust", description: "Can borrow anything you own" },
 ];
 
 export default function TrustAssignmentModal({ isOpen, onClose, user, onTrustAssigned }: TrustAssignmentModalProps) {
