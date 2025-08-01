@@ -21,10 +21,21 @@ export default function Home() {
     queryKey: ["/api/items"],
   });
 
-  const { data: searchResults = [] } = useQuery<Item[]>({
+  const { data: searchResults = [], error: searchError } = useQuery<Item[]>({
     queryKey: ["/api/items/search", { q: searchQuery }],
     enabled: searchQuery.length > 0,
+    retry: false,
+    onError: (error) => {
+      console.error('Search error:', error);
+    }
   });
+
+  // Debug logging
+  console.log('Search query:', searchQuery);
+  if (searchQuery.length > 0) {
+    console.log('Search results:', searchResults);
+    console.log('Search error:', searchError);
+  }
 
   const filteredItems = searchQuery ? searchResults : items;
 

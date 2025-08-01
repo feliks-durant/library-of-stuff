@@ -179,11 +179,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const query = req.query.q as string;
       
-      if (!query) {
-        return res.status(400).json({ message: "Search query is required" });
+      console.log('Search request received:', { userId, query, queryParams: req.query });
+      
+      if (!query || query.trim() === '') {
+        console.log('Empty search query, returning empty array');
+        return res.json([]);
       }
 
       const items = await storage.searchItems(userId, query);
+      console.log('Search results:', items.length, 'items found');
       res.json(items);
     } catch (error) {
       console.error("Error searching items:", error);
