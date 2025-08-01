@@ -5,6 +5,7 @@ import ItemCard from "@/components/item-card";
 import AddItemModal from "@/components/add-item-modal";
 import QRScannerModal from "@/components/qr-scanner-modal";
 import UserProfileModal from "@/components/user-profile-modal";
+import TrustAssignmentModal from "@/components/trust-assignment-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -53,7 +54,11 @@ function UserCard({ user }: { user: User }) {
         </CardContent>
       </Card>
       
-      {/* Trust Assignment Modal would go here */}
+      <TrustAssignmentModal 
+        isOpen={showTrustModal}
+        onClose={() => setShowTrustModal(false)}
+        user={user}
+      />
     </>
   );
 }
