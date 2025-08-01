@@ -38,6 +38,14 @@ export default function ItemCard({ item }: ItemCardProps) {
     : "?";
 
   const isOwner = user?.id === item.ownerId;
+  
+  // Debug logging
+  console.log('ItemCard Debug:', {
+    userId: user?.id,
+    itemOwnerId: item.ownerId,
+    isOwner,
+    itemTitle: item.title
+  });
 
   return (
     <>
@@ -98,6 +106,11 @@ export default function ItemCard({ item }: ItemCardProps) {
                 </Button>
               </LoanRequestModal>
             )}
+            
+            {/* Temporary: Always show a test button for debugging */}
+            <Button size="sm" variant="secondary" className="flex-1">
+              Test Button
+            </Button>
             
             {isOwner && (
               <Button 
