@@ -352,14 +352,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       console.log('Raw request body:', req.body);
       
-      // Convert date strings to Date objects before validation
-      const bodyWithDates = {
-        ...req.body,
-        requestedStartDate: new Date(req.body.requestedStartDate),
-        requestedEndDate: new Date(req.body.requestedEndDate)
-      };
+      // Manual validation and conversion instead of using schema
+      if (!req.body.itemId || !req.body.requestedStartDate || !req.body.requestedEndDate) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
       
-      const validatedData = insertLoanRequestSchema.parse(bodyWithDates);
+      const validatedData = {
+        itemId: req.body.itemId,
+        requestedStartDate: new Date(req.body.requestedStartDate),
+        requestedEndDate: new Date(req.body.requestedEndDate),
+        message: req.body.message || null,
+        status: "pending"
+      };
       
       // Check if item exists and user has access to it
       const items = await storage.getVisibleItems(userId);
