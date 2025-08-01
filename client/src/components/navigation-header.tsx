@@ -71,6 +71,18 @@ export default function NavigationHeader({
               <i className="fas fa-qrcode text-xl"></i>
             </Button>
             
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              className="p-2 text-gray-600 hover:text-brand-blue"
+            >
+              <Link href="/">
+                <i className="fas fa-arrow-left mr-2"></i>
+                Browse Items
+              </Link>
+            </Button>
+            
             <Button onClick={onAddItem} className="bg-brand-blue hover:bg-blue-700">
               <i className="fas fa-plus mr-2"></i>
               Add Item

@@ -372,11 +372,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Item not found or not accessible" });
       }
       
-      // Check if item is already on loan
-      const activeLoan = await storage.getActiveLoanForItem(validatedData.itemId);
-      if (activeLoan) {
-        return res.status(400).json({ message: "Item is already on loan" });
-      }
+      // Allow loan requests even if item is already on loan
+      // const activeLoan = await storage.getActiveLoanForItem(validatedData.itemId);
+      // if (activeLoan) {
+      //   return res.status(400).json({ message: "Item is already on loan" });
+      // }
       
       const loanRequest = await storage.createLoanRequest({
         ...validatedData,

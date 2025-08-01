@@ -156,7 +156,7 @@ export default function LoansPage() {
               </div>
             )}
             
-            {loan.status === "active" && type === "borrowed" && (
+            {loan.status === "active" && type === "lent" && (
               <Button variant="outline" className="w-full">
                 Mark as Returned
               </Button>
