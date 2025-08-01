@@ -4,13 +4,16 @@ import { Link } from "wouter";
 import NavigationHeader from "@/components/navigation-header";
 import EditItemModal from "@/components/edit-item-modal";
 import { LoanItemModal } from "@/components/loan-item-modal";
+import { MyItemDetailModal } from "@/components/my-item-detail-modal";
 import AddItemModal from "@/components/add-item-modal";
 import QRScannerModal from "@/components/qr-scanner-modal";
 import UserProfileModal from "@/components/user-profile-modal";
+import TrustAssignmentModal from "@/components/trust-assignment-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { HandHeart } from "lucide-react";
 import type { Item } from "@shared/schema";
 
@@ -19,9 +22,14 @@ export default function MyItems() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [loaningItemId, setLoaningItemId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [showMyItemDetail, setShowMyItemDetail] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showTrustModal, setShowTrustModal] = useState(false);
+  const [trustUserId, setTrustUserId] = useState<string | null>(null);
 
   const { data: items = [], isLoading } = useQuery<Item[]>({
     queryKey: ["/api/items/my"],
@@ -45,8 +53,26 @@ export default function MyItems() {
     return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
   });
 
-  const handleEditItem = (itemId: string) => {
-    setEditingItemId(itemId);
+  const handleItemClick = (item: Item) => {
+    setSelectedItem(item);
+    setShowMyItemDetail(true);
+  };
+
+  const handleEditItem = (item: Item) => {
+    setSelectedItem(null);
+    setShowMyItemDetail(false);
+    setEditingItemId(item.id);
+  };
+
+  const handleLoanItem = (item: Item) => {
+    setSelectedItem(null);
+    setShowMyItemDetail(false);
+    setLoaningItemId(item.id);
+  };
+
+  const handleTrustClick = (userId: string) => {
+    setTrustUserId(userId);
+    setShowTrustModal(true);
   };
 
   if (isLoading) {
@@ -174,7 +200,11 @@ export default function MyItems() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sortedItems.map((item) => (
-              <Card key={item.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 overflow-hidden">
+              <Card 
+                key={item.id} 
+                className="bg-white rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 border border-gray-200 overflow-hidden cursor-pointer"
+                onClick={() => handleItemClick(item)}
+              >
                 {/* Item Image */}
                 <div className="w-full h-48 overflow-hidden">
                   {item.imageUrl ? (
@@ -182,6 +212,8 @@ export default function MyItems() {
                       src={item.imageUrl}
                       alt={item.title}
                       className="w-full h-full object-cover"
+                      onLoad={() => console.log("Image loaded successfully:", item.imageUrl)}
+                      onError={() => console.log("Image failed to load:", item.imageUrl)}
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -196,34 +228,13 @@ export default function MyItems() {
                     {item.description}
                   </p>
                   
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full capitalize">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary" className="capitalize">
                       {item.category}
-                    </span>
+                    </Badge>
                     <span className="text-sm text-gray-500">
                       Trust Level: {item.trustLevel}
                     </span>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={() => handleEditItem(item.id)}
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      <i className="fas fa-edit mr-1"></i>
-                      Edit
-                    </Button>
-                    <LoanItemModal item={item}>
-                      <Button
-                        size="sm"
-                        className="flex-1 bg-brand-blue hover:bg-blue-700"
-                      >
-                        <HandHeart className="w-3 h-3 mr-1" />
-                        Loan
-                      </Button>
-                    </LoanItemModal>
                   </div>
                 </CardContent>
               </Card>
@@ -232,11 +243,43 @@ export default function MyItems() {
         )}
       </main>
 
+      {/* My Item Detail Modal */}
+      <MyItemDetailModal
+        item={selectedItem}
+        isOpen={showMyItemDetail}
+        onClose={() => {
+          setShowMyItemDetail(false);
+          setSelectedItem(null);
+        }}
+        onEdit={handleEditItem}
+        onLoan={handleLoanItem}
+        onTrustClick={handleTrustClick}
+      />
+
       {/* Edit Item Modal */}
       <EditItemModal 
         isOpen={!!editingItemId}
         onClose={() => setEditingItemId(null)}
         itemId={editingItemId}
+      />
+
+      {/* Loan Item Modal */}
+      {loaningItemId && (
+        <LoanItemModal
+          item={sortedItems.find(item => item.id === loaningItemId) || null}
+        >
+          <div />
+        </LoanItemModal>
+      )}
+
+      {/* Trust Assignment Modal */}
+      <TrustAssignmentModal
+        isOpen={showTrustModal}
+        onClose={() => {
+          setShowTrustModal(false);
+          setTrustUserId(null);
+        }}
+        userId={trustUserId}
       />
       
       <AddItemModal

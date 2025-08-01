@@ -717,6 +717,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get active loan for specific item
+  app.get('/api/loans/active/:itemId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { itemId } = req.params;
+      const activeLoan = await storage.getActiveLoanForItem(itemId);
+      res.json(activeLoan);
+    } catch (error) {
+      console.error("Error fetching active loan:", error);
+      res.status(500).json({ message: "Failed to fetch active loan" });
+    }
+  });
+
+  // Get loan history for specific item
+  app.get('/api/loans/history/:itemId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { itemId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      // Get all loans for this item (both active and completed)
+      const loanHistory = await db
+        .select()
+        .from(loans)
+        .where(eq(loans.itemId, itemId))
+        .orderBy(desc(loans.startDate));
+      
+      res.json(loanHistory);
+    } catch (error) {
+      console.error("Error fetching loan history:", error);
+      res.status(500).json({ message: "Failed to fetch loan history" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
