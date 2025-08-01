@@ -270,11 +270,13 @@ export default function MyItems() {
       />
 
       {/* Loan Item Modal */}
-      <LoanItemModal 
-        isOpen={!!loaningItemId}
-        onClose={() => setLoaningItemId(null)}
-        item={sortedItems.find(item => item.id === loaningItemId) || null}
-      />
+      {loaningItemId && (
+        <LoanItemModal 
+          isOpen={!!loaningItemId}
+          onClose={() => setLoaningItemId(null)}
+          item={sortedItems.find(item => item.id === loaningItemId) || null}
+        />
+      )}
 
       {/* Trust Assignment Modal */}
       {trustUserId && trustUser && (
