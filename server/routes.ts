@@ -243,6 +243,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const trust = await storage.setTrustLevel(trustData);
+      
+      // Also approve any pending trust request from this user
+      try {
+        await storage.approveTrustRequest(req.body.trusteeId, trusterId);
+      } catch (error) {
+        // Continue if there's no pending request to approve
+        console.log("No pending trust request to approve or error approving:", error);
+      }
+      
       res.json(trust);
     } catch (error) {
       console.error("Error setting trust level:", error);
@@ -385,9 +394,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/trust-requests', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      const { targetId, message } = req.body;
       const trustRequest = await storage.createTrustRequest({
         requesterId: userId,
-        ...req.body,
+        targetId,
+        message,
       });
       res.json(trustRequest);
     } catch (error) {

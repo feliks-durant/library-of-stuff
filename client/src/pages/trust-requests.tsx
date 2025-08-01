@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,15 +10,15 @@ import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
 import NavigationHeader from "@/components/navigation-header";
+import TrustAssignmentModal from "@/components/trust-assignment-modal";
 import { apiRequest } from "@/lib/queryClient";
+import type { User } from "@shared/schema";
 
 interface TrustRequestWithDetails {
   id: string;
   requesterId: string;
   targetId: string;
-  requestedLevel: number;
   message?: string;
   status: string;
   createdAt: string;
@@ -34,6 +35,7 @@ export default function TrustRequestsPage() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
   const queryClient = useQueryClient();
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -60,47 +62,15 @@ export default function TrustRequestsPage() {
     retry: false,
   });
 
-  const approveTrustRequestMutation = useMutation({
-    mutationFn: async ({ requestId, trustLevel }: { requestId: string; trustLevel: number }) => {
-      // First update the trust request to approved
-      await apiRequest(`/api/trust-requests/${requestId}`, "PATCH", {
-        status: "approved",
-      });
-      
-      // Then create the actual trust relationship
-      const response = await apiRequest("/api/trust", "POST", {
-        trusteeId: receivedRequests.find(req => req.id === requestId)?.requesterId,
-        trustLevel: trustLevel,
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/trust-requests/received"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/users/connections"] });
-      toast({
-        title: "Trust level assigned",
-        description: "You have successfully assigned trust to this user.",
-      });
-    },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Error",
-        description: "Failed to assign trust level. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  // When trust is assigned via the modal, automatically approve the request
+  const handleTrustAssigned = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/trust-requests/received"] });
+    toast({
+      title: "Trust request approved",
+      description: "Trust level has been set successfully.",
+    });
+    setSelectedUser(null);
+  };
 
   const denyTrustRequestMutation = useMutation({
     mutationFn: async (requestId: string) => {
@@ -163,7 +133,13 @@ export default function TrustRequestsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <NavigationHeader />
+        <NavigationHeader 
+          searchQuery=""
+          onSearchChange={() => {}}
+          onAddItem={() => {}}
+          onScanQR={() => {}}
+          onOpenProfile={() => {}}
+        />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
@@ -178,7 +154,13 @@ export default function TrustRequestsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavigationHeader />
+      <NavigationHeader 
+        searchQuery=""
+        onSearchChange={() => {}}
+        onAddItem={() => {}}
+        onScanQR={() => {}}
+        onOpenProfile={() => {}}
+      />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
@@ -233,9 +215,6 @@ export default function TrustRequestsPage() {
                               <h3 className="font-semibold text-gray-900">
                                 {request.requesterName || request.requesterEmail}
                               </h3>
-                              <Badge className={getTrustLevelBadge(request.requestedLevel)}>
-                                Trust Level {request.requestedLevel}
-                              </Badge>
                               {getStatusBadge(request.status)}
                             </div>
                             
@@ -251,18 +230,19 @@ export default function TrustRequestsPage() {
                         
                         {request.status === "pending" && (
                           <div className="flex space-x-2">
-                            {[1, 2, 3, 4, 5].map((level) => (
-                              <Button
-                                key={level}
-                                size="sm"
-                                variant={level === request.requestedLevel ? "default" : "outline"}
-                                onClick={() => approveTrustRequestMutation.mutate({ requestId: request.id, trustLevel: level })}
-                                disabled={approveTrustRequestMutation.isPending}
-                                className={level === request.requestedLevel ? "bg-brand-blue hover:bg-blue-700" : ""}
-                              >
-                                {level}
-                              </Button>
-                            ))}
+                            <Button
+                              size="sm"
+                              onClick={() => setSelectedUser({ 
+                                id: request.requesterId, 
+                                firstName: request.requesterName?.split(' ')[0] || '', 
+                                lastName: request.requesterName?.split(' ')[1] || '',
+                                email: request.requesterEmail || '',
+                                profileImageUrl: request.requesterProfileImage || undefined
+                              } as User)}
+                              className="bg-brand-blue hover:bg-blue-700"
+                            >
+                              Set Trust Level
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline"
@@ -270,7 +250,7 @@ export default function TrustRequestsPage() {
                               disabled={denyTrustRequestMutation.isPending}
                               className="text-red-600 hover:bg-red-50"
                             >
-                              Deny
+                              {denyTrustRequestMutation.isPending ? "..." : "Deny"}
                             </Button>
                           </div>
                         )}
@@ -337,6 +317,15 @@ export default function TrustRequestsPage() {
           </TabsContent>
         </Tabs>
       </main>
+      
+      {selectedUser && (
+        <TrustAssignmentModal
+          isOpen={!!selectedUser}
+          onClose={() => setSelectedUser(null)}
+          user={selectedUser}
+          onTrustAssigned={handleTrustAssigned}
+        />
+      )}
     </div>
   );
 }

@@ -30,13 +30,12 @@ function TrustRequestModal({
   onClose: () => void; 
   user: User;
 }) {
-  const [requestedLevel, setRequestedLevel] = useState(3);
   const [message, setMessage] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const createTrustRequestMutation = useMutation({
-    mutationFn: async (requestData: { targetId: string; requestedLevel: number; message?: string }) => {
+    mutationFn: async (requestData: { targetId: string; message?: string }) => {
       const response = await apiRequest("/api/trust-requests", "POST", requestData);
       return response.json();
     },
@@ -44,11 +43,10 @@ function TrustRequestModal({
       queryClient.invalidateQueries({ queryKey: ["/api/trust-requests/sent"] });
       toast({
         title: "Trust request sent",
-        description: `You have requested trust level ${requestedLevel} from ${user.firstName} ${user.lastName}`,
+        description: `You have requested trust from ${user.firstName} ${user.lastName}`,
       });
       onClose();
       setMessage("");
-      setRequestedLevel(3);
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
@@ -77,7 +75,6 @@ function TrustRequestModal({
   const handleSubmit = () => {
     createTrustRequestMutation.mutate({
       targetId: user.id,
-      requestedLevel,
       message: message || undefined,
     });
   };
@@ -90,23 +87,9 @@ function TrustRequestModal({
         </DialogHeader>
         
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="trustLevel" className="text-sm font-medium">
-              Requested Trust Level
-            </Label>
-            <Select value={requestedLevel.toString()} onValueChange={(value) => setRequestedLevel(parseInt(value))}>
-              <SelectTrigger className="w-full mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">Level 1 - Basic</SelectItem>
-                <SelectItem value="2">Level 2 - Low</SelectItem>
-                <SelectItem value="3">Level 3 - Medium</SelectItem>
-                <SelectItem value="4">Level 4 - High</SelectItem>
-                <SelectItem value="5">Level 5 - Maximum</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <p className="text-sm text-gray-600">
+            Send a trust request to {userName}. They will decide what trust level to assign you.
+          </p>
           
           <div>
             <Label htmlFor="message" className="text-sm font-medium">
@@ -114,7 +97,7 @@ function TrustRequestModal({
             </Label>
             <Textarea
               id="message"
-              placeholder="Why are you requesting this trust level?"
+              placeholder="Why are you requesting trust from this person?"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="mt-1"

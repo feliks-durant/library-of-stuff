@@ -81,7 +81,6 @@ export const trustRequests = pgTable("trust_requests", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   requesterId: varchar("requester_id").notNull().references(() => users.id, { onDelete: "cascade" }), // person requesting trust
   targetId: varchar("target_id").notNull().references(() => users.id, { onDelete: "cascade" }), // person being asked for trust
-  requestedLevel: integer("requested_level").notNull(), // 1-5, requested trust level
   message: text("message"), // optional message from requester
   status: varchar("status").notNull().default("pending"), // pending, approved, denied
   createdAt: timestamp("created_at").defaultNow(),

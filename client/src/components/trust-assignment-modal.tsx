@@ -14,6 +14,7 @@ interface TrustAssignmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: User;
+  onTrustAssigned?: () => void;
 }
 
 const trustLevels = [
@@ -24,7 +25,7 @@ const trustLevels = [
   { level: 5, icon: Gem, color: "text-orange-500", bg: "bg-orange-100", title: "Complete Trust", description: "Can borrow anything you own" },
 ];
 
-export default function TrustAssignmentModal({ isOpen, onClose, user }: TrustAssignmentModalProps) {
+export default function TrustAssignmentModal({ isOpen, onClose, user, onTrustAssigned }: TrustAssignmentModalProps) {
   const [trustLevel, setTrustLevel] = useState([3]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -68,6 +69,7 @@ export default function TrustAssignmentModal({ isOpen, onClose, user }: TrustAss
         description: `${userName} now has trust level ${trustLevel[0]}`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/users/connections"] });
+      onTrustAssigned?.();
       onClose();
     },
     onError: (error) => {

@@ -483,6 +483,19 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async approveTrustRequest(requesterId: string, targetId: string): Promise<void> {
+    await db
+      .update(trustRequests)
+      .set({ status: 'approved' })
+      .where(
+        and(
+          eq(trustRequests.requesterId, requesterId),
+          eq(trustRequests.targetId, targetId),
+          eq(trustRequests.status, 'pending')
+        )
+      );
+  }
+
   // Username generation
   async generateUniqueUsername(baseName: string): Promise<string> {
     // Clean the base name (remove spaces, special chars, make lowercase)
