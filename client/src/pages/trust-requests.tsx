@@ -350,7 +350,17 @@ export default function MyConnectionsPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortedConnections.map((connection) => (
-                  <Card key={connection.trusteeId} className="hover:shadow-md transition-shadow">
+                  <Card 
+                    key={connection.trusteeId} 
+                    className="hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer"
+                    onClick={() => setSelectedUser({
+                      id: connection.trusteeId,
+                      firstName: connection.firstName || '',
+                      lastName: connection.lastName || '',
+                      email: '',
+                      profileImageUrl: connection.profileImageUrl || '',
+                    } as User)}
+                  >
                     <CardContent className="p-6">
                       <div className="flex items-start space-x-4">
                         <Avatar className="w-12 h-12">
@@ -373,23 +383,6 @@ export default function MyConnectionsPage() {
                             <Badge className={getTrustLevelBadge(connection.trustLevel)}>
                               Trust Level {connection.trustLevel}
                             </Badge>
-                          </div>
-                          
-                          <div className="mt-4">
-                            <Button
-                              onClick={() => setSelectedUser({
-                                id: connection.trusteeId,
-                                firstName: connection.firstName || '',
-                                lastName: connection.lastName || '',
-                                email: '',
-                                profileImageUrl: connection.profileImageUrl || '',
-                              } as User)}
-                              variant="outline"
-                              size="sm"
-                              className="w-full"
-                            >
-                              Update Trust Level
-                            </Button>
                           </div>
                         </div>
                       </div>
