@@ -261,17 +261,40 @@ export class DatabaseStorage implements IStorage {
     return trust?.trustLevel || 0;
   }
 
-  async getUserConnections(userId: string): Promise<Array<{ trusteeId: string; trustLevel: number }>> {
-    // Get trust relationships where this user is the truster
+  async getUserConnections(userId: string): Promise<Array<{ 
+    trusteeId: string; 
+    trustLevel: number; 
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    profileImageUrl?: string;
+    createdAt?: string;
+  }>> {
+    // Get trust relationships where this user is the truster, joined with user details
     const connections = await db
       .select({
         trusteeId: trustRelationships.trusteeId,
         trustLevel: trustRelationships.trustLevel,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: trustRelationships.createdAt,
       })
       .from(trustRelationships)
+      .leftJoin(users, eq(trustRelationships.trusteeId, users.id))
       .where(eq(trustRelationships.trusterId, userId));
     
-    return connections;
+    // Convert null values to undefined and dates to strings
+    return connections.map(conn => ({
+      trusteeId: conn.trusteeId,
+      trustLevel: conn.trustLevel,
+      firstName: conn.firstName || undefined,
+      lastName: conn.lastName || undefined,
+      email: conn.email || undefined,
+      profileImageUrl: conn.profileImageUrl || undefined,
+      createdAt: conn.createdAt?.toISOString() || undefined,
+    }));
   }
 
   // Loan request operations
