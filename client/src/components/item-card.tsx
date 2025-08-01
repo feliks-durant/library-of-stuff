@@ -51,12 +51,19 @@ export default function ItemCard({ item }: ItemCardProps) {
               src={item.imageUrl}
               alt={item.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error('Image failed to load:', item.imageUrl);
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+              onLoad={() => {
+                console.log('Image loaded successfully:', item.imageUrl);
+              }}
             />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              <i className="fas fa-box text-gray-400 text-4xl"></i>
-            </div>
-          )}
+          ) : null}
+          <div className={`w-full h-full bg-gray-200 flex items-center justify-center ${item.imageUrl ? 'hidden' : ''}`}>
+            <i className="fas fa-box text-gray-400 text-4xl"></i>
+          </div>
         </div>
         
         <CardContent className="p-4">
