@@ -19,9 +19,9 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground vaporwave-grid">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section with authentic vaporwave grid */}
-      <section className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden">
+      <section className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden vaporwave-grid">
         {/* Animated grid with exact reference colors */}
         <div className="absolute inset-0 animated-grid"></div>
         
