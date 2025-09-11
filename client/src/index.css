@@ -160,26 +160,58 @@
     border-color: var(--vapor-purple);
   }
   
-  /* Authentic vaporwave grid - exact colors from reference image */
+  /* Authentic vaporwave grid with sunset gradient background */
   .vaporwave-grid {
+    /* Sunset gradient background */
+    background: 
+      linear-gradient(180deg, 
+        #FFE066 0%,     /* Bright yellow sun */
+        #FF9A56 20%,    /* Warm orange */
+        #FF6B9D 40%,    /* Sunset pink */
+        #C44899 60%,    /* Deep magenta */
+        var(--grid-bg) 80%  /* Transition to teal grid background */
+      );
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Grid overlay with perspective tilt */
+  .vaporwave-grid::after {
+    content: '';
+    position: absolute;
+    top: 30%;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: var(--grid-bg);
     background-image:
       linear-gradient(90deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%),
       linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
     background-size: 60px 60px;
-    position: relative;
-    overflow: hidden;
+    /* Perspective transform to recede into distance */
+    transform-origin: bottom center;
+    transform: perspective(800px) rotateX(75deg);
+    z-index: 0;
   }
   
-  /* Animated grid with exact reference colors */
+  /* Animated grid overlay with perspective tilt */
   .animated-grid {
-    background-color: var(--grid-bg);
+    position: absolute;
+    top: 30%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
     background-image:
       linear-gradient(90deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%),
       linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
     background-size: 60px 60px;
     animation: grid-move 8s linear infinite;
-    opacity: 0.4;
+    /* Perspective transform to recede into distance */
+    transform-origin: bottom center;
+    transform: perspective(800px) rotateX(75deg);
+    opacity: 0.6;
+    z-index: 1;
   }
   
   /* Scanlines for lo-fi VHS effect */
