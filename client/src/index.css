@@ -10,65 +10,65 @@
 @tailwind utilities;
 
 :root {
-  /* Vaporwave color palette */
-  --background: hsl(270, 50%, 5%); /* Deep purple-black */
-  --foreground: hsl(300, 100%, 90%); /* Hot pink text */
-  --muted: hsl(270, 40%, 15%); /* Dark purple */
-  --muted-foreground: hsl(180, 100%, 70%); /* Cyan */
-  --popover: hsl(270, 60%, 8%); /* Slightly lighter dark purple */
-  --popover-foreground: hsl(300, 100%, 90%);
-  --card: hsl(270, 50%, 10%); /* Dark card background */
-  --card-foreground: hsl(300, 100%, 90%);
-  --border: hsl(300, 100%, 50%); /* Hot pink borders */
-  --input: hsl(270, 40%, 20%); /* Dark purple inputs */
-  --primary: hsl(300, 100%, 50%); /* Hot pink primary */
-  --primary-foreground: hsl(270, 50%, 5%);
-  --secondary: hsl(180, 100%, 50%); /* Electric cyan */
-  --secondary-foreground: hsl(270, 50%, 5%);
-  --accent: hsl(270, 100%, 60%); /* Purple accent */
-  --accent-foreground: hsl(300, 100%, 90%);
-  --destructive: hsl(0, 100%, 50%); /* Neon red */
+  /* Soft Vaporwave color palette - inspired by sunset and 90s nostalgia */
+  --background: hsl(280, 30%, 8%); /* Soft dark purple */
+  --foreground: hsl(320, 60%, 85%); /* Soft pink text */
+  --muted: hsl(280, 35%, 18%); /* Muted dark purple */
+  --muted-foreground: hsl(190, 40%, 70%); /* Soft teal */
+  --popover: hsl(280, 40%, 12%); /* Soft dark purple */
+  --popover-foreground: hsl(320, 60%, 85%);
+  --card: hsl(280, 35%, 15%); /* Soft dark card */
+  --card-foreground: hsl(320, 60%, 85%);
+  --border: hsl(320, 50%, 65%); /* Soft pink borders */
+  --input: hsl(280, 30%, 22%); /* Soft purple inputs */
+  --primary: hsl(320, 50%, 65%); /* Soft coral pink */
+  --primary-foreground: hsl(280, 30%, 8%);
+  --secondary: hsl(190, 40%, 65%); /* Soft teal */
+  --secondary-foreground: hsl(280, 30%, 8%);
+  --accent: hsl(270, 40%, 70%); /* Soft lavender */
+  --accent-foreground: hsl(320, 60%, 85%);
+  --destructive: hsl(350, 50%, 60%); /* Soft coral red */
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(300, 100%, 50%); /* Hot pink focus ring */
+  --ring: hsl(320, 50%, 65%); /* Soft pink focus ring */
   --radius: 0.75rem;
   
-  /* Vaporwave brand colors */
-  --neon-pink: hsl(300, 100%, 50%); /* #FF00FF */
-  --electric-cyan: hsl(180, 100%, 50%); /* #00FFFF */
-  --neon-purple: hsl(270, 100%, 60%); /* #9900FF */
-  --sunset-orange: hsl(30, 100%, 60%); /* #FF9900 */
-  --laser-green: hsl(120, 100%, 50%); /* #00FF00 */
+  /* Authentic Vaporwave brand colors - soft pastels */
+  --vapor-pink: hsl(320, 50%, 70%); /* Soft coral pink */
+  --vapor-teal: hsl(190, 40%, 65%); /* Muted teal */
+  --vapor-purple: hsl(270, 40%, 70%); /* Soft lavender */
+  --vapor-orange: hsl(25, 50%, 70%); /* Soft peach */
+  --vapor-mint: hsl(160, 35%, 70%); /* Soft mint green */
 }
 
 .dark {
-  /* Enhanced vaporwave dark mode - even more intense! */
-  --background: hsl(270, 80%, 2%); /* Ultra dark purple-black */
-  --foreground: hsl(300, 100%, 95%); /* Brighter hot pink text */
-  --muted: hsl(270, 60%, 8%); /* Darker purple */
-  --muted-foreground: hsl(180, 100%, 80%); /* Brighter cyan */
-  --popover: hsl(270, 70%, 5%);
-  --popover-foreground: hsl(300, 100%, 95%);
-  --card: hsl(270, 70%, 5%); /* Ultra dark cards */
-  --card-foreground: hsl(300, 100%, 95%);
-  --border: hsl(300, 100%, 60%); /* Glowing hot pink borders */
-  --input: hsl(270, 50%, 12%);
-  --primary: hsl(300, 100%, 60%); /* Glowing hot pink */
-  --primary-foreground: hsl(270, 80%, 2%);
-  --secondary: hsl(180, 100%, 60%); /* Glowing cyan */
-  --secondary-foreground: hsl(270, 80%, 2%);
-  --accent: hsl(270, 100%, 70%); /* Brighter purple */
-  --accent-foreground: hsl(300, 100%, 95%);
-  --destructive: hsl(0, 100%, 60%); /* Bright neon red */
+  /* Soft vaporwave dark mode - dreamy and nostalgic */
+  --background: hsl(280, 40%, 4%); /* Deeper soft purple */
+  --foreground: hsl(320, 50%, 90%); /* Soft pink text */
+  --muted: hsl(280, 45%, 10%); /* Deeper muted purple */
+  --muted-foreground: hsl(190, 35%, 75%); /* Softer teal */
+  --popover: hsl(280, 50%, 6%);
+  --popover-foreground: hsl(320, 50%, 90%);
+  --card: hsl(280, 45%, 8%); /* Deeper soft cards */
+  --card-foreground: hsl(320, 50%, 90%);
+  --border: hsl(320, 45%, 70%); /* Softer pink borders */
+  --input: hsl(280, 35%, 15%);
+  --primary: hsl(320, 45%, 70%); /* Softer coral pink */
+  --primary-foreground: hsl(280, 40%, 4%);
+  --secondary: hsl(190, 35%, 70%); /* Softer teal */
+  --secondary-foreground: hsl(280, 40%, 4%);
+  --accent: hsl(270, 35%, 75%); /* Softer lavender */
+  --accent-foreground: hsl(320, 50%, 90%);
+  --destructive: hsl(350, 45%, 65%); /* Softer coral red */
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(300, 100%, 60%); /* Glowing focus ring */
+  --ring: hsl(320, 45%, 70%); /* Softer focus ring */
   --radius: 0.75rem;
   
-  /* Enhanced vaporwave brand colors for dark mode */
-  --neon-pink: hsl(300, 100%, 60%); /* Brighter pink */
-  --electric-cyan: hsl(180, 100%, 60%); /* Brighter cyan */
-  --neon-purple: hsl(270, 100%, 70%); /* Brighter purple */
-  --sunset-orange: hsl(30, 100%, 70%); /* Brighter orange */
-  --laser-green: hsl(120, 100%, 60%); /* Brighter green */
+  /* Soft vaporwave brand colors for dark mode */
+  --vapor-pink: hsl(320, 45%, 75%); /* Softer coral pink */
+  --vapor-teal: hsl(190, 35%, 70%); /* Softer teal */
+  --vapor-purple: hsl(270, 35%, 75%); /* Softer lavender */
+  --vapor-orange: hsl(25, 45%, 75%); /* Softer peach */
+  --vapor-mint: hsl(160, 30%, 75%); /* Softer mint green */
 }
 
 @layer base {
@@ -82,78 +82,78 @@
 }
 
 @layer utilities {
-  /* Vaporwave color utilities */
-  .text-neon-pink {
-    color: var(--neon-pink);
+  /* Soft Vaporwave color utilities */
+  .text-vapor-pink {
+    color: var(--vapor-pink);
   }
   
-  .bg-neon-pink {
-    background-color: var(--neon-pink);
+  .bg-vapor-pink {
+    background-color: var(--vapor-pink);
   }
   
-  .text-electric-cyan {
-    color: var(--electric-cyan);
+  .text-vapor-teal {
+    color: var(--vapor-teal);
   }
   
-  .bg-electric-cyan {
-    background-color: var(--electric-cyan);
+  .bg-vapor-teal {
+    background-color: var(--vapor-teal);
   }
   
-  .text-neon-purple {
-    color: var(--neon-purple);
+  .text-vapor-purple {
+    color: var(--vapor-purple);
   }
   
-  .bg-neon-purple {
-    background-color: var(--neon-purple);
+  .bg-vapor-purple {
+    background-color: var(--vapor-purple);
   }
   
-  .text-sunset-orange {
-    color: var(--sunset-orange);
+  .text-vapor-orange {
+    color: var(--vapor-orange);
   }
   
-  .bg-sunset-orange {
-    background-color: var(--sunset-orange);
+  .bg-vapor-orange {
+    background-color: var(--vapor-orange);
   }
   
-  .text-laser-green {
-    color: var(--laser-green);
+  .text-vapor-mint {
+    color: var(--vapor-mint);
   }
   
-  .bg-laser-green {
-    background-color: var(--laser-green);
+  .bg-vapor-mint {
+    background-color: var(--vapor-mint);
   }
   
-  /* Glow effects */
+  /* Soft glow effects - subtle and dreamy */
   .text-glow-pink {
-    color: var(--neon-pink);
-    text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+    color: var(--vapor-pink);
+    text-shadow: 0 0 8px var(--vapor-pink), 0 0 16px var(--vapor-pink), 0 0 24px var(--vapor-pink);
   }
   
-  .text-glow-cyan {
-    color: var(--electric-cyan);
-    text-shadow: 0 0 10px var(--electric-cyan), 0 0 20px var(--electric-cyan), 0 0 40px var(--electric-cyan);
+  .text-glow-teal {
+    color: var(--vapor-teal);
+    text-shadow: 0 0 8px var(--vapor-teal), 0 0 16px var(--vapor-teal), 0 0 24px var(--vapor-teal);
   }
   
   .text-glow-purple {
-    color: var(--neon-purple);
-    text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 40px var(--neon-purple);
+    color: var(--vapor-purple);
+    text-shadow: 0 0 8px var(--vapor-purple), 0 0 16px var(--vapor-purple), 0 0 24px var(--vapor-purple);
   }
   
-  /* Box glow effects */
+  /* Soft box glow effects */
   .box-glow-pink {
-    box-shadow: 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink), inset 0 0 20px rgba(255, 0, 255, 0.1);
+    box-shadow: 0 0 15px var(--vapor-pink), 0 0 30px var(--vapor-pink), inset 0 0 15px rgba(255, 192, 203, 0.1);
   }
   
-  .box-glow-cyan {
-    box-shadow: 0 0 20px var(--electric-cyan), 0 0 40px var(--electric-cyan), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  .box-glow-teal {
+    box-shadow: 0 0 15px var(--vapor-teal), 0 0 30px var(--vapor-teal), inset 0 0 15px rgba(176, 224, 230, 0.1);
   }
   
-  /* Vaporwave grid background */
+  /* Soft vaporwave grid background with dreamy sunset gradients */
   .vaporwave-grid {
     background: 
-      linear-gradient(90deg, transparent 0%, transparent 49%, var(--neon-pink) 50%, var(--neon-pink) 51%, transparent 52%, transparent 100%),
-      linear-gradient(0deg, transparent 0%, transparent 49%, var(--electric-cyan) 50%, var(--electric-cyan) 51%, transparent 52%, transparent 100%);
-    background-size: 60px 60px;
+      linear-gradient(90deg, transparent 0%, transparent 49%, var(--vapor-pink) 50%, var(--vapor-pink) 51%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 49%, var(--vapor-teal) 50%, var(--vapor-teal) 51%, transparent 52%, transparent 100%);
+    background-size: 80px 80px;
     position: relative;
     overflow: hidden;
   }
@@ -166,19 +166,30 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 50% 0%, var(--neon-purple) 0%, transparent 50%),
-      radial-gradient(circle at 50% 100%, var(--sunset-orange) 0%, transparent 50%);
-    opacity: 0.3;
+      radial-gradient(ellipse at 50% 0%, var(--vapor-purple) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, var(--vapor-orange) 0%, transparent 60%);
+    opacity: 0.4;
     z-index: -1;
   }
   
-  /* Animated grid */
+  /* Animated grid with softer movement */
   .animated-grid {
     background: 
-      linear-gradient(90deg, transparent 0%, transparent 49%, var(--neon-pink) 50%, var(--neon-pink) 51%, transparent 52%, transparent 100%),
-      linear-gradient(0deg, transparent 0%, transparent 49%, var(--electric-cyan) 50%, var(--electric-cyan) 51%, transparent 52%, transparent 100%);
-    background-size: 60px 60px;
-    animation: grid-move 4s linear infinite;
+      linear-gradient(90deg, transparent 0%, transparent 49%, var(--vapor-pink) 50%, var(--vapor-pink) 51%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 49%, var(--vapor-teal) 50%, var(--vapor-teal) 51%, transparent 52%, transparent 100%);
+    background-size: 80px 80px;
+    animation: grid-move 6s linear infinite;
+    opacity: 0.6;
+  }
+  
+  /* Sunset gradient background */
+  .sunset-gradient {
+    background: linear-gradient(180deg, 
+      var(--vapor-orange) 0%, 
+      var(--vapor-pink) 35%, 
+      var(--vapor-purple) 70%, 
+      var(--background) 100%
+    );
   }
   
   /* Legacy support */

@@ -27,7 +27,7 @@ export default function Landing() {
         
         <div className="text-center max-w-2xl mx-auto relative z-10">
           <h1 
-            className="text-5xl md:text-7xl font-bold mb-8 animate-fade-up text-glow-pink animate-neon-pulse"
+            className="text-5xl md:text-7xl font-bold mb-8 animate-fade-up text-glow-pink"
             data-testid="text-hero-title"
           >
             Welcome to the Library of Stuff
@@ -37,7 +37,7 @@ export default function Landing() {
             <Button 
               onClick={handleLogin}
               size="lg"
-              className="bg-neon-pink hover:bg-neon-purple text-background px-10 py-4 text-xl font-bold box-glow-pink animate-glow-pulse border-2 border-neon-pink"
+              className="bg-vapor-pink hover:bg-vapor-purple text-background px-10 py-4 text-xl font-bold box-glow-pink border-2 border-vapor-pink"
               data-testid="button-enter"
             >
               ▶ ENTER ◀
@@ -46,7 +46,7 @@ export default function Landing() {
               onClick={handleLearnMore}
               variant="outline"
               size="lg"
-              className="border-2 border-electric-cyan text-electric-cyan hover:bg-electric-cyan hover:text-background px-10 py-4 text-xl font-bold box-glow-cyan"
+              className="border-2 border-vapor-teal text-vapor-teal hover:bg-vapor-teal hover:text-background px-10 py-4 text-xl font-bold box-glow-teal"
               data-testid="button-learn-more"
             >
               ▶ LEARN MORE ◀
@@ -64,20 +64,20 @@ export default function Landing() {
       >
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="max-w-none">
-            <p className="text-2xl leading-relaxed mb-8 text-electric-cyan font-semibold">
+            <p className="text-2xl leading-relaxed mb-8 text-vapor-teal font-semibold">
               The Library of Stuff makes it easy to borrow and loan every day items from people you already trust. 
               Trust is one way and customizable for each relationship.
             </p>
             
-            <div className="bg-card border-2 border-neon-purple p-6 rounded-lg mb-8 box-glow-pink">
-              <p className="text-xl leading-relaxed mb-4 text-sunset-orange">
-                <span className="text-neon-pink font-bold">EXAMPLE:</span> Alice adds a guitar to the library, trust level 3. 
+            <div className="bg-card border-2 border-vapor-purple p-6 rounded-lg mb-8 box-glow-pink">
+              <p className="text-xl leading-relaxed mb-4 text-vapor-orange">
+                <span className="text-vapor-pink font-bold">EXAMPLE:</span> Alice adds a guitar to the library, trust level 3. 
                 Alice adds Bob at trust level 3 and Chewy at trust level 2. Bob can see Alice's guitar but Chewy can't. 
                 Neither Bob nor Chewy knows what level of trust Alice has granted them.
               </p>
             </div>
             
-            <p className="text-xl leading-relaxed mb-8 text-laser-green">
+            <p className="text-xl leading-relaxed mb-8 text-vapor-mint">
               When Bob wants to borrow the guitar, he texts Alice. The app does not include messaging on the assumption 
               that if you trust someone, you know how to contact them. They meet up to exchange the guitar. Bob sends 
               a request for the guitar which Alice approves. Alice can see the guitar in her list of loans, and Bob can 
@@ -88,7 +88,7 @@ export default function Landing() {
               <Button 
                 onClick={handleLogin}
                 size="lg"
-                className="bg-neon-pink hover:bg-neon-purple text-background px-16 py-6 text-2xl font-bold box-glow-pink animate-glow-pulse border-2 border-neon-pink"
+                className="bg-vapor-pink hover:bg-vapor-purple text-background px-16 py-6 text-2xl font-bold box-glow-pink border-2 border-vapor-pink"
                 data-testid="button-get-started"
               >
                 ▶ GET STARTED ◀
