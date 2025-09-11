@@ -7,15 +7,15 @@ export default function Landing() {
   const handleLogin = () => {
     // Check if user just logged out and needs fresh authentication
     const urlParams = new URLSearchParams(window.location.search);
-    const loggedOut = urlParams.get('logged_out') === 'true';
-    
+    const loggedOut = urlParams.get("logged_out") === "true";
+
     // Force fresh authentication if user just logged out
     const loginUrl = loggedOut ? "/api/login?force=true" : "/api/login";
     window.location.href = loginUrl;
   };
 
   const handleLearnMore = () => {
-    explanationRef.current?.scrollIntoView({ behavior: 'smooth' });
+    explanationRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -24,21 +24,22 @@ export default function Landing() {
       <section className="min-h-screen flex items-center justify-center px-4 py-8 relative vaporwave-grid">
         {/* Animated grid with exact reference colors */}
         <div className="absolute inset-0 animated-grid"></div>
-        
+        <div className="absolute inset-0 animated-grid-2"></div>
+
         {/* Scanlines for lo-fi VHS effect */}
         <div className="absolute inset-0 scanlines"></div>
-        
+
         <div className="text-center max-w-3xl mx-auto relative z-10">
-          <h1 
+          <h1
             className="text-5xl md:text-7xl font-black mb-12 animate-fade-up vapor-text-pink uppercase tracking-wide leading-tight"
-            style={{ fontFamily: 'Inter', letterSpacing: '0.02em' }}
+            style={{ fontFamily: "Inter", letterSpacing: "0.02em" }}
             data-testid="text-hero-title"
           >
             Library of Stuff
           </h1>
-          
+
           <div className="flex flex-col sm:flex-row gap-8 justify-center animate-fade-up animation-delay-200">
-            <Button 
+            <Button
               onClick={handleLogin}
               size="lg"
               className="bg-vapor-pink hover:bg-vapor-purple text-background px-12 py-6 text-2xl font-bold border-2 vapor-border-pink uppercase tracking-wider"
@@ -46,7 +47,7 @@ export default function Landing() {
             >
               ENTER
             </Button>
-            <Button 
+            <Button
               onClick={handleLearnMore}
               variant="outline"
               size="lg"
@@ -60,7 +61,7 @@ export default function Landing() {
       </section>
 
       {/* Explanation Section with clean vaporwave styling */}
-      <section 
+      <section
         ref={explanationRef}
         id="learn-more"
         className="py-20 px-4 bg-muted relative"
@@ -68,31 +69,38 @@ export default function Landing() {
       >
         {/* Subtle scanlines for lo-fi effect */}
         <div className="absolute inset-0 scanlines opacity-30"></div>
-        
+
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="max-w-none space-y-8">
             <p className="text-2xl leading-relaxed vapor-text-teal font-semibold">
-              The Library of Stuff makes it easy to borrow and loan every day items from people you already trust. 
-              Trust is one way and customizable for each relationship.
+              The Library of Stuff makes it easy to borrow and loan every day
+              items from people you already trust. Trust is one way and
+              customizable for each relationship.
             </p>
-            
+
             <div className="bg-card border-2 vapor-border-purple p-8 rounded-lg">
               <p className="text-xl leading-relaxed vapor-text-orange">
-                <span className="vapor-text-pink font-bold uppercase tracking-wide">EXAMPLE:</span> Alice adds a guitar to the library, trust level 3. 
-                Alice adds Bob at trust level 3 and Chewy at trust level 2. Bob can see Alice's guitar but Chewy can't. 
-                Neither Bob nor Chewy knows what level of trust Alice has granted them.
+                <span className="vapor-text-pink font-bold uppercase tracking-wide">
+                  EXAMPLE:
+                </span>{" "}
+                Alice adds a guitar to the library, trust level 3. Alice adds
+                Bob at trust level 3 and Chewy at trust level 2. Bob can see
+                Alice's guitar but Chewy can't. Neither Bob nor Chewy knows what
+                level of trust Alice has granted them.
               </p>
             </div>
-            
+
             <p className="text-xl leading-relaxed vapor-text-mint">
-              When Bob wants to borrow the guitar, he texts Alice. The app does not include messaging on the assumption 
-              that if you trust someone, you know how to contact them. They meet up to exchange the guitar. Bob sends 
-              a request for the guitar which Alice approves. Alice can see the guitar in her list of loans, and Bob can 
-              see it in his list of borrows.
+              When Bob wants to borrow the guitar, he texts Alice. The app does
+              not include messaging on the assumption that if you trust someone,
+              you know how to contact them. They meet up to exchange the guitar.
+              Bob sends a request for the guitar which Alice approves. Alice can
+              see the guitar in her list of loans, and Bob can see it in his
+              list of borrows.
             </p>
 
             <div className="mt-16 text-center">
-              <Button 
+              <Button
                 onClick={handleLogin}
                 size="lg"
                 className="bg-vapor-pink hover:bg-vapor-purple text-background px-16 py-8 text-3xl font-black border-2 vapor-border-pink uppercase tracking-wider"
