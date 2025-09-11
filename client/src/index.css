@@ -221,7 +221,7 @@
   }
 
   /* Grid overlay with perspective tilt */
-  /* .vaporwave-grid::after {
+  .vaporwave-grid::after {
     content: '';
     position: absolute;
     top: 100%;
@@ -237,7 +237,7 @@
     /* transform-origin: top center;
     transform: perspective(1500px) rotateX(60deg);
     z-index: 0;
-  } */
+  }
 
   /* Animated grid overlay with perspective tilt */
   .animated-grid {
