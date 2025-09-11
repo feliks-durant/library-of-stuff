@@ -272,6 +272,12 @@ export type TrustRequest = typeof trustRequests.$inferSelect;
 export type InsertTrustRequest = z.infer<typeof insertTrustRequestSchema>;
 export type UpdateTrustRequest = z.infer<typeof updateTrustRequestSchema>;
 
+// Extended type for trust requests with requester details
+export type TrustRequestWithDetails = TrustRequest & {
+  requesterName: string | null;
+  requesterProfileImage: string | null;
+};
+
 // Utility functions for username display
 export function formatUsername(user: { username?: string | null }): string {
   if (!user.username) {

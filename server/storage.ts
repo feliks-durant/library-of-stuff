@@ -13,6 +13,7 @@ import {
   type TrustRelationship,
   type InsertTrustRelationship,
   type TrustRequest,
+  type TrustRequestWithDetails,
   type InsertTrustRequest,
   type UpdateTrustRequest,
   type UpdateUserProfile,
@@ -51,7 +52,7 @@ export interface IStorage {
   
   // Trust request operations
   createTrustRequest(requesterId: string, trustRequestData: InsertTrustRequest): Promise<TrustRequest>;
-  getTrustRequestsReceived(userId: string): Promise<TrustRequest[]>;
+  getTrustRequestsReceived(userId: string): Promise<TrustRequestWithDetails[]>;
   getTrustRequestsSent(userId: string): Promise<TrustRequest[]>;
   updateTrustRequest(id: string, updates: UpdateTrustRequest): Promise<TrustRequest | undefined>;
   
@@ -551,12 +552,31 @@ export class DatabaseStorage implements IStorage {
     return newRequest;
   }
 
-  async getTrustRequestsReceived(userId: string): Promise<TrustRequest[]> {
-    return await db
-      .select()
+  async getTrustRequestsReceived(userId: string): Promise<TrustRequestWithDetails[]> {
+    const results = await db
+      .select({
+        id: trustRequests.id,
+        requesterId: trustRequests.requesterId,
+        targetId: trustRequests.targetId,
+        message: trustRequests.message,
+        status: trustRequests.status,
+        createdAt: trustRequests.createdAt,
+        updatedAt: trustRequests.updatedAt,
+        requesterName: sql<string>`CASE 
+          WHEN ${users.firstName} IS NOT NULL AND ${users.lastName} IS NOT NULL 
+          THEN ${users.firstName} || ' ' || ${users.lastName}
+          WHEN ${users.username} IS NOT NULL 
+          THEN ${users.username}
+          ELSE 'Anonymous User' 
+        END`,
+        requesterProfileImage: users.profileImageUrl,
+      })
       .from(trustRequests)
+      .leftJoin(users, eq(trustRequests.requesterId, users.id))
       .where(eq(trustRequests.targetId, userId))
       .orderBy(desc(trustRequests.createdAt));
+
+    return results;
   }
 
   async getTrustRequestsSent(userId: string): Promise<TrustRequest[]> {
