@@ -100,9 +100,14 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    // Check if we need to force a fresh login (e.g., after logout)
+    const forceLogin = req.query.force === 'true';
+    
     passport.authenticate(`replitauth:${req.hostname}`, {
-      prompt: "login consent",
+      prompt: forceLogin ? "login" : "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
+      // Add max_age=0 to force fresh authentication when needed
+      ...(forceLogin && { max_age: 0 })
     })(req, res, next);
   });
 
@@ -142,13 +147,27 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/logout", (req, res) => {
+    // Clear the session completely
+    req.session.destroy((err) => {
+      if (err) {
+        console.log('Session destruction error:', err);
+      }
+    });
+    
+    // Clear session cookie
+    res.clearCookie('connect.sid');
+    
     req.logout(() => {
-      res.redirect(
-        client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
-        }).href
-      );
+      // Build logout URL with additional parameters to force clean logout
+      const logoutUrl = client.buildEndSessionUrl(config, {
+        client_id: process.env.REPL_ID!,
+        post_logout_redirect_uri: `${req.protocol}://${req.hostname}?logged_out=true`,
+        // Add hint to logout all sessions
+        logout_hint: 'force_logout'
+      });
+      
+      console.log('[LOGOUT] Redirecting to logout URL:', logoutUrl.href);
+      res.redirect(logoutUrl.href);
     });
   });
 }

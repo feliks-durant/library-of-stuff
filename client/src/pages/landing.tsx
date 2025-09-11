@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 
 export default function Landing() {
   const handleLogin = () => {
-    window.location.href = "/api/login";
+    // Check if user just logged out and needs fresh authentication
+    const urlParams = new URLSearchParams(window.location.search);
+    const loggedOut = urlParams.get('logged_out') === 'true';
+    
+    // Force fresh authentication if user just logged out
+    const loginUrl = loggedOut ? "/api/login?force=true" : "/api/login";
+    window.location.href = loginUrl;
   };
 
   return (
