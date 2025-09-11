@@ -234,7 +234,7 @@
       linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
     background-size: 90px 90px;
     /* Perspective transform to recede into distance */
-    /* transform-origin: top center;
+    transform-origin: top center;
     transform: perspective(1500px) rotateX(60deg);
     z-index: 0;
   }
