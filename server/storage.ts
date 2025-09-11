@@ -50,7 +50,7 @@ export interface IStorage {
   getUserConnections(userId: string): Promise<Array<{ trusteeId: string; trustLevel: number }>>;
   
   // Trust request operations
-  createTrustRequest(trustRequest: InsertTrustRequest): Promise<TrustRequest>;
+  createTrustRequest(requesterId: string, trustRequestData: InsertTrustRequest): Promise<TrustRequest>;
   getTrustRequestsReceived(userId: string): Promise<TrustRequest[]>;
   getTrustRequestsSent(userId: string): Promise<TrustRequest[]>;
   updateTrustRequest(id: string, updates: UpdateTrustRequest): Promise<TrustRequest | undefined>;
@@ -90,18 +90,44 @@ export class DatabaseStorage implements IStorage {
       userData.username = await this.generateUniqueUsername(baseName);
     }
 
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
+    try {
+      const [user] = await db
+        .insert(users)
+        .values(userData)
+        .onConflictDoUpdate({
+          target: users.id,
+          set: {
+            ...userData,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+      return user;
+    } catch (error: any) {
+      // Handle case where email already exists but with different ID
+      if (error?.message?.includes('users_email_unique')) {
+        // Find existing user by email and update them
+        const [existingUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, userData.email!));
+        
+        if (existingUser) {
+          const [updatedUser] = await db
+            .update(users)
+            .set({
+              ...userData,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.email, userData.email!))
+            .returning();
+          return updatedUser;
+        }
+      }
+      
+      // Re-throw if it's a different error or we can't handle it
+      throw error;
+    }
   }
 
   async updateUserProfile(userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'username' | 'profileImageUrl'>>): Promise<User | undefined> {
@@ -513,8 +539,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Trust request operations
-  async createTrustRequest(trustRequest: InsertTrustRequest): Promise<TrustRequest> {
-    const [newRequest] = await db.insert(trustRequests).values(trustRequest).returning();
+  async createTrustRequest(
+    requesterId: string, 
+    trustRequestData: InsertTrustRequest
+  ): Promise<TrustRequest> {
+    const [newRequest] = await db.insert(trustRequests).values({
+      id: nanoid(),
+      ...trustRequestData,
+      requesterId,
+    }).returning();
     return newRequest;
   }
 

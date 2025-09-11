@@ -494,11 +494,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const validatedData = insertTrustRequestSchema.parse(req.body);
-      const trustRequest = await storage.createTrustRequest({
-        requesterId: userId,
+      const trustRequest = await storage.createTrustRequest(userId, {
         targetId: validatedData.targetId,
-        message: validatedData.message,
-      } as any);
+        message: validatedData.message || null,
+        status: 'pending'
+      });
       res.json(trustRequest);
     } catch (error) {
       console.error("Error creating trust request:", error);
