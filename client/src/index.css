@@ -1,7 +1,8 @@
 /* Font Awesome icons */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-/* Inter font */
+/* Vaporwave fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -9,59 +10,65 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 10%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
-  --radius: 0.5rem;
+  /* Vaporwave color palette */
+  --background: hsl(270, 50%, 5%); /* Deep purple-black */
+  --foreground: hsl(300, 100%, 90%); /* Hot pink text */
+  --muted: hsl(270, 40%, 15%); /* Dark purple */
+  --muted-foreground: hsl(180, 100%, 70%); /* Cyan */
+  --popover: hsl(270, 60%, 8%); /* Slightly lighter dark purple */
+  --popover-foreground: hsl(300, 100%, 90%);
+  --card: hsl(270, 50%, 10%); /* Dark card background */
+  --card-foreground: hsl(300, 100%, 90%);
+  --border: hsl(300, 100%, 50%); /* Hot pink borders */
+  --input: hsl(270, 40%, 20%); /* Dark purple inputs */
+  --primary: hsl(300, 100%, 50%); /* Hot pink primary */
+  --primary-foreground: hsl(270, 50%, 5%);
+  --secondary: hsl(180, 100%, 50%); /* Electric cyan */
+  --secondary-foreground: hsl(270, 50%, 5%);
+  --accent: hsl(270, 100%, 60%); /* Purple accent */
+  --accent-foreground: hsl(300, 100%, 90%);
+  --destructive: hsl(0, 100%, 50%); /* Neon red */
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(300, 100%, 50%); /* Hot pink focus ring */
+  --radius: 0.75rem;
   
-  /* Custom brand colors */
-  --brand-blue: hsl(217, 81%, 55%);
-  --brand-green: hsl(158, 64%, 52%);
-  --trust-gold: hsl(38, 92%, 50%);
+  /* Vaporwave brand colors */
+  --neon-pink: hsl(300, 100%, 50%); /* #FF00FF */
+  --electric-cyan: hsl(180, 100%, 50%); /* #00FFFF */
+  --neon-purple: hsl(270, 100%, 60%); /* #9900FF */
+  --sunset-orange: hsl(30, 100%, 60%); /* #FF9900 */
+  --laser-green: hsl(120, 100%, 50%); /* #00FF00 */
 }
 
 .dark {
-  --background: hsl(240, 10%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(240, 3.7%, 15.9%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
+  /* Enhanced vaporwave dark mode - even more intense! */
+  --background: hsl(270, 80%, 2%); /* Ultra dark purple-black */
+  --foreground: hsl(300, 100%, 95%); /* Brighter hot pink text */
+  --muted: hsl(270, 60%, 8%); /* Darker purple */
+  --muted-foreground: hsl(180, 100%, 80%); /* Brighter cyan */
+  --popover: hsl(270, 70%, 5%);
+  --popover-foreground: hsl(300, 100%, 95%);
+  --card: hsl(270, 70%, 5%); /* Ultra dark cards */
+  --card-foreground: hsl(300, 100%, 95%);
+  --border: hsl(300, 100%, 60%); /* Glowing hot pink borders */
+  --input: hsl(270, 50%, 12%);
+  --primary: hsl(300, 100%, 60%); /* Glowing hot pink */
+  --primary-foreground: hsl(270, 80%, 2%);
+  --secondary: hsl(180, 100%, 60%); /* Glowing cyan */
+  --secondary-foreground: hsl(270, 80%, 2%);
+  --accent: hsl(270, 100%, 70%); /* Brighter purple */
+  --accent-foreground: hsl(300, 100%, 95%);
+  --destructive: hsl(0, 100%, 60%); /* Bright neon red */
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
-  --radius: 0.5rem;
+  --ring: hsl(300, 100%, 60%); /* Glowing focus ring */
+  --radius: 0.75rem;
   
-  /* Custom brand colors for dark mode */
-  --brand-blue: hsl(217, 81%, 55%);
-  --brand-green: hsl(158, 64%, 52%);
-  --trust-gold: hsl(38, 92%, 50%);
+  /* Enhanced vaporwave brand colors for dark mode */
+  --neon-pink: hsl(300, 100%, 60%); /* Brighter pink */
+  --electric-cyan: hsl(180, 100%, 60%); /* Brighter cyan */
+  --neon-purple: hsl(270, 100%, 70%); /* Brighter purple */
+  --sunset-orange: hsl(30, 100%, 70%); /* Brighter orange */
+  --laser-green: hsl(120, 100%, 60%); /* Brighter green */
 }
 
 @layer base {
@@ -75,30 +82,106 @@
 }
 
 @layer utilities {
-  .text-brand-blue {
-    color: var(--brand-blue);
+  /* Vaporwave color utilities */
+  .text-neon-pink {
+    color: var(--neon-pink);
   }
   
-  .bg-brand-blue {
-    background-color: var(--brand-blue);
+  .bg-neon-pink {
+    background-color: var(--neon-pink);
   }
   
-  .text-brand-green {
-    color: var(--brand-green);
+  .text-electric-cyan {
+    color: var(--electric-cyan);
   }
   
-  .bg-brand-green {
-    background-color: var(--brand-green);
+  .bg-electric-cyan {
+    background-color: var(--electric-cyan);
   }
   
-  .text-trust-gold {
-    color: var(--trust-gold);
+  .text-neon-purple {
+    color: var(--neon-purple);
   }
   
-  .bg-trust-gold {
-    background-color: var(--trust-gold);
+  .bg-neon-purple {
+    background-color: var(--neon-purple);
   }
   
+  .text-sunset-orange {
+    color: var(--sunset-orange);
+  }
+  
+  .bg-sunset-orange {
+    background-color: var(--sunset-orange);
+  }
+  
+  .text-laser-green {
+    color: var(--laser-green);
+  }
+  
+  .bg-laser-green {
+    background-color: var(--laser-green);
+  }
+  
+  /* Glow effects */
+  .text-glow-pink {
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+  }
+  
+  .text-glow-cyan {
+    color: var(--electric-cyan);
+    text-shadow: 0 0 10px var(--electric-cyan), 0 0 20px var(--electric-cyan), 0 0 40px var(--electric-cyan);
+  }
+  
+  .text-glow-purple {
+    color: var(--neon-purple);
+    text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 40px var(--neon-purple);
+  }
+  
+  /* Box glow effects */
+  .box-glow-pink {
+    box-shadow: 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink), inset 0 0 20px rgba(255, 0, 255, 0.1);
+  }
+  
+  .box-glow-cyan {
+    box-shadow: 0 0 20px var(--electric-cyan), 0 0 40px var(--electric-cyan), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  }
+  
+  /* Vaporwave grid background */
+  .vaporwave-grid {
+    background: 
+      linear-gradient(90deg, transparent 0%, transparent 49%, var(--neon-pink) 50%, var(--neon-pink) 51%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 49%, var(--electric-cyan) 50%, var(--electric-cyan) 51%, transparent 52%, transparent 100%);
+    background-size: 60px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .vaporwave-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 50% 0%, var(--neon-purple) 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, var(--sunset-orange) 0%, transparent 50%);
+    opacity: 0.3;
+    z-index: -1;
+  }
+  
+  /* Animated grid */
+  .animated-grid {
+    background: 
+      linear-gradient(90deg, transparent 0%, transparent 49%, var(--neon-pink) 50%, var(--neon-pink) 51%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 49%, var(--electric-cyan) 50%, var(--electric-cyan) 51%, transparent 52%, transparent 100%);
+    background-size: 60px 60px;
+    animation: grid-move 4s linear infinite;
+  }
+  
+  /* Legacy support */
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -112,10 +195,11 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Orbitron', 'Inter', monospace, sans-serif;
+  background-attachment: fixed;
 }
 
-/* Fade-up animation keyframes */
+/* Vaporwave animations */
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -124,6 +208,33 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes grid-move {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 60px 60px;
+  }
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+  50% {
+    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor, inset 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -141,8 +252,18 @@ body {
     animation-delay: 0.4s;
   }
   
+  .animate-neon-pulse {
+    animation: neon-pulse 2s ease-in-out infinite;
+  }
+  
+  .animate-glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+  
   @media (prefers-reduced-motion: reduce) {
-    .animate-fade-up {
+    .animate-fade-up,
+    .animate-neon-pulse,
+    .animate-glow-pulse {
       animation: none;
       opacity: 1;
       transform: none;
