@@ -1,9 +1,8 @@
 /* Font Awesome icons */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-/* Vaporwave fonts */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Clean vaporwave fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -32,12 +31,14 @@
   --ring: hsl(320, 50%, 65%); /* Soft pink focus ring */
   --radius: 0.75rem;
   
-  /* Authentic Vaporwave brand colors - soft pastels */
-  --vapor-pink: hsl(320, 50%, 70%); /* Soft coral pink */
-  --vapor-teal: hsl(190, 40%, 65%); /* Muted teal */
-  --vapor-purple: hsl(270, 40%, 70%); /* Soft lavender */
-  --vapor-orange: hsl(25, 50%, 70%); /* Soft peach */
-  --vapor-mint: hsl(160, 35%, 70%); /* Soft mint green */
+  /* Authentic Vaporwave colors - exact from reference images */
+  --grid-bg: #6FAADB; /* Exact teal-blue from grid reference */
+  --grid-line: #DD6B9A; /* Exact pink-magenta from grid reference */
+  --vapor-pink: #E6A8C7; /* Soft dusty pink */
+  --vapor-teal: #6FAADB; /* Muted teal-blue */ 
+  --vapor-purple: #B8A9D9; /* Soft lavender */
+  --vapor-orange: #E6B896; /* Soft peach */
+  --vapor-mint: #A8D9C7; /* Soft mint green */
 }
 
 .dark {
@@ -63,12 +64,14 @@
   --ring: hsl(320, 45%, 70%); /* Softer focus ring */
   --radius: 0.75rem;
   
-  /* Soft vaporwave brand colors for dark mode */
-  --vapor-pink: hsl(320, 45%, 75%); /* Softer coral pink */
-  --vapor-teal: hsl(190, 35%, 70%); /* Softer teal */
-  --vapor-purple: hsl(270, 35%, 75%); /* Softer lavender */
-  --vapor-orange: hsl(25, 45%, 75%); /* Softer peach */
-  --vapor-mint: hsl(160, 30%, 75%); /* Softer mint green */
+  /* Authentic Vaporwave colors for dark mode */
+  --grid-bg: #5A8BB8; /* Darker teal-blue from grid reference */
+  --grid-line: #C55A87; /* Darker pink-magenta from grid reference */
+  --vapor-pink: #D199B5; /* Darker dusty pink */
+  --vapor-teal: #5A8BB8; /* Darker muted teal */ 
+  --vapor-purple: #A599C7; /* Darker lavender */
+  --vapor-orange: #D1A584; /* Darker peach */
+  --vapor-mint: #99C7B5; /* Darker mint green */
 }
 
 @layer base {
@@ -123,63 +126,78 @@
     background-color: var(--vapor-mint);
   }
   
-  /* Soft glow effects - subtle and dreamy */
-  .text-glow-pink {
+  /* Clean vaporwave typography - no glow effects */
+  .vapor-text-pink {
     color: var(--vapor-pink);
-    text-shadow: 0 0 8px var(--vapor-pink), 0 0 16px var(--vapor-pink), 0 0 24px var(--vapor-pink);
   }
   
-  .text-glow-teal {
+  .vapor-text-teal {
     color: var(--vapor-teal);
-    text-shadow: 0 0 8px var(--vapor-teal), 0 0 16px var(--vapor-teal), 0 0 24px var(--vapor-teal);
   }
   
-  .text-glow-purple {
+  .vapor-text-purple {
     color: var(--vapor-purple);
-    text-shadow: 0 0 8px var(--vapor-purple), 0 0 16px var(--vapor-purple), 0 0 24px var(--vapor-purple);
   }
   
-  /* Soft box glow effects */
-  .box-glow-pink {
-    box-shadow: 0 0 15px var(--vapor-pink), 0 0 30px var(--vapor-pink), inset 0 0 15px rgba(255, 192, 203, 0.1);
+  .vapor-text-orange {
+    color: var(--vapor-orange);
   }
   
-  .box-glow-teal {
-    box-shadow: 0 0 15px var(--vapor-teal), 0 0 30px var(--vapor-teal), inset 0 0 15px rgba(176, 224, 230, 0.1);
+  .vapor-text-mint {
+    color: var(--vapor-mint);
   }
   
-  /* Soft vaporwave grid background with dreamy sunset gradients */
+  /* Clean button styling - no glow effects */
+  .vapor-border-pink {
+    border-color: var(--vapor-pink);
+  }
+  
+  .vapor-border-teal {
+    border-color: var(--vapor-teal);
+  }
+  
+  .vapor-border-purple {
+    border-color: var(--vapor-purple);
+  }
+  
+  /* Authentic vaporwave grid - exact colors from reference image */
   .vaporwave-grid {
-    background: 
-      linear-gradient(90deg, transparent 0%, transparent 49%, var(--vapor-pink) 50%, var(--vapor-pink) 51%, transparent 52%, transparent 100%),
-      linear-gradient(0deg, transparent 0%, transparent 49%, var(--vapor-teal) 50%, var(--vapor-teal) 51%, transparent 52%, transparent 100%);
-    background-size: 80px 80px;
+    background-color: var(--grid-bg);
+    background-image:
+      linear-gradient(90deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
+    background-size: 60px 60px;
     position: relative;
     overflow: hidden;
   }
   
-  .vaporwave-grid::before {
-    content: '';
+  /* Animated grid with exact reference colors */
+  .animated-grid {
+    background-color: var(--grid-bg);
+    background-image:
+      linear-gradient(90deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
+    background-size: 60px 60px;
+    animation: grid-move 8s linear infinite;
+    opacity: 0.4;
+  }
+  
+  /* Scanlines for lo-fi VHS effect */
+  .scanlines {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
-      radial-gradient(ellipse at 50% 0%, var(--vapor-purple) 0%, transparent 60%),
-      radial-gradient(ellipse at 50% 100%, var(--vapor-orange) 0%, transparent 60%);
-    opacity: 0.4;
-    z-index: -1;
-  }
-  
-  /* Animated grid with softer movement */
-  .animated-grid {
-    background: 
-      linear-gradient(90deg, transparent 0%, transparent 49%, var(--vapor-pink) 50%, var(--vapor-pink) 51%, transparent 52%, transparent 100%),
-      linear-gradient(0deg, transparent 0%, transparent 49%, var(--vapor-teal) 50%, var(--vapor-teal) 51%, transparent 52%, transparent 100%);
-    background-size: 80px 80px;
-    animation: grid-move 6s linear infinite;
-    opacity: 0.6;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 3px
+    );
+    pointer-events: none;
+    z-index: 1;
   }
   
   /* Sunset gradient background */
@@ -206,8 +224,27 @@ html {
 }
 
 body {
-  font-family: 'Orbitron', 'Inter', monospace, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   background-attachment: fixed;
+}
+
+/* Add film grain texture for lo-fi vaporwave aesthetic */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(circle, transparent 1px, rgba(255,255,255,0.01) 1px),
+    radial-gradient(circle, transparent 1px, rgba(0,0,0,0.05) 1px);
+  background-size: 4px 4px, 8px 8px;
+  background-position: 0 0, 2px 2px;
+  opacity: 0.15;
+  z-index: 1000;
+  mix-blend-mode: soft-light;
 }
 
 /* Vaporwave animations */
@@ -231,23 +268,7 @@ body {
   }
 }
 
-@keyframes neon-pulse {
-  0%, 100% {
-    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
-  }
-  50% {
-    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
-  }
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor, inset 0 0 20px rgba(255, 255, 255, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.05);
-  }
-}
+/* Removed neon-pulse and glow-pulse keyframes - clean vaporwave aesthetic */
 
 @layer utilities {
   .animate-fade-up {
@@ -263,13 +284,7 @@ body {
     animation-delay: 0.4s;
   }
   
-  .animate-neon-pulse {
-    animation: neon-pulse 2s ease-in-out infinite;
-  }
-  
-  .animate-glow-pulse {
-    animation: glow-pulse 3s ease-in-out infinite;
-  }
+  /* Removed neon-pulse and glow-pulse animations - clean vaporwave aesthetic */
   
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-up,

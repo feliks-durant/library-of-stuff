@@ -20,64 +20,71 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground vaporwave-grid">
-      {/* Hero Section with animated grid background */}
+      {/* Hero Section with authentic vaporwave grid */}
       <section className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden">
-        {/* Animated grid overlay */}
-        <div className="absolute inset-0 animated-grid opacity-20"></div>
+        {/* Animated grid with exact reference colors */}
+        <div className="absolute inset-0 animated-grid"></div>
         
-        <div className="text-center max-w-2xl mx-auto relative z-10">
+        {/* Scanlines for lo-fi VHS effect */}
+        <div className="absolute inset-0 scanlines"></div>
+        
+        <div className="text-center max-w-3xl mx-auto relative z-10">
           <h1 
-            className="text-5xl md:text-7xl font-bold mb-8 animate-fade-up text-glow-pink"
+            className="text-5xl md:text-7xl font-black mb-12 animate-fade-up vapor-text-pink uppercase tracking-wide leading-tight"
+            style={{ fontFamily: 'Inter', letterSpacing: '0.02em' }}
             data-testid="text-hero-title"
           >
-            Welcome to the Library of Stuff
+            Library of Stuff
           </h1>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center animate-fade-up animation-delay-200">
+          <div className="flex flex-col sm:flex-row gap-8 justify-center animate-fade-up animation-delay-200">
             <Button 
               onClick={handleLogin}
               size="lg"
-              className="bg-vapor-pink hover:bg-vapor-purple text-background px-10 py-4 text-xl font-bold box-glow-pink border-2 border-vapor-pink"
+              className="bg-vapor-pink hover:bg-vapor-purple text-background px-12 py-6 text-2xl font-bold border-2 vapor-border-pink uppercase tracking-wider"
               data-testid="button-enter"
             >
-              ▶ ENTER ◀
+              ENTER
             </Button>
             <Button 
               onClick={handleLearnMore}
               variant="outline"
               size="lg"
-              className="border-2 border-vapor-teal text-vapor-teal hover:bg-vapor-teal hover:text-background px-10 py-4 text-xl font-bold box-glow-teal"
+              className="border-2 vapor-border-teal vapor-text-teal hover:bg-vapor-teal hover:text-background px-12 py-6 text-2xl font-bold uppercase tracking-wider"
               data-testid="button-learn-more"
             >
-              ▶ LEARN MORE ◀
+              LEARN MORE
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Explanation Section with vaporwave styling */}
+      {/* Explanation Section with clean vaporwave styling */}
       <section 
         ref={explanationRef}
         id="learn-more"
         className="py-20 px-4 bg-muted relative"
         data-testid="section-learn-more"
       >
+        {/* Subtle scanlines for lo-fi effect */}
+        <div className="absolute inset-0 scanlines opacity-30"></div>
+        
         <div className="max-w-4xl mx-auto relative z-10">
-          <div className="max-w-none">
-            <p className="text-2xl leading-relaxed mb-8 text-vapor-teal font-semibold">
+          <div className="max-w-none space-y-8">
+            <p className="text-2xl leading-relaxed vapor-text-teal font-semibold">
               The Library of Stuff makes it easy to borrow and loan every day items from people you already trust. 
               Trust is one way and customizable for each relationship.
             </p>
             
-            <div className="bg-card border-2 border-vapor-purple p-6 rounded-lg mb-8 box-glow-pink">
-              <p className="text-xl leading-relaxed mb-4 text-vapor-orange">
-                <span className="text-vapor-pink font-bold">EXAMPLE:</span> Alice adds a guitar to the library, trust level 3. 
+            <div className="bg-card border-2 vapor-border-purple p-8 rounded-lg">
+              <p className="text-xl leading-relaxed vapor-text-orange">
+                <span className="vapor-text-pink font-bold uppercase tracking-wide">EXAMPLE:</span> Alice adds a guitar to the library, trust level 3. 
                 Alice adds Bob at trust level 3 and Chewy at trust level 2. Bob can see Alice's guitar but Chewy can't. 
                 Neither Bob nor Chewy knows what level of trust Alice has granted them.
               </p>
             </div>
             
-            <p className="text-xl leading-relaxed mb-8 text-vapor-mint">
+            <p className="text-xl leading-relaxed vapor-text-mint">
               When Bob wants to borrow the guitar, he texts Alice. The app does not include messaging on the assumption 
               that if you trust someone, you know how to contact them. They meet up to exchange the guitar. Bob sends 
               a request for the guitar which Alice approves. Alice can see the guitar in her list of loans, and Bob can 
@@ -88,10 +95,10 @@ export default function Landing() {
               <Button 
                 onClick={handleLogin}
                 size="lg"
-                className="bg-vapor-pink hover:bg-vapor-purple text-background px-16 py-6 text-2xl font-bold box-glow-pink border-2 border-vapor-pink"
+                className="bg-vapor-pink hover:bg-vapor-purple text-background px-16 py-8 text-3xl font-black border-2 vapor-border-pink uppercase tracking-wider"
                 data-testid="button-get-started"
               >
-                ▶ GET STARTED ◀
+                GET STARTED
               </Button>
             </div>
           </div>
