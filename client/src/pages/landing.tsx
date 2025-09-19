@@ -25,6 +25,7 @@ export default function Landing() {
         {/* Animated grid with exact reference colors */}
         <div className="absolute inset-0 animated-grid"></div>
         <div className="absolute inset-0 animated-grid-2"></div>
+        <div className="absolute inset-0 animated-grid-3"></div>
 
         {/* Scanlines for lo-fi VHS effect */}
         <div className="absolute inset-0 scanlines"></div>
@@ -32,7 +33,12 @@ export default function Landing() {
         <div className="text-center max-w-3xl mx-auto relative z-10">
           <h1
             className="text-5xl md:text-7xl font-black mb-12 animate-fade-up vapor-text-pink uppercase tracking-wide leading-tight"
-            style={{ fontFamily: "Inter", letterSpacing: "0.02em" }}
+            style={{
+              fontFamily: "Inter",
+              letterSpacing: "0.04em",
+              textShadow:
+                "2px 2px 3px rgba(255, 80, 0, 0.6), -4px 4px 3px rgba(255, 120, 0, 1),  5px 5px 5px rgba(0,0,0,0.4)",
+            }}
             data-testid="text-hero-title"
           >
             Library of Stuff
@@ -64,11 +70,12 @@ export default function Landing() {
       <section
         ref={explanationRef}
         id="learn-more"
-        className="py-20 px-4 bg-muted relative"
+        className="py-20 px-4 bg-static relative"
         data-testid="section-learn-more"
       >
         {/* Subtle scanlines for lo-fi effect */}
-        <div className="absolute inset-0 scanlines opacity-30"></div>
+        {/* <div className="absolute inset-0 scanlines"></div> */}
+        <div className="absolute inset-0 tv-static"></div>
 
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="max-w-none space-y-8">
@@ -86,18 +93,16 @@ export default function Landing() {
                 Alice adds a guitar to the library, trust level 3. Alice adds
                 Bob at trust level 3 and Chewy at trust level 2. Bob can see
                 Alice's guitar but Chewy can't. Neither Bob nor Chewy knows what
-                level of trust Alice has granted them.
+                level of trust Alice has granted them. <br />
+                <br />
+                When Bob wants to borrow the guitar, he texts Alice.* They meet
+                up to exchange the guitar. Bob sends a request for the guitar
+                which Alice approves. Alice can see the guitar in her list of
+                loans, and Bob can see it in his list of borrows. <br />
+                <br />* The app does not include messaging on the assumption
+                that if you trust someone, you know how to contact them.
               </p>
             </div>
-
-            <p className="text-xl leading-relaxed vapor-text-mint">
-              When Bob wants to borrow the guitar, he texts Alice. The app does
-              not include messaging on the assumption that if you trust someone,
-              you know how to contact them. They meet up to exchange the guitar.
-              Bob sends a request for the guitar which Alice approves. Alice can
-              see the guitar in her list of loans, and Bob can see it in his
-              list of borrows.
-            </p>
 
             <div className="mt-16 text-center">
               <Button

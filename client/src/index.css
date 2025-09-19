@@ -150,6 +150,10 @@
     background-color: var(--vapor-purple);
   }
 
+  .bg-static {
+    background-color: var(--grid-bg)
+  }
+
   .text-vapor-orange {
     color: var(--vapor-orange);
   }
@@ -204,14 +208,14 @@
   .vaporwave-grid {
     /* Sunset gradient background */
     background:
-      linear-gradient(180deg,
-        #FFE066 0%,
+      linear-gradient(170deg,
+        #F0E050 0%,
         /* Bright yellow sun */
-        #FF9A56 20%,
+        #FF9A96 20%,
         /* Warm orange */
-        #FF6B9D 40%,
+        #FF6B8F 40%,
         /* Sunset pink */
-        #C44899 60%,
+        #C44889 60%,
         /* Deep magenta */
         var(--grid-bg) 80%
         /* Transition to teal grid background */
@@ -232,17 +236,36 @@
       linear-gradient(90deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%),
       linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
     background-size: 90px 90px;
-    animation: grid-move 8s linear infinite;
+    animation: grid-move 120s linear infinite forwards;
     transform-origin: top center;
-    transform: perspective(1500px) rotateX(60deg);
+    transform: perspective(1500px) rotateX(82deg);
     opacity: 0.6;
-    z-index: 2;
+    z-index: 1;
   }
 
   /* Animated grid overlay with perspective tilt */
   .animated-grid-2 {
     position: absolute;
-    top: 40%;
+    top: 0%;
+    height: 200vh;
+    width: 200%;
+    left: -40%;
+    background-color: transparent;
+    background-image:
+      linear-gradient(90deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
+    background-size: 90px 90px;
+    animation: grid-move 110s linear infinite forwards;
+    /* Perspective transform to recede into distance */
+    transform-origin: top center;
+    transform: perspective(1500px) rotateX(82deg);
+    opacity: 0.6;
+    z-index: 1;
+  }
+
+  /* Animated grid overlay with perspective tilt */
+  .animated-grid-3 {
+    position: absolute;
     height: 200vh;
     width: 200%;
     left: -50%;
@@ -251,10 +274,10 @@
       linear-gradient(90deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%),
       linear-gradient(0deg, transparent 0%, transparent 49%, var(--grid-line) 50%, var(--grid-line) 51%, transparent 52%, transparent 100%);
     background-size: 90px 90px;
-    animation: grid-move 4s linear infinite;
+    animation: grid-move-backwards 140s linear infinite forwards;
     /* Perspective transform to recede into distance */
     transform-origin: top center;
-    transform: perspective(1500px) rotateX(60deg);
+    transform: perspective(1400px) rotateX(82deg);
     opacity: 0.6;
     z-index: 1;
   }
@@ -290,6 +313,33 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .tv-static {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    /* Static black and white TV noise pattern */
+    background-image:
+      radial-gradient(circle at 1px 1px, #000 1px, transparent 1px),
+      radial-gradient(circle at 3px 2px, #fff 1px, transparent 1px),
+      radial-gradient(circle at 5px 4px, #000 1px, transparent 1px),
+      radial-gradient(circle at 2px 6px, #fff 1px, transparent 1px),
+      radial-gradient(circle at 7px 3px, #000 1px, transparent 1px),
+      radial-gradient(circle at 4px 7px, #fff 1px, transparent 1px),
+      radial-gradient(circle at 6px 1px, #000 1px, transparent 1px),
+      radial-gradient(circle at 8px 5px, #fff 1px, transparent 1px),
+      radial-gradient(circle at 1px 8px, #000 1px, transparent 1px),
+      radial-gradient(circle at 9px 2px, #fff 1px, transparent 1px),
+      radial-gradient(circle at 3px 9px, #000 1px, transparent 1px),
+      radial-gradient(circle at 11px 4px, #fff 1px, transparent 1px),
+      radial-gradient(circle at 5px 11px, #000 1px, transparent 1px),
+      radial-gradient(circle at 10px 7px, #fff 1px, transparent 1px),
+      radial-gradient(circle at 12px 1px, #000 1px, transparent 1px),
+      radial-gradient(circle at 7px 12px, #fff 1px, transparent 1px);
+    background-size: 8px 8px, 12px 12px, 6px 6px, 10px 10px, 14px 14px, 9px 9px, 11px 11px, 7px 7px, 13px 13px, 15px 15px, 5px 5px, 16px 16px, 8px 8px, 12px 12px, 6px 6px, 10px 10px;
+    background-position: 0 0, 2px 3px, 4px 1px, 1px 5px, 6px 2px, 3px 6px, 5px 0px, 7px 4px, 0px 7px, 8px 1px, 2px 8px, 10px 3px, 4px 10px, 9px 6px, 11px 0px, 6px 11px;
+    opacity: 0.3;
   }
 }
 
@@ -340,36 +390,17 @@ body::after {
   }
 
   to {
-    background-position: 60px 60px;
+    background-position: 100% 100%;
   }
 }
 
-/* Removed neon-pulse and glow-pulse keyframes - clean vaporwave aesthetic */
-
-@layer utilities {
-  .animate-fade-up {
-    animation: fade-up 0.8s ease-out forwards;
-    opacity: 0;
+@keyframes grid-move-backwards {
+  from {
+    background-position: 100% 100%;
   }
 
-  .animation-delay-200 {
-    animation-delay: 0.2s;
-  }
-
-  .animation-delay-400 {
-    animation-delay: 0.4s;
-  }
-
-  /* Removed neon-pulse and glow-pulse animations - clean vaporwave aesthetic */
-
-  @media (prefers-reduced-motion: reduce) {
-
-    .animate-fade-up,
-    .animate-neon-pulse,
-    .animate-glow-pulse {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
+  to {
+    background-position: 0 0;
   }
 }
+
