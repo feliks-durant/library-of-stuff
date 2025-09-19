@@ -79,7 +79,7 @@ export default function Landing() {
 
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="max-w-none space-y-8">
-            <p className="text-2xl leading-relaxed vapor-text-teal font-semibold">
+            <p className="text-2xl leading-relaxed vapor-purple font-semibold">
               The Library of Stuff makes it easy to borrow and loan every day
               items from people you already trust. Trust is one way and
               customizable for each relationship.
