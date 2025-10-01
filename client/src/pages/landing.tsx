@@ -40,7 +40,7 @@ export default function Landing() {
   // Initialize audio element
   useEffect(() => {
     audioRef.current = new Audio(jingleAudio);
-    audioRef.current.addEventListener('ended', () => setIsPlaying(false));
+    audioRef.current.loop = true;
     
     return () => {
       if (audioRef.current) {
