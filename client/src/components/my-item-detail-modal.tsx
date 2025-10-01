@@ -216,7 +216,7 @@ export function MyItemDetailModal({
         <div className="space-y-6">
           {/* Item Image */}
           {item.imageUrl && (
-            <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
+            <div className="w-full h-64 bg-muted rounded-lg overflow-hidden">
               <img
                 src={item.imageUrl}
                 alt={item.title}
@@ -227,18 +227,18 @@ export function MyItemDetailModal({
 
           {/* Description */}
           <div>
-            <h3 className="font-semibold mb-2">Description</h3>
-            <p className="text-gray-700">{item.description}</p>
+            <h3 className="font-semibold text-foreground mb-2">Description</h3>
+            <p className="text-muted-foreground">{item.description}</p>
           </div>
 
           {/* Availability Status */}
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold">Status:</h3>
+            <h3 className="font-semibold text-foreground">Status:</h3>
             <Badge variant={isUnavailable ? "destructive" : "default"}>
               {isUnavailable ? "Unavailable" : "Available"}
             </Badge>
             {isUnavailable && activeLoan && (
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-muted-foreground">
                 (Currently loaned out)
               </span>
             )}
@@ -270,11 +270,11 @@ export function MyItemDetailModal({
                 className="flex-1"
                 disabled={updateTrustLevelMutation.isPending}
               />
-              <span className="w-12 text-center font-medium text-blue-600">
+              <span className="w-12 text-center font-medium text-primary">
                 {trustLevel[0]}
               </span>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Higher levels mean only your most trusted contacts can see this item.
             </p>
           </div>
@@ -315,7 +315,7 @@ export function MyItemDetailModal({
             
             <CollapsibleContent className="space-y-3 mt-3">
               {loanHistory.length === 0 ? (
-                <p className="text-gray-500 text-sm">No loan history yet.</p>
+                <p className="text-muted-foreground text-sm">No loan history yet.</p>
               ) : (
                 loanHistory.map((loan) => {
                   const borrower = borrowerMap[loan.borrowerId];
@@ -348,11 +348,11 @@ export function MyItemDetailModal({
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-black">
+                            <p className="font-medium text-foreground">
                               {borrowerName}
                             </p>
                             {borrowerUsername && (
-                              <p className="text-sm text-gray-500">@{borrowerUsername}</p>
+                              <p className="text-sm text-muted-foreground">@{borrowerUsername}</p>
                             )}
                           </div>
                         </div>
@@ -363,9 +363,9 @@ export function MyItemDetailModal({
                     
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                         <div>
-                          <p className="text-gray-600">Borrowed</p>
+                          <p className="text-muted-foreground">Borrowed</p>
                           <p className="font-medium">
                             {format(new Date(loan.startDate), "MMM d, yyyy")}
                           </p>
@@ -373,9 +373,9 @@ export function MyItemDetailModal({
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                         <div>
-                          <p className="text-gray-600">
+                          <p className="text-muted-foreground">
                             {loan.status === "active" ? "Due" : "Returned"}
                           </p>
                           <p className="font-medium">

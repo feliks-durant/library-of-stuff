@@ -89,11 +89,11 @@ export default function TrustAssignment() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse space-y-4 w-full max-w-md mx-auto p-6">
-          <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto"></div>
-          <div className="h-6 bg-gray-200 rounded w-48 mx-auto"></div>
-          <div className="h-4 bg-gray-200 rounded w-32 mx-auto"></div>
+          <div className="w-24 h-24 bg-muted rounded-full mx-auto"></div>
+          <div className="h-6 bg-muted rounded w-48 mx-auto"></div>
+          <div className="h-4 bg-muted rounded w-32 mx-auto"></div>
         </div>
       </div>
     );
@@ -101,14 +101,14 @@ export default function TrustAssignment() {
 
   if (isError || !user) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i className="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">User Not Found</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">User Not Found</h3>
+            <p className="text-muted-foreground mb-6">
               The user profile you're trying to access could not be found.
             </p>
             <Button onClick={() => setLocation("/")} variant="outline">
@@ -123,7 +123,7 @@ export default function TrustAssignment() {
   const description = getTrustDescription(trustLevel[0]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <NavigationHeader 
         searchQuery=""
         onSearchChange={() => {}}
@@ -141,7 +141,7 @@ export default function TrustAssignment() {
           >
             <i className="fas fa-arrow-left text-xl"></i>
           </Button>
-          <h2 className="text-xl font-semibold text-gray-900">Set Trust Level</h2>
+          <h2 className="text-xl font-semibold text-foreground">Set Trust Level</h2>
         </div>
 
         <div className="flex-1">
@@ -157,15 +157,15 @@ export default function TrustAssignment() {
               </AvatarFallback>
             </Avatar>
             
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-2xl font-semibold text-foreground mb-2">
               {user.firstName} {user.lastName}
             </h3>
-            <p className="text-gray-600">{user.email}</p>
+            <p className="text-muted-foreground">{user.email}</p>
           </div>
 
           <Card className="mb-8">
             <CardContent className="pt-6">
-              <h4 className="font-semibold text-gray-900 mb-4">
+              <h4 className="font-semibold text-foreground mb-4">
                 How much do you trust this person?
               </h4>
               
@@ -179,17 +179,17 @@ export default function TrustAssignment() {
                     step={1}
                     className="flex-1"
                   />
-                  <span className="w-12 text-center font-bold text-2xl text-brand-blue">
+                  <span className="w-12 text-center font-bold text-2xl text-primary">
                     {trustLevel[0]}
                   </span>
                 </div>
                 
                 <Card>
                   <CardContent className="pt-4 text-center">
-                    <p className="font-medium text-gray-900 mb-1">
+                    <p className="font-medium text-foreground mb-1">
                       {description.title}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {description.desc}
                     </p>
                   </CardContent>
@@ -202,7 +202,7 @@ export default function TrustAssignment() {
             <Button 
               onClick={handleSave}
               disabled={saveTrustMutation.isPending}
-              className="w-full bg-brand-blue hover:bg-blue-700 py-4 text-white font-semibold"
+              className="w-full bg-primary text-primary-foreground hover:opacity-90 py-4 font-semibold"
             >
               {saveTrustMutation.isPending ? (
                 <>

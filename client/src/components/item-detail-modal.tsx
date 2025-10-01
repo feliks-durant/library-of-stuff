@@ -61,8 +61,8 @@ export default function ItemDetailModal({ item, isOpen, onClose }: ItemDetailMod
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <i className="fas fa-box text-gray-400 text-4xl"></i>
+                <div className="w-full h-full bg-muted flex items-center justify-center">
+                  <i className="fas fa-box text-muted-foreground text-4xl"></i>
                 </div>
               )}
             </div>
@@ -70,13 +70,13 @@ export default function ItemDetailModal({ item, isOpen, onClose }: ItemDetailMod
             {/* Item Details */}
             <div className="space-y-3">
               <div>
-                <h4 className="font-medium text-gray-900 mb-1">Description</h4>
-                <p className="text-gray-600 text-sm">{item.description}</p>
+                <h4 className="font-medium text-foreground mb-1">Description</h4>
+                <p className="text-muted-foreground text-sm">{item.description}</p>
               </div>
               
               <div>
-                <h4 className="font-medium text-gray-900 mb-1">Category</h4>
-                <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full capitalize">
+                <h4 className="font-medium text-foreground mb-1">Category</h4>
+                <span className="inline-block bg-muted text-foreground text-xs px-2 py-1 rounded-full capitalize">
                   {item.category}
                 </span>
               </div>
@@ -93,11 +93,11 @@ export default function ItemDetailModal({ item, isOpen, onClose }: ItemDetailMod
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-gray-900 text-sm">Shared by</p>
+                  <p className="font-medium text-foreground text-sm">Shared by</p>
                   <div className="flex flex-col leading-tight">
-                    <span className="text-sm text-gray-900">{ownerDisplayName}</span>
+                    <span className="text-sm text-foreground">{ownerDisplayName}</span>
                     {ownerUsername && (
-                      <span className="text-xs text-gray-500">{ownerUsername}</span>
+                      <span className="text-xs text-muted-foreground">{ownerUsername}</span>
                     )}
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export default function ItemDetailModal({ item, isOpen, onClose }: ItemDetailMod
               <div className="pt-4 border-t space-y-2">
                 {!isOwner && (
                   <LoanRequestModal item={item}>
-                    <Button className="w-full bg-brand-blue hover:bg-blue-700">
+                    <Button className="w-full bg-primary text-primary-foreground hover:opacity-90">
                       <HandHeart className="w-4 h-4 mr-2" />
                       Request to Borrow
                     </Button>
@@ -119,7 +119,7 @@ export default function ItemDetailModal({ item, isOpen, onClose }: ItemDetailMod
                       onClose();
                       setShowEditModal(true);
                     }}
-                    className="w-full bg-brand-blue hover:bg-blue-700"
+                    className="w-full bg-primary text-primary-foreground hover:opacity-90"
                   >
                     <i className="fas fa-edit mr-2"></i>
                     Edit Item

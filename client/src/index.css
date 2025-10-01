@@ -12,19 +12,19 @@
   /* Day Mode - Parchment Palette */
   --background: hsl(28, 38%, 90%); /* #F3E2D4 - lightest parchment */
   --foreground: hsl(202, 40%, 17%); /* #17313E - darkest text */
-  --muted: hsl(275, 27%, 75%); /* #C5B0CD - light purple muted */
-  --muted-foreground: hsl(202, 27%, 34%); /* #415E72 - medium blue */
-  --popover: hsl(28, 38%, 90%); /* #F3E2D4 */
+  --muted: hsl(28, 30%, 85%); /* Neutral warm beige muted */
+  --muted-foreground: hsl(202, 30%, 30%); /* Darker for better contrast */
+  --popover: hsl(28, 35%, 88%); /* Slightly darker parchment */
   --popover-foreground: hsl(202, 40%, 17%); /* #17313E */
-  --card: hsl(275, 27%, 75%); /* #C5B0CD - light purple card */
+  --card: hsl(28, 35%, 88%); /* Neutral warm beige card, NOT purple */
   --card-foreground: hsl(202, 40%, 17%); /* #17313E */
-  --border: hsl(202, 27%, 34%); /* #415E72 - medium borders */
-  --input: hsl(275, 27%, 75%); /* #C5B0CD */
+  --border: hsl(202, 20%, 50%); /* Softer border */
+  --input: hsl(28, 35%, 88%); /* Match card */
   --primary: hsl(202, 40%, 17%); /* #17313E - dark primary */
   --primary-foreground: hsl(28, 38%, 90%); /* #F3E2D4 */
-  --secondary: hsl(202, 27%, 34%); /* #415E72 */
-  --secondary-foreground: hsl(28, 38%, 90%); /* #F3E2D4 */
-  --accent: hsl(275, 27%, 75%); /* #C5B0CD */
+  --secondary: hsl(275, 27%, 75%); /* #C5B0CD - purple for accents only */
+  --secondary-foreground: hsl(202, 40%, 17%); /* #17313E */
+  --accent: hsl(275, 27%, 75%); /* #C5B0CD - purple accent */
   --accent-foreground: hsl(202, 40%, 17%); /* #17313E */
   --destructive: hsl(0, 60%, 50%);
   --destructive-foreground: hsl(0, 0%, 98%);
@@ -55,8 +55,8 @@
   --background: hsl(243, 46%, 16%); /* #17153B - darkest purple */
   --foreground: hsl(276, 38%, 82%); /* #C8ACD6 - lightest purple text */
   --muted: hsl(248, 43%, 30%); /* #2E236C - dark purple muted */
-  --muted-foreground: hsl(245, 35%, 55%); /* #433D8B - medium purple */
-  --popover: hsl(243, 46%, 16%); /* #17153B */
+  --muted-foreground: hsl(276, 30%, 70%); /* Lighter for better readability */
+  --popover: hsl(248, 43%, 30%); /* #2E236C */
   --popover-foreground: hsl(276, 38%, 82%); /* #C8ACD6 */
   --card: hsl(248, 43%, 30%); /* #2E236C - dark purple card */
   --card-foreground: hsl(276, 38%, 82%); /* #C8ACD6 */

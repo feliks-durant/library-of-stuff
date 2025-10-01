@@ -331,14 +331,14 @@ export default function LoansPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <NavigationHeader 
         onAddItem={() => setShowAddItemModal(true)}
         onScanQR={() => setShowQRScanner(true)}
         onOpenProfile={() => setShowProfileModal(true)}
       />
       <div className="container mx-auto p-6 max-w-4xl">
-        <h1 className="text-2xl font-bold mb-6">Loans & Requests</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6">Loans & Requests</h1>
         
         <Tabs defaultValue="requests" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
@@ -360,7 +360,7 @@ export default function LoansPage() {
           {requestsLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+                <div key={i} className="h-32 bg-muted rounded-lg animate-pulse" />
               ))}
             </div>
           ) : loanRequests.length === 0 ? (
@@ -390,14 +390,14 @@ export default function LoansPage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                             <div className="min-w-0 flex-1">
-                              <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">
+                              <h3 className="font-semibold text-foreground truncate text-sm sm:text-base">
                                 {(request.borrowerFirstName || request.borrowerLastName) ? (
                                   <>
-                                    <span className="text-black">
+                                    <span className="text-foreground">
                                       {[request.borrowerFirstName, request.borrowerLastName].filter(Boolean).join(' ')}
                                     </span>
                                     {request.borrowerUsername && (
-                                      <span className="text-gray-500 ml-1">@{request.borrowerUsername}</span>
+                                      <span className="text-muted-foreground ml-1">@{request.borrowerUsername}</span>
                                     )}
                                   </>
                                 ) : (
@@ -405,7 +405,7 @@ export default function LoansPage() {
                                 )}
                               </h3>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                                <span className="text-xs sm:text-sm font-medium text-foreground truncate">
                                   {request.itemTitle}
                                 </span>
                                 <Badge className={`text-xs ${
@@ -419,7 +419,7 @@ export default function LoansPage() {
                             </div>
                           </div>
                           
-                          <div className="text-xs sm:text-sm text-gray-600 mb-2">
+                          <div className="text-xs sm:text-sm text-muted-foreground mb-2">
                             <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                             <span className="truncate">
                               {format(new Date(request.requestedStartDate), "MMM d")} - {" "}
@@ -428,10 +428,10 @@ export default function LoansPage() {
                           </div>
                           
                           {request.message && (
-                            <p className="text-gray-600 mb-3 text-xs sm:text-sm line-clamp-2">{request.message}</p>
+                            <p className="text-muted-foreground mb-3 text-xs sm:text-sm line-clamp-2">{request.message}</p>
                           )}
                           
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground opacity-70">
                             Requested {format(new Date(request.createdAt), "MMM d, yyyy 'at' h:mm a")}
                           </p>
                         </div>
@@ -443,7 +443,7 @@ export default function LoansPage() {
                             size="sm"
                             onClick={() => approveLoanRequestMutation.mutate(request.id)}
                             disabled={pendingApproval !== null || pendingDenial !== null}
-                            className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm"
+                            className="bg-primary text-primary-foreground hover:opacity-90 text-xs sm:text-sm"
                           >
                             {pendingApproval === request.id ? "Approving..." : "Approve"}
                           </Button>
@@ -470,7 +470,7 @@ export default function LoansPage() {
           {borrowedLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+                <div key={i} className="h-32 bg-muted rounded-lg animate-pulse" />
               ))}
             </div>
           ) : borrowedLoans.length === 0 ? (
@@ -496,7 +496,7 @@ export default function LoansPage() {
           {lentLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+                <div key={i} className="h-32 bg-muted rounded-lg animate-pulse" />
               ))}
             </div>
           ) : lentLoans.length === 0 ? (

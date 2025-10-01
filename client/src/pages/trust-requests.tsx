@@ -176,7 +176,7 @@ export default function MyConnectionsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <NavigationHeader 
           onAddItem={() => setShowAddItemModal(true)}
           onScanQR={() => setShowQRScanner(true)}
@@ -185,8 +185,8 @@ export default function MyConnectionsPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading...</p>
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading...</p>
             </div>
           </div>
         </main>
@@ -195,7 +195,7 @@ export default function MyConnectionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <NavigationHeader 
         onAddItem={() => setShowAddItemModal(true)}
         onScanQR={() => setShowQRScanner(true)}
@@ -204,8 +204,8 @@ export default function MyConnectionsPage() {
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Connections</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-foreground mb-2">My Connections</h1>
+          <p className="text-muted-foreground">
             Manage trust requests and view your connections with trust levels.
           </p>
         </div>
@@ -226,15 +226,15 @@ export default function MyConnectionsPage() {
             {receivedLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <div className="w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading requests...</p>
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading requests...</p>
                 </div>
               </div>
             ) : receivedRequests.length === 0 ? (
               <div className="text-center py-12">
-                <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No trust requests</h3>
-                <p className="text-gray-600">No one has requested trust from you yet.</p>
+                <Heart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">No trust requests</h3>
+                <p className="text-muted-foreground">No one has requested trust from you yet.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -252,17 +252,17 @@ export default function MyConnectionsPage() {
                           
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
-                              <h3 className="font-semibold text-gray-900">
+                              <h3 className="font-semibold text-foreground">
                                 {request.requesterName || "Anonymous User"}
                               </h3>
                               {getStatusBadge(request.status)}
                             </div>
                             
                             {request.message && (
-                              <p className="text-gray-600 mb-3">{request.message}</p>
+                              <p className="text-muted-foreground mb-3">{request.message}</p>
                             )}
                             
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-muted-foreground opacity-70">
                               Requested {format(new Date(request.createdAt), "MMM d, yyyy 'at' h:mm a")}
                             </p>
                           </div>
@@ -279,7 +279,7 @@ export default function MyConnectionsPage() {
                                 email: '',
                                 profileImageUrl: request.requesterProfileImage || undefined
                               } as User)}
-                              className="bg-brand-blue hover:bg-blue-700"
+                              className="bg-primary text-primary-foreground hover:opacity-90"
                             >
                               Set Trust Level
                             </Button>
@@ -306,7 +306,7 @@ export default function MyConnectionsPage() {
             {/* Search and Sort Controls */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search connections..."
                   value={searchQuery}
@@ -329,22 +329,22 @@ export default function MyConnectionsPage() {
             {connectionsLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <div className="w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading connections...</p>
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading connections...</p>
                 </div>
               </div>
             ) : sortedConnections.length === 0 ? (
               searchQuery ? (
                 <div className="text-center py-12">
-                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No connections found</h3>
-                  <p className="text-gray-600">Try adjusting your search query.</p>
+                  <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No connections found</h3>
+                  <p className="text-muted-foreground">Try adjusting your search query.</p>
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No connections yet</h3>
-                  <p className="text-gray-600">Start building trust relationships by setting trust levels for other users.</p>
+                  <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No connections yet</h3>
+                  <p className="text-muted-foreground">Start building trust relationships by setting trust levels for other users.</p>
                 </div>
               )
             ) : (
@@ -375,7 +375,7 @@ export default function MyConnectionsPage() {
                         </Avatar>
                         
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">
+                          <h3 className="font-semibold text-foreground">
                             {formatDisplayName(connection)}
                           </h3>
                           

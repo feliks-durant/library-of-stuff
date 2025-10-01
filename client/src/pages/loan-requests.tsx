@@ -103,7 +103,7 @@ export default function LoanRequestsPage() {
         <h1 className="text-2xl font-bold mb-6">Loan Requests</h1>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+            <div key={i} className="h-32 bg-muted rounded-lg animate-pulse" />
           ))}
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function LoanRequestsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <NavigationHeader 
         searchQuery=""
         onSearchChange={() => {}}
@@ -120,7 +120,7 @@ export default function LoanRequestsPage() {
         onOpenProfile={() => {}}
       />
       <div className="container mx-auto p-6 max-w-4xl">
-        <h1 className="text-2xl font-bold mb-6">Pending Loan Requests</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6">Pending Loan Requests</h1>
       
       {requests.length === 0 ? (
         <Card>
