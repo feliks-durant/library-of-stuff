@@ -52,7 +52,7 @@ export default function ItemCard({ item, onClick }: ItemCardProps) {
   return (
     <>
       <Card 
-        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-200 overflow-hidden cursor-pointer hover:scale-[1.02]"
+        className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all border overflow-hidden cursor-pointer hover:scale-[1.02]"
         onClick={handleCardClick}
       >
         {/* Item Image */}
@@ -72,14 +72,14 @@ export default function ItemCard({ item, onClick }: ItemCardProps) {
               }}
             />
           ) : null}
-          <div className={`w-full h-full bg-gray-200 flex items-center justify-center ${item.imageUrl ? 'hidden' : ''}`}>
-            <i className="fas fa-box text-gray-400 text-4xl"></i>
+          <div className={`w-full h-full bg-muted flex items-center justify-center ${item.imageUrl ? 'hidden' : ''}`}>
+            <i className="fas fa-box text-muted-foreground text-4xl"></i>
           </div>
         </div>
         
         <CardContent className="p-4">
-          <h3 className="font-semibold text-gray-900 mb-2">{item.title}</h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+          <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
+          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
             {item.description}
           </p>
           
@@ -95,9 +95,9 @@ export default function ItemCard({ item, onClick }: ItemCardProps) {
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col leading-tight">
-              <span className="text-sm text-gray-900">{ownerDisplayName}</span>
+              <span className="text-sm text-foreground">{ownerDisplayName}</span>
               {ownerUsername && (
-                <span className="text-xs text-gray-500">{ownerUsername}</span>
+                <span className="text-xs text-muted-foreground">{ownerUsername}</span>
               )}
             </div>
           </div>

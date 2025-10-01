@@ -24,7 +24,7 @@ export default function ThemeToggle() {
       variant="ghost"
       size="sm"
       onClick={() => setIsDark(!isDark)}
-      className="px-4 py-2 text-gray-600 hover:text-brand-blue min-w-[48px]"
+      className="px-4 py-2 text-foreground hover:text-primary min-w-[48px]"
       title={isDark ? "Switch to Day Mode" : "Switch to Night Mode"}
       data-testid="button-theme-toggle"
     >

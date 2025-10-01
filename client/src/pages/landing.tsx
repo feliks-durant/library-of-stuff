@@ -1,8 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 export default function Landing() {
   const explanationRef = useRef<HTMLDivElement>(null);
+
+  // Temporarily remove dark class from landing page to preserve vaporwave theme
+  useEffect(() => {
+    const root = document.documentElement;
+    const hadDarkClass = root.classList.contains('dark');
+    
+    // Remove dark class while on landing page
+    root.classList.remove('dark');
+    
+    // Restore dark class when leaving landing page
+    return () => {
+      if (hadDarkClass) {
+        root.classList.add('dark');
+      }
+    };
+  }, []);
 
   const handleLogin = () => {
     // Check if user just logged out and needs fresh authentication
@@ -19,7 +35,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="bg-background text-foreground">
+    <div className="landing-page">
       {/* Hero Section with authentic vaporwave grid */}
       <section className="min-h-screen flex items-center justify-center px-4 py-8 relative vaporwave-grid">
         {/* Animated grid with exact reference colors */}

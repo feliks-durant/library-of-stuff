@@ -40,7 +40,7 @@ export default function NavigationHeader({
           <div className="flex items-center min-w-0 flex-1">
             <div className="flex-shrink-0">
               <Link href="/">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-brand-blue hover:text-blue-700 cursor-pointer transition-colors truncate">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary hover:opacity-80 cursor-pointer transition-colors truncate">
                   <i className="fas fa-boxes mr-1 sm:mr-2"></i>
                   <span className="hidden xs:inline">Library of Stuff</span>
                   <span className="xs:hidden">LoS</span>
@@ -59,7 +59,7 @@ export default function NavigationHeader({
               variant="ghost"
               size="sm"
               onClick={onScanQR}
-              className="px-4 py-2 text-gray-600 hover:text-brand-blue min-w-[48px]"
+              className="px-4 py-2 text-foreground hover:text-primary min-w-[48px]"
               title="Scan QR Code"
             >
               <i className="fas fa-qrcode text-lg sm:text-xl"></i>
@@ -69,7 +69,7 @@ export default function NavigationHeader({
             {/* Add Item Button - Responsive */}
             <Button 
               onClick={onAddItem} 
-              className="bg-brand-blue hover:bg-blue-700 text-xs sm:text-sm px-4 sm:px-6 min-w-[64px] sm:min-w-[120px]"
+              className="bg-primary text-primary-foreground hover:opacity-90 text-xs sm:text-sm px-4 sm:px-6 min-w-[64px] sm:min-w-[120px]"
             >
               <i className="fas fa-plus sm:mr-2"></i>
               <span className="hidden sm:inline ml-1">Add Item</span>
@@ -78,7 +78,7 @@ export default function NavigationHeader({
             {/* User Profile Dropdown - Responsive */}
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-1 sm:space-x-2 text-gray-700 hover:text-brand-blue min-w-0">
+                <Button variant="ghost" className="flex items-center space-x-1 sm:space-x-2 text-foreground hover:text-primary min-w-0">
                   <Avatar className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0">
                     <AvatarImage 
                       src={user?.profileImageUrl || undefined} 

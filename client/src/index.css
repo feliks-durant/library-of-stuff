@@ -317,6 +317,16 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Landing page isolation - override any theme */
+.landing-page {
+  background: hsl(280, 30%, 8%) !important;
+  color: hsl(320, 60%, 85%) !important;
+}
+
+.landing-page * {
+  border-color: inherit;
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background-attachment: fixed;

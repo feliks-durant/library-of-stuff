@@ -90,7 +90,7 @@ export default function MyItems() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <NavigationHeader 
           onAddItem={() => setShowAddItemModal(true)}
           onScanQR={() => setShowQRScanner(true)}
@@ -99,12 +99,12 @@ export default function MyItems() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-                <div className="w-full h-48 bg-gray-200"></div>
+              <div key={i} className="bg-card rounded-xl shadow-sm border overflow-hidden animate-pulse">
+                <div className="w-full h-48 bg-muted"></div>
                 <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-full"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-muted rounded w-full"></div>
+                  <div className="h-3 bg-muted rounded w-2/3"></div>
                 </div>
               </div>
             ))}
@@ -115,7 +115,7 @@ export default function MyItems() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <NavigationHeader 
         onAddItem={() => setShowAddItemModal(true)}
         onScanQR={() => setShowQRScanner(true)}
@@ -126,8 +126,8 @@ export default function MyItems() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">My Items</h2>
-            <p className="text-lg text-gray-600 mt-2">
+            <h2 className="text-3xl font-bold text-foreground">My Items</h2>
+            <p className="text-lg text-muted-foreground mt-2">
               Manage the items you've shared
             </p>
           </div>
@@ -149,7 +149,7 @@ export default function MyItems() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4"
             />
-            <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
           </div>
 
           <div className="flex flex-wrap items-center justify-between">
@@ -193,10 +193,10 @@ export default function MyItems() {
               </Select>
             </div>
             
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-muted-foreground">
               {sortedItems.length} items
               {visibilityFilter === "all" && items.filter(item => item.isHidden).length > 0 && (
-                <span className="ml-2 text-gray-500">
+                <span className="ml-2 text-muted-foreground opacity-70">
                   ({items.filter(item => item.isHidden).length} hidden)
                 </span>
               )}
@@ -207,11 +207,11 @@ export default function MyItems() {
         {/* Items Grid */}
         {sortedItems.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="fas fa-boxes text-gray-400 text-2xl"></i>
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="fas fa-boxes text-muted-foreground text-2xl"></i>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No items found</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">No items found</h3>
+            <p className="text-muted-foreground mb-6">
               {searchQuery 
                 ? "No items match your search criteria." 
                 : "You haven't added any items yet."
@@ -231,7 +231,7 @@ export default function MyItems() {
             {sortedItems.map((item) => (
               <Card 
                 key={item.id} 
-                className="bg-white rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 border border-gray-200 overflow-hidden cursor-pointer relative"
+                className="bg-card rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 border overflow-hidden cursor-pointer relative"
                 onClick={() => handleItemClick(item)}
               >
                 {/* Item Image */}
@@ -245,15 +245,15 @@ export default function MyItems() {
                       onError={() => console.log("Image failed to load:", item.imageUrl)}
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <i className="fas fa-box text-gray-400 text-4xl"></i>
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <i className="fas fa-box text-muted-foreground text-4xl"></i>
                     </div>
                   )}
                   
                   {/* Hidden Item Indicator */}
                   {item.isHidden && (
                     <div className="absolute top-2 right-2">
-                      <Badge variant="secondary" className="bg-gray-600 text-white">
+                      <Badge variant="secondary">
                         Hidden
                       </Badge>
                     </div>
@@ -262,14 +262,14 @@ export default function MyItems() {
                 
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                    <h3 className="font-semibold text-foreground">{item.title}</h3>
                     {item.isHidden && (
-                      <Badge variant="outline" className="text-xs border-gray-400 text-gray-600">
+                      <Badge variant="outline" className="text-xs">
                         Hidden
                       </Badge>
                     )}
                   </div>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
                     {item.description}
                   </p>
                   
@@ -277,7 +277,7 @@ export default function MyItems() {
                     <Badge variant="secondary" className="capitalize">
                       {item.category}
                     </Badge>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       Trust Level: {item.trustLevel}
                     </span>
                   </div>

@@ -87,7 +87,7 @@ function TrustRequestModal({
         </DialogHeader>
         
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Send a trust request to {userName}. They will decide what trust level to assign you.
           </p>
           
@@ -135,7 +135,7 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
 
   return (
     <>
-      <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 overflow-hidden">
+      <Card className="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow border overflow-hidden">
         <CardContent className="p-6 text-center">
           <Avatar className="w-16 h-16 mx-auto mb-4">
             <AvatarImage 
@@ -150,13 +150,13 @@ function UserCard({ user, existingTrustLevel }: { user: User; existingTrustLevel
           
           {user.firstName && user.lastName ? (
             <>
-              <h3 className="font-semibold text-black mb-1">{user.firstName} {user.lastName}</h3>
+              <h3 className="font-semibold text-foreground mb-1">{user.firstName} {user.lastName}</h3>
               {user.username && (
-                <p className="text-sm text-gray-500 mb-3">@{user.username}</p>
+                <p className="text-sm text-muted-foreground mb-3">@{user.username}</p>
               )}
             </>
           ) : (
-            <h3 className="font-semibold text-gray-900 mb-4">{userName}</h3>
+            <h3 className="font-semibold text-foreground mb-4">{userName}</h3>
           )}
           {existingTrustLevel && (
             <div className="mb-3">
@@ -278,7 +278,7 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <NavigationHeader 
           onAddItem={() => setShowAddModal(true)}
           onScanQR={() => setShowQRModal(true)}
@@ -287,12 +287,12 @@ export default function Home() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-                <div className="w-full h-48 bg-gray-200"></div>
+              <div key={i} className="bg-card rounded-xl shadow-sm border overflow-hidden animate-pulse">
+                <div className="w-full h-48 bg-muted"></div>
                 <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-full"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-muted rounded w-full"></div>
+                  <div className="h-3 bg-muted rounded w-2/3"></div>
                 </div>
               </div>
             ))}
@@ -303,7 +303,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <NavigationHeader 
         onAddItem={() => setShowAddModal(true)}
         onScanQR={() => setShowQRModal(true)}
@@ -313,7 +313,7 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
             Don't buy, borrow. 
           </h2>
           {/* <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
@@ -330,7 +330,7 @@ export default function Home() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 border-gray-300 focus:ring-2 focus:ring-brand-blue focus:border-transparent"
               />
-              <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
             </div>
           </div>
         </div>
@@ -367,7 +367,7 @@ export default function Home() {
               </Select>
             </div>
             
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-muted-foreground">
               {sortedItems.length} items available to borrow
             </div>
           </div>
@@ -418,7 +418,7 @@ export default function Home() {
                   </Select>
                 </div>
                 
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {sortedItems.length} items available to borrow
                 </div>
               </div>
@@ -430,8 +430,8 @@ export default function Home() {
               </div>
               {sortedItems.length === 0 && (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No items found for "{searchQuery}"</p>
-                  <p className="text-gray-400 mt-2">Try a different search term or adjust your filters.</p>
+                  <p className="text-muted-foreground text-lg">No items found for "{searchQuery}"</p>
+                  <p className="text-muted-foreground mt-2 opacity-70">Try a different search term or adjust your filters.</p>
                 </div>
               )}
             </TabsContent>
@@ -452,7 +452,7 @@ export default function Home() {
                   </Select>
                 </div>
                 
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {filteredUsers.length} users found
                 </div>
               </div>
@@ -464,19 +464,19 @@ export default function Home() {
               </div>
               {filteredUsers.length === 0 && (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No users found for "{searchQuery}"</p>
-                  <p className="text-gray-400 mt-2">Try a different search term or adjust your filter.</p>
+                  <p className="text-muted-foreground text-lg">No users found for "{searchQuery}"</p>
+                  <p className="text-muted-foreground mt-2 opacity-70">Try a different search term or adjust your filter.</p>
                 </div>
               )}
             </TabsContent>
           </Tabs>
         ) : sortedItems.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="fas fa-boxes text-gray-400 text-2xl"></i>
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="fas fa-boxes text-muted-foreground text-2xl"></i>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No items available</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">No items available</h3>
+            <p className="text-muted-foreground mb-6">
               {searchQuery 
                 ? "No items match your search criteria." 
                 : "No one has shared items with you yet, or you need to be assigned trust levels to see items."
