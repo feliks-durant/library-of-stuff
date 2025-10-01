@@ -10,6 +10,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### October 1, 2025 - Landing Page FAQ Accordion Implementation
+- Converted second section of landing page into fold-out FAQ accordion
+- Created 5 FAQ sections: "What is it?", "What is anti-capitalist infrastructure?", "Does that mean you hate capitalism?", "How can I support the Library of Stuff?", and "Who built it?"
+- Moved existing content (description and Alice/Bob/Chewy example) into first accordion item
+- Maintained vaporwave aesthetic with purple borders and pink headers
+- Get Started button positioned below all FAQ items
+- Single accordion type allows one section open at a time for cleaner UX
+
+### October 1, 2025 - QR Code Feature for Item Sharing
+- Added QR codes to ItemDetailModal and MyItemDetailModal (150x150px on white background)
+- Implemented QR scan handler at /qr/item/:itemId with four decision paths
+- Created backend endpoint /api/items/:id/check-access for authentication and trust verification
+- Built RequestTrust page at /request-trust/:userId for non-trusted users to send trust requests
+- Decision paths: login redirect for unauthenticated, trust request for no relationship, insufficient trust modal, or item access for sufficient trust
+- All QR scan scenarios tested and working correctly
+
 ### August 1, 2025 - My Items Card UI Improvements and Modal Implementation
 - Replaced Edit/Loan buttons with clickable item cards for better user experience
 - Created MyItemDetailModal component with comprehensive item management features
