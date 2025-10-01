@@ -19,7 +19,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground">
       {/* Hero Section with authentic vaporwave grid */}
       <section className="min-h-screen flex items-center justify-center px-4 py-8 relative vaporwave-grid">
         {/* Animated grid with exact reference colors */}
@@ -70,7 +70,7 @@ export default function Landing() {
       <section
         ref={explanationRef}
         id="learn-more"
-        className="py-20 px-4 bg-static relative"
+        className="py-20 px-4 bg-background relative overflow-hidden"
         data-testid="section-learn-more"
       >
         {/* Subtle scanlines for lo-fi effect */}
