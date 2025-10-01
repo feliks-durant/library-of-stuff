@@ -16,13 +16,11 @@ import ThemeToggle from "@/components/theme-toggle";
 
 interface NavigationHeaderProps {
   onAddItem: () => void;
-  onScanQR: () => void;
   onOpenProfile: () => void;
 }
 
 export default function NavigationHeader({
   onAddItem,
-  onScanQR,
   onOpenProfile,
 }: NavigationHeaderProps) {
   const { user } = useAuth();
@@ -53,18 +51,6 @@ export default function NavigationHeader({
           <nav className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4 flex-shrink-0">
             {/* Theme Toggle */}
             <ThemeToggle />
-            
-            {/* QR Code Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onScanQR}
-              className="px-4 py-2 text-foreground hover:text-primary min-w-[48px]"
-              title="Scan QR Code"
-            >
-              <i className="fas fa-qrcode text-lg sm:text-xl"></i>
-              <span className="sr-only">Scan QR</span>
-            </Button>
             
             {/* Add Item Button - Responsive */}
             <Button 

@@ -125,10 +125,7 @@ export default function TrustAssignment() {
   return (
     <div className="min-h-screen bg-background">
       <NavigationHeader 
-        searchQuery=""
-        onSearchChange={() => {}}
         onAddItem={() => {}}
-        onScanQR={() => {}}
         onOpenProfile={() => {}}
       />
       <div className="max-w-md mx-auto p-6 h-full flex flex-col">

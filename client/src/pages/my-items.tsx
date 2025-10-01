@@ -93,7 +93,6 @@ export default function MyItems() {
       <div className="min-h-screen bg-background">
         <NavigationHeader 
           onAddItem={() => setShowAddItemModal(true)}
-          onScanQR={() => setShowQRScanner(true)}
           onOpenProfile={() => setShowProfileModal(true)}
         />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -118,7 +117,6 @@ export default function MyItems() {
     <div className="min-h-screen bg-background">
       <NavigationHeader 
         onAddItem={() => setShowAddItemModal(true)}
-        onScanQR={() => setShowQRScanner(true)}
         onOpenProfile={() => setShowProfileModal(true)}
       />
       
