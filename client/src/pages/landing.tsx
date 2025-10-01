@@ -1,4 +1,10 @@
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useRef, useEffect, useState } from "react";
 import jingleAudio from "@assets/library-of-stuff-jingle_1759345825836.mp3";
 
@@ -41,7 +47,7 @@ export default function Landing() {
   useEffect(() => {
     audioRef.current = new Audio(jingleAudio);
     audioRef.current.loop = true;
-    
+
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -52,7 +58,7 @@ export default function Landing() {
 
   const handleToggleJingle = () => {
     if (!audioRef.current) return;
-    
+
     if (isPlaying) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -122,7 +128,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Explanation Section with clean vaporwave styling */}
+      {/* FAQ Section with accordion */}
       <section
         ref={explanationRef}
         id="learn-more"
@@ -130,49 +136,144 @@ export default function Landing() {
         style={{ backgroundColor: "#1a1a2e" }}
         data-testid="section-learn-more"
       >
-        {/* Subtle scanlines for lo-fi effect */}
-        {/* <div className="absolute inset-0 scanlines"></div> */}
         <div className="absolute inset-0 tv-static">
           <div className="fuzzy-overlay"></div>
         </div>
 
         <div className="max-w-4xl mx-auto relative z-10">
-          <div className="max-w-none space-y-8">
-            <p className="text-2xl leading-relaxed vapor-text-purple font-semibold">
-              The Library of Stuff makes it easy to borrow and loan every day
-              items from people you already trust. Trust is one way and
-              customizable for each relationship.
-            </p>
-
-            <div className="border-2 vapor-border-purple p-8 rounded-lg" style={{ backgroundColor: '#0f0f1e' }}>
-              <p className="text-xl leading-relaxed vapor-text-orange">
-                <span className="vapor-text-pink font-bold uppercase tracking-wide">
-                  EXAMPLE:
-                </span>{" "}
-                Alice adds a guitar to the library, trust level 3. Alice adds
-                Bob at trust level 3 and Chewy at trust level 2. Bob can see
-                Alice's guitar but Chewy can't. Neither Bob nor Chewy knows what
-                level of trust Alice has granted them. <br />
-                <br />
-                When Bob wants to borrow the guitar, he texts Alice.* They meet
-                up to exchange the guitar. Bob sends a request for the guitar
-                which Alice approves. Alice can see the guitar in her list of
-                loans, and Bob can see it in his list of borrows. <br />
-                <br />* The app does not include messaging on the assumption
-                that if you trust someone, you know how to contact them.
-              </p>
-            </div>
-
-            <div className="mt-16 text-center">
-              <Button
-                onClick={handleLogin}
-                size="lg"
-                className="bg-vapor-pink hover:bg-vapor-purple text-background px-16 py-8 text-3xl font-black border-2 vapor-border-pink uppercase tracking-wider"
-                data-testid="button-get-started"
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            {/* FAQ 1: What is it? */}
+            <AccordionItem 
+              value="item-1" 
+              className="border-2 vapor-border-purple rounded-lg overflow-hidden"
+              style={{ backgroundColor: "#0f0f1e" }}
+            >
+              <AccordionTrigger 
+                className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
+                data-testid="accordion-trigger-what-is-it"
               >
-                GET STARTED
-              </Button>
-            </div>
+                What is it?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <div className="space-y-6">
+                  <p className="text-xl leading-relaxed vapor-text-purple">
+                    The Library of Stuff makes it easy to borrow and loan every day
+                    items from people you already trust. Trust is one way and
+                    customizable for each relationship.
+                  </p>
+
+                  <div
+                    className="border-2 vapor-border-purple p-6 rounded-lg"
+                    style={{ backgroundColor: "#1a1a2e" }}
+                  >
+                    <p className="text-lg leading-relaxed vapor-text-orange">
+                      <span className="vapor-text-pink font-bold uppercase tracking-wide">
+                        EXAMPLE:
+                      </span>{" "}
+                      Alice adds a guitar to the library, trust level 3. Alice adds
+                      Bob at trust level 3 and Chewy at trust level 2. Bob can see
+                      Alice's guitar but Chewy can't. Neither Bob nor Chewy knows what
+                      level of trust Alice has granted them. <br />
+                      <br />
+                      When Bob wants to borrow the guitar, he texts Alice.* They meet
+                      up to exchange the guitar. Bob sends a request for the guitar
+                      which Alice approves. Alice can see the guitar in her list of
+                      loans, and Bob can see it in his list of borrows. <br />
+                      <br />* The app does not include messaging on the assumption
+                      that if you trust someone, you know how to contact them.
+                    </p>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* FAQ 2: What is anti-capitalist infrastructure? */}
+            <AccordionItem 
+              value="item-2" 
+              className="border-2 vapor-border-purple rounded-lg overflow-hidden"
+              style={{ backgroundColor: "#0f0f1e" }}
+            >
+              <AccordionTrigger 
+                className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
+                data-testid="accordion-trigger-anti-capitalist"
+              >
+                What is anti-capitalist infrastructure?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-lg leading-relaxed vapor-text-purple">
+                  Anti-capitalist infrastructure refers to systems and tools that help people meet their needs outside of traditional market exchanges. Instead of buying and selling, we share resources based on trust and mutual aid. The Library of Stuff is infrastructure because it provides a foundation for sharing—not a marketplace for transactions. It's anti-capitalist because it prioritizes access over ownership and relationships over profit.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* FAQ 3: Does that mean you hate capitalism? */}
+            <AccordionItem 
+              value="item-3" 
+              className="border-2 vapor-border-purple rounded-lg overflow-hidden"
+              style={{ backgroundColor: "#0f0f1e" }}
+            >
+              <AccordionTrigger 
+                className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
+                data-testid="accordion-trigger-hate-capitalism"
+              >
+                Does that mean you hate capitalism?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-lg leading-relaxed vapor-text-purple">
+                  Not necessarily. This project isn't about hate—it's about building alternatives. Whether you think capitalism is fundamentally broken or just needs some balance, the Library of Stuff offers a different way to meet everyday needs. You can use this tool to reduce consumption, save money, strengthen community bonds, or all of the above. Your reasons are your own.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* FAQ 4: How can I support the Library of Stuff? */}
+            <AccordionItem 
+              value="item-4" 
+              className="border-2 vapor-border-purple rounded-lg overflow-hidden"
+              style={{ backgroundColor: "#0f0f1e" }}
+            >
+              <AccordionTrigger 
+                className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
+                data-testid="accordion-trigger-support"
+              >
+                How can I support the Library of Stuff?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-lg leading-relaxed vapor-text-purple">
+                  The best way to support this project is to use it! Share it with people you trust. Add your stuff. Borrow from others. Build a culture of sharing in your community. This tool is free and open-source—no premium tiers, no ads, no data harvesting. If you want to contribute technically, the code is available for you to improve, fork, or learn from.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* FAQ 5: Who built it? */}
+            <AccordionItem 
+              value="item-5" 
+              className="border-2 vapor-border-purple rounded-lg overflow-hidden"
+              style={{ backgroundColor: "#0f0f1e" }}
+            >
+              <AccordionTrigger 
+                className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
+                data-testid="accordion-trigger-who-built"
+              >
+                Who built it?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-lg leading-relaxed vapor-text-purple">
+                  This project was built by someone who believes we can create better systems for sharing resources and supporting each other. It's offered freely as a tool for communities to use and adapt. The vaporwave aesthetic? That's just for fun—a little nostalgia for digital spaces that felt more human and less corporate.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* Get Started Button */}
+          <div className="mt-16 text-center">
+            <Button
+              onClick={handleLogin}
+              size="lg"
+              className="bg-vapor-pink hover:bg-vapor-purple text-background px-16 py-8 text-3xl font-black border-2 vapor-border-pink uppercase tracking-wider"
+              data-testid="button-get-started"
+            >
+              GET STARTED
+            </Button>
           </div>
         </div>
       </section>
