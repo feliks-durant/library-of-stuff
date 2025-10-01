@@ -7,15 +7,15 @@ export default function Landing() {
   // Temporarily remove dark class from landing page to preserve vaporwave theme
   useEffect(() => {
     const root = document.documentElement;
-    const hadDarkClass = root.classList.contains('dark');
-    
+    const hadDarkClass = root.classList.contains("dark");
+
     // Remove dark class while on landing page
-    root.classList.remove('dark');
-    
+    root.classList.remove("dark");
+
     // Restore dark class when leaving landing page
     return () => {
       if (hadDarkClass) {
-        root.classList.add('dark');
+        root.classList.add("dark");
       }
     };
   }, []);
@@ -87,7 +87,7 @@ export default function Landing() {
         ref={explanationRef}
         id="learn-more"
         className="py-20 px-4 relative overflow-hidden"
-        style={{ backgroundColor: '#1a1a2e' }}
+        style={{ backgroundColor: "#1a1a2e" }}
         data-testid="section-learn-more"
       >
         {/* Subtle scanlines for lo-fi effect */}
@@ -104,7 +104,7 @@ export default function Landing() {
               customizable for each relationship.
             </p>
 
-            <div className="bg-card border-2 vapor-border-purple p-8 rounded-lg">
+            <div className="border-2 vapor-border-purple p-8 rounded-lg" style={{ backgroundColor: '#0f0f1e' }}>
               <p className="text-xl leading-relaxed vapor-text-orange">
                 <span className="vapor-text-pink font-bold uppercase tracking-wide">
                   EXAMPLE:
