@@ -323,7 +323,7 @@ export default function Home() {
             <div className="relative">
               <Input
                 type="search"
-                placeholder="Search your web of trust..."
+                placeholder="Search for things or people..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 border-gray-300 focus:ring-2 focus:ring-brand-blue focus:border-transparent"

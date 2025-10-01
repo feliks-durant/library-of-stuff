@@ -267,6 +267,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/items/:id/check-access', async (req: any, res) => {
+    try {
+      const itemId = req.params.id;
+      
+      // Check if user is authenticated
+      if (!req.user || !req.user.claims || !req.user.claims.sub) {
+        return res.json({ 
+          action: 'login',
+          message: 'Please log in to view this item'
+        });
+      }
+
+      const scannerId = req.user.claims.sub;
+      const item = await storage.getItem(itemId);
+      
+      if (!item) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+
+      const ownerId = item.ownerId;
+
+      // If scanner is the owner, allow full access
+      if (scannerId === ownerId) {
+        return res.json({ 
+          action: 'view',
+          item: item
+        });
+      }
+
+      // Check if scanner has a trust relationship with the owner
+      const trustLevel = await storage.getTrustLevel(ownerId, scannerId);
+      
+      if (trustLevel === 0) {
+        return res.json({ 
+          action: 'request_trust',
+          ownerId: ownerId,
+          message: 'You need to be trusted by the owner to view this item'
+        });
+      }
+
+      // Check if scanner's trust level is sufficient
+      if (trustLevel < item.trustLevel) {
+        return res.json({ 
+          action: 'insufficient_trust',
+          requiredLevel: item.trustLevel,
+          currentLevel: trustLevel,
+          message: 'Sorry, the trust level for this item is above your trust level. Chat with the owner about it if you have questions'
+        });
+      }
+
+      // Scanner has sufficient access
+      return res.json({ 
+        action: 'view',
+        item: item
+      });
+    } catch (error) {
+      console.error("Error checking item access:", error);
+      res.status(500).json({ message: "Failed to check item access" });
+    }
+  });
+
   app.put('/api/items/:id', isAuthenticated, upload.single('image'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;

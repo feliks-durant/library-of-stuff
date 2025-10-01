@@ -29,6 +29,7 @@ import {
   User
 } from "lucide-react";
 import { format } from "date-fns";
+import { QRCodeSVG } from "qrcode.react";
 import type { Item, Loan } from "@shared/schema";
 
 interface MyItemDetailModalProps {
@@ -205,6 +206,9 @@ export function MyItemDetailModal({
   if (!item) return null;
 
   const isUnavailable = !!activeLoan;
+  
+  // Generate QR code URL
+  const qrCodeUrl = `${window.location.origin}/qr/item/${item.id}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -298,6 +302,17 @@ export function MyItemDetailModal({
               <Users className="h-4 w-4" />
               {isUnavailable ? "Item Loaned Out" : "Loan Item"}
             </Button>
+          </div>
+
+          {/* QR Code */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold text-foreground mb-3 text-center">Share via QR Code</h3>
+            <div className="flex justify-center bg-white p-4 rounded-lg border">
+              <QRCodeSVG value={qrCodeUrl} size={150} data-testid="qr-code-my-item" />
+            </div>
+            <p className="text-sm text-muted-foreground text-center mt-2">
+              Others can scan this code to request borrowing this item
+            </p>
           </div>
 
           {/* Loan History */}

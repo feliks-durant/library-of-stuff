@@ -14,6 +14,8 @@ import MyItems from "@/pages/my-items";
 import LoanRequests from "@/pages/loan-requests";
 import Loans from "@/pages/loans";
 import TrustRequests from "@/pages/trust-requests";
+import QRItemScan from "@/pages/qr-item-scan";
+import RequestTrust from "@/pages/request-trust";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -35,6 +37,11 @@ function Router() {
   return (
     <>
       <Switch>
+        {/* QR scan route - accessible to everyone */}
+        <Route path="/qr/item/:itemId" component={QRItemScan} />
+        {/* Trust request route - accessible to authenticated users */}
+        <Route path="/request-trust/:userId" component={RequestTrust} />
+        
         {isLoading || !isAuthenticated ? (
           <Route path="/" component={Landing} />
         ) : (

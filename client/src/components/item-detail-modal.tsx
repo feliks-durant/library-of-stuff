@@ -6,6 +6,7 @@ import { LoanRequestModal } from "@/components/loan-request-modal";
 import EditItemModal from "@/components/edit-item-modal";
 import { HandHeart } from "lucide-react";
 import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import type { Item } from "@shared/schema";
 
 interface ItemDetailModalProps {
@@ -42,6 +43,9 @@ export default function ItemDetailModal({ item, isOpen, onClose }: ItemDetailMod
     : "?";
 
   const isOwner = user?.id === item.ownerId;
+  
+  // Generate QR code URL
+  const qrCodeUrl = `${window.location.origin}/qr/item/${item.id}`;
 
   return (
     <>
@@ -100,6 +104,14 @@ export default function ItemDetailModal({ item, isOpen, onClose }: ItemDetailMod
                       <span className="text-xs text-muted-foreground">{ownerUsername}</span>
                     )}
                   </div>
+                </div>
+              </div>
+              
+              {/* QR Code */}
+              <div className="pt-4 border-t">
+                <h4 className="font-medium text-foreground mb-2 text-center">Share via QR Code</h4>
+                <div className="flex justify-center bg-white p-4 rounded-lg">
+                  <QRCodeSVG value={qrCodeUrl} size={150} data-testid="qr-code-item" />
                 </div>
               </div>
               
