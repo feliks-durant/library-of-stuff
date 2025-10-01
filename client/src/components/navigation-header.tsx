@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDisplayName } from "@shared/schema";
+import ThemeToggle from "@/components/theme-toggle";
 
 interface NavigationHeaderProps {
   onAddItem: () => void;
@@ -32,7 +33,7 @@ export default function NavigationHeader({
   };
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-background shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section - Responsive */}
@@ -50,6 +51,9 @@ export default function NavigationHeader({
 
           {/* Navigation Section - Responsive */}
           <nav className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4 flex-shrink-0">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            
             {/* QR Code Button */}
             <Button
               variant="ghost"

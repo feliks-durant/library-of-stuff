@@ -9,39 +9,26 @@
 @tailwind utilities;
 
 :root {
-  /* Soft Vaporwave color palette - inspired by sunset and 90s nostalgia */
-  --background: hsl(280, 30%, 8%);
-  /* Soft dark purple */
-  --foreground: hsl(320, 60%, 85%);
-  /* Soft pink text */
-  --muted: hsl(280, 35%, 18%);
-  /* Muted dark purple */
-  --muted-foreground: hsl(180, 40%, 70%);
-  /* Soft teal */
-  --popover: hsl(280, 40%, 12%);
-  /* Soft dark purple */
-  --popover-foreground: hsl(320, 60%, 85%);
-  --card: hsl(280, 35%, 15%);
-  /* Soft dark card */
-  --card-foreground: hsl(320, 60%, 85%);
-  --border: hsl(320, 50%, 65%);
-  /* Soft pink borders */
-  --input: hsl(280, 30%, 22%);
-  /* Soft purple inputs */
-  --primary: hsl(320, 50%, 65%);
-  /* Soft coral pink */
-  --primary-foreground: hsl(280, 30%, 8%);
-  --secondary: hsl(190, 40%, 65%);
-  /* Soft teal */
-  --secondary-foreground: hsl(280, 30%, 8%);
-  --accent: hsl(270, 40%, 70%);
-  /* Soft lavender */
-  --accent-foreground: hsl(320, 60%, 85%);
-  --destructive: hsl(350, 50%, 60%);
-  /* Soft coral red */
+  /* Day Mode - Parchment Palette */
+  --background: hsl(28, 38%, 90%); /* #F3E2D4 - lightest parchment */
+  --foreground: hsl(202, 40%, 17%); /* #17313E - darkest text */
+  --muted: hsl(275, 27%, 75%); /* #C5B0CD - light purple muted */
+  --muted-foreground: hsl(202, 27%, 34%); /* #415E72 - medium blue */
+  --popover: hsl(28, 38%, 90%); /* #F3E2D4 */
+  --popover-foreground: hsl(202, 40%, 17%); /* #17313E */
+  --card: hsl(275, 27%, 75%); /* #C5B0CD - light purple card */
+  --card-foreground: hsl(202, 40%, 17%); /* #17313E */
+  --border: hsl(202, 27%, 34%); /* #415E72 - medium borders */
+  --input: hsl(275, 27%, 75%); /* #C5B0CD */
+  --primary: hsl(202, 40%, 17%); /* #17313E - dark primary */
+  --primary-foreground: hsl(28, 38%, 90%); /* #F3E2D4 */
+  --secondary: hsl(202, 27%, 34%); /* #415E72 */
+  --secondary-foreground: hsl(28, 38%, 90%); /* #F3E2D4 */
+  --accent: hsl(275, 27%, 75%); /* #C5B0CD */
+  --accent-foreground: hsl(202, 40%, 17%); /* #17313E */
+  --destructive: hsl(0, 60%, 50%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(320, 50%, 65%);
-  /* Soft pink focus ring */
+  --ring: hsl(202, 27%, 34%); /* #415E72 */
   --radius: 0.75rem;
 
   /* Authentic Vaporwave colors - exact from reference images */
@@ -64,37 +51,26 @@
 }
 
 .dark {
-  /* Soft vaporwave dark mode - dreamy and nostalgic */
-  --background: hsl(280, 40%, 4%);
-  /* Deeper soft purple */
-  --foreground: hsl(320, 50%, 90%);
-  /* Soft pink text */
-  --muted: hsl(280, 45%, 10%);
-  /* Deeper muted purple */
-  --muted-foreground: hsl(190, 35%, 75%);
-  /* Softer teal */
-  --popover: hsl(280, 50%, 6%);
-  --popover-foreground: hsl(320, 50%, 90%);
-  --card: hsl(280, 45%, 8%);
-  /* Deeper soft cards */
-  --card-foreground: hsl(320, 50%, 90%);
-  --border: hsl(320, 45%, 70%);
-  /* Softer pink borders */
-  --input: hsl(280, 35%, 15%);
-  --primary: hsl(320, 45%, 70%);
-  /* Softer coral pink */
-  --primary-foreground: hsl(280, 40%, 4%);
-  --secondary: hsl(190, 35%, 70%);
-  /* Softer teal */
-  --secondary-foreground: hsl(280, 40%, 4%);
-  --accent: hsl(270, 35%, 75%);
-  /* Softer lavender */
-  --accent-foreground: hsl(320, 50%, 90%);
-  --destructive: hsl(350, 45%, 65%);
-  /* Softer coral red */
+  /* Night Mode - Purple Palette */
+  --background: hsl(243, 46%, 16%); /* #17153B - darkest purple */
+  --foreground: hsl(276, 38%, 82%); /* #C8ACD6 - lightest purple text */
+  --muted: hsl(248, 43%, 30%); /* #2E236C - dark purple muted */
+  --muted-foreground: hsl(245, 35%, 55%); /* #433D8B - medium purple */
+  --popover: hsl(243, 46%, 16%); /* #17153B */
+  --popover-foreground: hsl(276, 38%, 82%); /* #C8ACD6 */
+  --card: hsl(248, 43%, 30%); /* #2E236C - dark purple card */
+  --card-foreground: hsl(276, 38%, 82%); /* #C8ACD6 */
+  --border: hsl(245, 35%, 55%); /* #433D8B - medium borders */
+  --input: hsl(248, 43%, 30%); /* #2E236C */
+  --primary: hsl(276, 38%, 82%); /* #C8ACD6 - light primary */
+  --primary-foreground: hsl(243, 46%, 16%); /* #17153B */
+  --secondary: hsl(245, 35%, 55%); /* #433D8B */
+  --secondary-foreground: hsl(276, 38%, 82%); /* #C8ACD6 */
+  --accent: hsl(245, 35%, 55%); /* #433D8B */
+  --accent-foreground: hsl(276, 38%, 82%); /* #C8ACD6 */
+  --destructive: hsl(0, 60%, 50%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(320, 45%, 70%);
-  /* Softer focus ring */
+  --ring: hsl(245, 35%, 55%); /* #433D8B */
   --radius: 0.75rem;
 
   /* Authentic Vaporwave colors for dark mode */
