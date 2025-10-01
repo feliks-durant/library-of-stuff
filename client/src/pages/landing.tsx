@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import jingleAudio from "@assets/library-of-stuff-jingle_1759345825836.mp3";
 
 export default function Landing() {
   const explanationRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Temporarily remove dark class from landing page to preserve vaporwave theme
   useEffect(() => {
@@ -34,6 +37,32 @@ export default function Landing() {
     explanationRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio(jingleAudio);
+    audioRef.current.addEventListener('ended', () => setIsPlaying(false));
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleToggleJingle = () => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
   return (
     <div className="landing-page">
       {/* Hero Section with authentic vaporwave grid */}
@@ -60,23 +89,34 @@ export default function Landing() {
             Library of Stuff
           </h1>
 
-          <div className="flex flex-col sm:flex-row gap-8 justify-center animate-fade-up animation-delay-200">
+          <div className="flex flex-col items-center gap-8 animate-fade-up animation-delay-200">
+            <div className="flex flex-col sm:flex-row gap-8 justify-center">
+              <Button
+                onClick={handleLogin}
+                size="lg"
+                className="bg-vapor-pink hover:bg-vapor-purple text-background px-12 py-6 text-2xl font-bold border-2 vapor-border-pink uppercase tracking-wider"
+                data-testid="button-enter"
+              >
+                ENTER
+              </Button>
+              <Button
+                onClick={handleLearnMore}
+                variant="outline"
+                size="lg"
+                className="border-2 vapor-border-teal vapor-text-teal hover:bg-vapor-teal hover:text-background px-12 py-6 text-2xl font-bold uppercase tracking-wider"
+                data-testid="button-learn-more"
+              >
+                LEARN MORE
+              </Button>
+            </div>
             <Button
-              onClick={handleLogin}
-              size="lg"
-              className="bg-vapor-pink hover:bg-vapor-purple text-background px-12 py-6 text-2xl font-bold border-2 vapor-border-pink uppercase tracking-wider"
-              data-testid="button-enter"
-            >
-              ENTER
-            </Button>
-            <Button
-              onClick={handleLearnMore}
+              onClick={handleToggleJingle}
               variant="outline"
               size="lg"
-              className="border-2 vapor-border-teal vapor-text-teal hover:bg-vapor-teal hover:text-background px-12 py-6 text-2xl font-bold uppercase tracking-wider"
-              data-testid="button-learn-more"
+              className="border-2 vapor-border-purple vapor-text-purple hover:bg-vapor-purple hover:text-background px-12 py-6 text-2xl font-bold uppercase tracking-wider"
+              data-testid="button-jingle"
             >
-              LEARN MORE
+              {isPlaying ? "STOP THE JINGLE" : "PLAY THE JINGLE"}
             </Button>
           </div>
         </div>
