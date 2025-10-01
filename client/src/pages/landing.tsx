@@ -75,7 +75,9 @@ export default function Landing() {
       >
         {/* Subtle scanlines for lo-fi effect */}
         {/* <div className="absolute inset-0 scanlines"></div> */}
-        <div className="absolute inset-0 tv-static"></div>
+        <div className="absolute inset-0 tv-static">
+          <div className="fuzzy-overlay"></div>
+        </div>
 
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="max-w-none space-y-8">

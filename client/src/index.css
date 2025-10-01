@@ -344,7 +344,7 @@
     .fuzzy-overlay {
       position: absolute;
       inset: -200%;
-      background-image: url("noise.png");
+      background-image: url("/noise.png");
       opacity: 25%;
       z-index: 0;
       /* pointer-events: none; */
