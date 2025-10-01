@@ -86,7 +86,8 @@ export default function Landing() {
       <section
         ref={explanationRef}
         id="learn-more"
-        className="py-20 px-4 bg-background relative overflow-hidden"
+        className="py-20 px-4 relative overflow-hidden"
+        style={{ backgroundColor: '#1a1a2e' }}
         data-testid="section-learn-more"
       >
         {/* Subtle scanlines for lo-fi effect */}
