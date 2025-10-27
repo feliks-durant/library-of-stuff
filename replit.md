@@ -10,6 +10,25 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### October 27, 2025 - Custom Email/Password Authentication System
+- **Complete authentication system migration from Replit Auth to local email/password authentication**
+- Created new `server/auth.ts` with bcrypt password hashing and Passport.js local strategy
+- Updated database schema: added password, passwordResetToken, and passwordResetExpiry fields to users table
+- Email is now the unique identifier for users (replacing Replit ID)
+- All users collect full profile information (email, password, firstName, lastName, username) during registration
+- Built registration page (`/register`) with real-time username availability checking
+- Built login page (`/login`) with email/password authentication
+- Updated landing page to redirect to new login/register pages instead of Replit Auth
+- Modified all backend routes to use `req.user.id` instead of `req.user.claims.sub`
+- Removed onboarding modal flow - all data collected upfront during registration
+- Updated logout functionality to use POST /api/logout endpoint
+- Password reset infrastructure ready (tokens and expiry fields in database)
+- All existing user data cleared as part of migration
+- Application now fully independent from Replit's authentication infrastructure
+
+### October 27, 2025 - Landing Page Link Styling
+- Added CSS to make all `<a>` elements on the landing page bold and underlined for better visibility
+
 ### October 1, 2025 - Landing Page FAQ Accordion Implementation
 - Converted second section of landing page into fold-out FAQ accordion
 - Created 5 FAQ sections: "What is it?", "What is anti-capitalist infrastructure?", "Does that mean you hate capitalism?", "How can I support the Library of Stuff?", and "Who built it?"
@@ -121,10 +140,12 @@ Preferred communication style: Simple, everyday language.
 - **QR Code Integration**: Profile sharing via QR codes for trust network expansion
 
 ### Authentication & Authorization
-- **Provider**: Replit Auth with OIDC flow
-- **Session Storage**: PostgreSQL-backed sessions with 1-week TTL
+- **Provider**: Local email/password authentication with bcrypt hashing
+- **Strategy**: Passport.js local strategy for user authentication
+- **Session Storage**: In-memory sessions with 1-week TTL
 - **Route Protection**: Middleware-based authentication checks
-- **User Management**: Automatic user creation/update on login
+- **User Management**: Self-service registration with email verification ready
+- **Password Security**: Bcrypt with 10 salt rounds for password hashing
 
 ### File Management
 - **Upload Handling**: Server-side file processing with Multer
@@ -145,8 +166,8 @@ Preferred communication style: Simple, everyday language.
 - **Local File Storage**: Image uploads stored in application filesystem
 
 ### Authentication
-- **Replit Auth**: OpenID Connect authentication provider
-- **Passport.js**: Authentication middleware for Express
+- **Bcrypt**: Password hashing library for secure credential storage
+- **Passport.js**: Authentication middleware for Express with local strategy
 
 ### UI Framework
 - **Radix UI**: Headless component primitives for accessibility
