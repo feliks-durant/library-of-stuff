@@ -143,12 +143,12 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto relative z-10">
           <Accordion type="single" collapsible className="w-full space-y-4">
             {/* FAQ 1: What is it? */}
-            <AccordionItem 
-              value="item-1" 
+            <AccordionItem
+              value="item-1"
               className="border-2 vapor-border-purple rounded-lg overflow-hidden"
               style={{ backgroundColor: "#0f0f1e" }}
             >
-              <AccordionTrigger 
+              <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-what-is-it"
               >
@@ -157,9 +157,9 @@ export default function Landing() {
               <AccordionContent className="px-6 pb-6">
                 <div className="space-y-6">
                   <p className="text-xl leading-relaxed vapor-text-purple">
-                    The Library of Stuff makes it easy to borrow and loan every day
-                    items from people you already trust. Trust is one way and
-                    customizable for each relationship.
+                    The Library of Stuff makes it easy to borrow and loan every
+                    day items from people you already trust. Trust is one way
+                    and customizable for each relationship.
                   </p>
 
                   <div
@@ -170,17 +170,20 @@ export default function Landing() {
                       <span className="vapor-text-pink font-bold uppercase tracking-wide">
                         EXAMPLE:
                       </span>{" "}
-                      Alice adds a guitar to the library, trust level 3. Alice adds
-                      Bob at trust level 3 and Chewy at trust level 2. Bob can see
-                      Alice's guitar but Chewy can't. Neither Bob nor Chewy knows what
-                      level of trust Alice has granted them. <br />
+                      Alice adds a guitar to the library, trust level 3. Alice
+                      adds Bob at trust level 3 and Chewy at trust level 2. Bob
+                      can see Alice's guitar but Chewy can't. Neither Bob nor
+                      Chewy knows what level of trust Alice has granted them.{" "}
                       <br />
-                      When Bob wants to borrow the guitar, he texts Alice.* They meet
-                      up to exchange the guitar. Bob sends a request for the guitar
-                      which Alice approves. Alice can see the guitar in her list of
-                      loans, and Bob can see it in his list of borrows. <br />
-                      <br />* The app does not include messaging on the assumption
-                      that if you trust someone, you know how to contact them.
+                      <br />
+                      When Bob wants to borrow the guitar, he texts Alice.* They
+                      meet up to exchange the guitar. Bob sends a request for
+                      the guitar which Alice approves. Alice can see the guitar
+                      in her list of loans, and Bob can see it in his list of
+                      borrows. <br />
+                      <br />* The app does not include messaging on the
+                      assumption that if you trust someone, you know how to
+                      contact them.
                     </p>
                   </div>
                 </div>
@@ -188,12 +191,12 @@ export default function Landing() {
             </AccordionItem>
 
             {/* FAQ 2: What is anti-capitalist infrastructure? */}
-            <AccordionItem 
-              value="item-2" 
+            <AccordionItem
+              value="item-2"
               className="border-2 vapor-border-purple rounded-lg overflow-hidden"
               style={{ backgroundColor: "#0f0f1e" }}
             >
-              <AccordionTrigger 
+              <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-anti-capitalist"
               >
@@ -201,18 +204,61 @@ export default function Landing() {
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-lg leading-relaxed vapor-text-purple">
-                  Anti-capitalist infrastructure refers to systems and tools that help people meet their needs outside of traditional market exchanges. Instead of buying and selling, we share resources based on trust and mutual aid. The Library of Stuff is infrastructure because it provides a foundation for sharing—not a marketplace for transactions. It's anti-capitalist because it prioritizes access over ownership and relationships over profit.
+                  I explore this more on substack but in brief:
+                  <br />
+                  <br />
+                  Infrastructure is anti-capitalist when it diminishes the power
+                  of capitalism in our lives. The Library of Stuff attempts that
+                  by focusing our attention on strong relationships and sharing
+                  what we already have rather than seeking individual power to
+                  acquire new stuff.
+                  <br />
+                  <br />
+                  In theory, if owners know that their stuff is going to be used
+                  by others, they will be incentivized to buy higher quality
+                  items that can be used by their friends many times. Not
+                  needing to personally own one of everything allows people to
+                  invest in better items.
+                  <br />
+                  <br />
+                  ex. if I need to hang a painting but don't have a drill, I
+                  might buy one. However, knowing that I won't use it much, I'm
+                  likely to get the cheapest one. If I know that my friends
+                  would also use the drill, I might be more likely to buy a
+                  higher quality one so that it can be passed around without
+                  breaking.
+                  <br />
+                  <br />
+                  Because items are still individually owned, and trust it the
+                  main currency, borrowers have an incentive to treat items with
+                  care and respect to stay in good report with the owner. Owners
+                  adjust the trust levels of individual borrowers to ensure that
+                  their stuff is used responsibly. <br />
+                  <br />
+                  One final thought; there's a Japanese concept called
+                  tsukumogami, the idea that objects can take on their own
+                  spirit.* A high-quality tool that has been a part of many
+                  people's lives can have a powerful, well-storied spirit.
+                  Modern society is built around the division between the
+                  inanimate and the conscious. A more sustainable, meaningful
+                  view may be one where the stuff around us -- our books, our
+                  tools, our clothes, our homes -- are cared for as beings unto
+                  themselves.
+                  <br />
+                  <br />* Japan is not the only culture with this concept its
+                  just particularly easy to find information about Japanese
+                  culture on the internet
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             {/* FAQ 3: Does that mean you hate capitalism? */}
-            <AccordionItem 
-              value="item-3" 
+            <AccordionItem
+              value="item-3"
               className="border-2 vapor-border-purple rounded-lg overflow-hidden"
               style={{ backgroundColor: "#0f0f1e" }}
             >
-              <AccordionTrigger 
+              <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-hate-capitalism"
               >
@@ -220,18 +266,24 @@ export default function Landing() {
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-lg leading-relaxed vapor-text-purple">
-                  Not necessarily. This project isn't about hate—it's about building alternatives. Whether you think capitalism is fundamentally broken or just needs some balance, the Library of Stuff offers a different way to meet everyday needs. You can use this tool to reduce consumption, save money, strengthen community bonds, or all of the above. Your reasons are your own.
+                  I do not have the time or energy to hate a system that is so
+                  embedded in my life that it's hard to imagine life without it.
+                  <br />
+                  <br />
+                  That said, capitalism is obviously flawed and is the cause of
+                  unfathomable suffering in the world. I think it's important to
+                  create tools to reclaim power from capital.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             {/* FAQ 4: How can I support the Library of Stuff? */}
-            <AccordionItem 
-              value="item-4" 
+            <AccordionItem
+              value="item-4"
               className="border-2 vapor-border-purple rounded-lg overflow-hidden"
               style={{ backgroundColor: "#0f0f1e" }}
             >
-              <AccordionTrigger 
+              <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-support"
               >
@@ -239,18 +291,24 @@ export default function Landing() {
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-lg leading-relaxed vapor-text-purple">
-                  The best way to support this project is to use it! Share it with people you trust. Add your stuff. Borrow from others. Build a culture of sharing in your community. This tool is free and open-source—no premium tiers, no ads, no data harvesting. If you want to contribute technically, the code is available for you to improve, fork, or learn from.
+                  The best way to support is to use it! The library is only
+                  valuable when people are willing to add their items and lend
+                  them out. The next best way is to support financially at{" "}
+                  <a href="https://ko-fi.com/feliksdurant">
+                    ko-fi.com/feliksdurant
+                  </a>{" "}
+                  so that I can keep the servers running.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             {/* FAQ 5: Who built it? */}
-            <AccordionItem 
-              value="item-5" 
+            <AccordionItem
+              value="item-5"
               className="border-2 vapor-border-purple rounded-lg overflow-hidden"
               style={{ backgroundColor: "#0f0f1e" }}
             >
-              <AccordionTrigger 
+              <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-who-built"
               >
@@ -258,7 +316,33 @@ export default function Landing() {
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-lg leading-relaxed vapor-text-purple">
-                  This project was built by someone who believes we can create better systems for sharing resources and supporting each other. It's offered freely as a tool for communities to use and adapt. The vaporwave aesthetic? That's just for fun—a little nostalgia for digital spaces that felt more human and less corporate.
+                  My name is Feliks Durant, insta @feliks.durant I'll have a website
+                  at some point but it aint today.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+            
+            {/* FAQ 6: How was it built? */}
+            <AccordionItem
+              value="item-6"
+              className="border-2 vapor-border-purple rounded-lg overflow-hidden"
+              style={{ backgroundColor: "#0f0f1e" }}
+            >
+              <AccordionTrigger
+                className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
+                data-testid="accordion-trigger-how-was-it-built"
+              >
+                How was it built?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-lg leading-relaxed vapor-text-purple">
+                  Originally I tried building it from scratch in Django but that
+                  turned out to be a lot of work and I got burned out on it. A
+                  couple months later the AI tools were way better and I just
+                  proompted it into existance. Not crazy proud of that but I'm
+                  hopeful that the water and energy that we could save by
+                  borrowing more stuff will more than make up for what was spent
+                  developing it.
                 </p>
               </AccordionContent>
             </AccordionItem>
