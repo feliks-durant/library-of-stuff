@@ -14,10 +14,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { HandHeart } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { HandHeart, Printer, CheckSquare, Square } from "lucide-react";
 import type { Item } from "@shared/schema";
+import { generateQRCodesPDF } from "@/lib/pdfGenerator";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function MyItems() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
@@ -31,6 +35,10 @@ export default function MyItems() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showTrustModal, setShowTrustModal] = useState(false);
   const [trustUserId, setTrustUserId] = useState<string | null>(null);
+  
+  // Print mode state
+  const [printMode, setPrintMode] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
 
   // Fetch user data for trust modal
   const { data: trustUser } = useQuery({
@@ -67,8 +75,52 @@ export default function MyItems() {
   });
 
   const handleItemClick = (item: Item) => {
-    setSelectedItem(item);
-    setShowMyItemDetail(true);
+    if (printMode) {
+      // In print mode, toggle selection
+      toggleItemSelection(item.id);
+    } else {
+      setSelectedItem(item);
+      setShowMyItemDetail(true);
+    }
+  };
+
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItemIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedItemIds.size === sortedItems.length) {
+      setSelectedItemIds(new Set());
+    } else {
+      setSelectedItemIds(new Set(sortedItems.map(item => item.id)));
+    }
+  };
+
+  const handleEnterPrintMode = () => {
+    setPrintMode(true);
+    setSelectedItemIds(new Set());
+  };
+
+  const handleExitPrintMode = () => {
+    setPrintMode(false);
+    setSelectedItemIds(new Set());
+  };
+
+  const handleGeneratePDF = async () => {
+    const selectedItems = sortedItems.filter(item => selectedItemIds.has(item.id));
+    if (selectedItems.length === 0) return;
+
+    await generateQRCodesPDF(selectedItems, user?.username || 'user');
+    // Exit print mode after generating PDF
+    handleExitPrintMode();
   };
 
   const handleEditItem = (item: Item) => {
@@ -126,15 +178,49 @@ export default function MyItems() {
           <div>
             <h2 className="text-3xl font-bold text-foreground">My Items</h2>
             <p className="text-lg text-muted-foreground mt-2">
-              Manage the items you've shared
+              {printMode ? "Select items to print QR codes" : "Manage the items you've shared"}
             </p>
           </div>
-          <Link href="/browse">
-            <Button variant="outline">
-              <i className="fas fa-arrow-left mr-2"></i>
-              Back to Browse
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            {printMode ? (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={handleExitPrintMode}
+                  data-testid="button-exit-print-mode"
+                >
+                  <i className="fas fa-times mr-2"></i>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleGeneratePDF}
+                  disabled={selectedItemIds.size === 0}
+                  data-testid="button-generate-pdf"
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  Generate PDF ({selectedItemIds.size})
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={handleEnterPrintMode}
+                  disabled={sortedItems.length === 0}
+                  data-testid="button-enter-print-mode"
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print QR Codes
+                </Button>
+                <Link href="/browse">
+                  <Button variant="outline" data-testid="button-back-to-browse">
+                    <i className="fas fa-arrow-left mr-2"></i>
+                    Back to Browse
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -202,6 +288,29 @@ export default function MyItems() {
           </div>
         </div>
 
+        {/* Print Mode Select All */}
+        {printMode && sortedItems.length > 0 && (
+          <div className="mb-4">
+            <Button
+              variant="outline"
+              onClick={toggleSelectAll}
+              data-testid="button-toggle-select-all"
+            >
+              {selectedItemIds.size === sortedItems.length ? (
+                <>
+                  <Square className="mr-2 h-4 w-4" />
+                  Deselect All
+                </>
+              ) : (
+                <>
+                  <CheckSquare className="mr-2 h-4 w-4" />
+                  Select All
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
         {/* Items Grid */}
         {sortedItems.length === 0 ? (
           <div className="text-center py-12">
@@ -231,7 +340,21 @@ export default function MyItems() {
                 key={item.id} 
                 className="bg-card rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 border overflow-hidden cursor-pointer relative"
                 onClick={() => handleItemClick(item)}
+                data-testid={`card-item-${item.id}`}
               >
+                {/* Print Mode Checkbox */}
+                {printMode && (
+                  <div className="absolute top-2 right-2 z-10">
+                    <Checkbox
+                      checked={selectedItemIds.has(item.id)}
+                      onCheckedChange={() => toggleItemSelection(item.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-background border-2"
+                      data-testid={`checkbox-item-${item.id}`}
+                    />
+                  </div>
+                )}
+                
                 {/* Item Image */}
                 <div className="w-full h-48 overflow-hidden">
                   {item.imageUrl ? (
@@ -249,7 +372,7 @@ export default function MyItems() {
                   )}
                   
                   {/* Hidden Item Indicator */}
-                  {item.isHidden && (
+                  {item.isHidden && !printMode && (
                     <div className="absolute top-2 right-2">
                       <Badge variant="secondary">
                         Hidden
