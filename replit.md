@@ -16,11 +16,13 @@ Preferred communication style: Simple, everyday language.
 - Checkboxes appear in top-right corner of item cards when in print mode
 - Clicking cards in print mode toggles selection instead of opening detail modal
 - Select All / Deselect All button for convenient bulk selection
-- PDF generation creates A4 portrait document with:
-  - Boxes with rounded borders for each selected item
-  - Vertical divider splitting each box in half
+- PDF generation creates A4 portrait document with compact layout:
+  - **Two labels per row** for efficient printing
+  - Each label has rounded border box (87.5mm wide × 35mm tall)
+  - Vertical divider splits each label in half
   - Left side displays item name and username
-  - Right side contains QR code linking to item sharing URL
+  - Right side contains QR code (13mm × 13mm) linking to item sharing URL
+  - 5mm gap between labels for easy cutting
 - PDF automatically downloads with timestamped filename
 - Print mode exits automatically after PDF generation
 - Fixed cache invalidation to ensure newly added items appear immediately in My Items list
