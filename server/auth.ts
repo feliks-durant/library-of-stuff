@@ -19,18 +19,21 @@ export async function comparePassword(password: string, hash: string): Promise<b
   return bcrypt.compare(password, hash);
 }
 
+// Create a single pool instance for session store
+const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 export function getSession() {
   const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days (configurable)
   
   // Use PostgreSQL session store for persistence
   const PgStore = connectPgSimple(session);
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   
   const sessionStore = new PgStore({
-    pool,
+    pool: sessionPool,
     tableName: 'session', // Table will be auto-created
     createTableIfMissing: true,
     pruneSessionInterval: 60 * 60, // Prune expired sessions every hour (in seconds)
+    errorLog: console.error, // Log errors for debugging
   });
   
   return session({
