@@ -2,7 +2,8 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, hashPassword } from "./auth";
+import passport from "passport";
 import { 
   insertItemSchema, 
   updateItemSchema, 
@@ -14,6 +15,8 @@ import {
   updateLoanSchema,
   insertTrustRequestSchema,
   updateTrustRequestSchema,
+  registerUserSchema,
+  loginUserSchema,
   users
 } from "@shared/schema";
 import { db } from "./db";
@@ -21,6 +24,7 @@ import { eq, sql } from "drizzle-orm";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 
 // Configure multer for file uploads
 const uploadDir = path.resolve("uploads");
@@ -48,20 +52,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
+  // Registration endpoint
+  app.post('/api/register', async (req, res) => {
+    try {
+      const validatedData = registerUserSchema.parse(req.body);
+      
+      // Check if email already exists (case-insensitive)
+      const existingEmail = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(sql`LOWER(${users.email}) = LOWER(${validatedData.email})`);
+
+      if (existingEmail.length > 0) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // Check if username already exists (case-insensitive)
+      const existingUsername = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(sql`LOWER(${users.username}) = LOWER(${validatedData.username})`);
+
+      if (existingUsername.length > 0) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+
+      // Hash password
+      const hashedPassword = await hashPassword(validatedData.password);
+
+      // Create user
+      const [newUser] = await db.insert(users).values({
+        email: validatedData.email.toLowerCase().trim(),
+        password: hashedPassword,
+        firstName: validatedData.firstName.trim(),
+        lastName: validatedData.lastName.trim(),
+        username: validatedData.username.toLowerCase().trim(),
+      }).returning();
+
+      // Log the user in automatically
+      req.login({ id: newUser.id }, (err) => {
+        if (err) {
+          console.error("Error logging in after registration:", err);
+          return res.status(500).json({ message: "Registration successful but login failed" });
+        }
+
+        // Return user without password
+        const { password: _, ...userWithoutPassword } = newUser;
+        res.status(201).json(userWithoutPassword);
+      });
+    } catch (error: any) {
+      console.error("Error during registration:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  // Login endpoint
+  app.post('/api/login', (req, res, next) => {
+    try {
+      // Validate request body
+      loginUserSchema.parse(req.body);
+      
+      passport.authenticate('local', (err: any, user: any, info: any) => {
+        if (err) {
+          console.error("Authentication error:", err);
+          return res.status(500).json({ message: "Authentication error" });
+        }
+        
+        if (!user) {
+          return res.status(401).json({ message: info?.message || "Invalid email or password" });
+        }
+
+        req.login(user, (loginErr) => {
+          if (loginErr) {
+            console.error("Login error:", loginErr);
+            return res.status(500).json({ message: "Login failed" });
+          }
+          
+          res.json(user);
+        });
+      })(req, res, next);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Logout endpoint
+  app.post('/api/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
+  // Get current user
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      res.json(req.user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  // Username availability check
-  app.get('/api/users/check-username', isAuthenticated, async (req: any, res) => {
+  // Username availability check (no auth required for registration)
+  app.get('/api/users/check-username', async (req: any, res) => {
     try {
       const { username } = req.query;
       
@@ -93,10 +196,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Complete onboarding with optional profile image
-  app.post('/api/users/complete-onboarding', isAuthenticated, upload.single('profileImage'), async (req: any, res) => {
+  // Update user profile with optional image
+  app.post('/api/users/update-profile', isAuthenticated, upload.single('profileImage'), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { firstName, lastName, username } = req.body;
 
       // Validate required fields
@@ -160,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Items routes
   app.get('/api/items/search', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const query = req.query.q as string;
       
       console.log('Search request received:', { userId, query, queryParams: req.query });
@@ -201,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/items', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const items = await storage.getVisibleItems(userId);
       res.json(items);
     } catch (error) {
@@ -212,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/items/my', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const items = await storage.getItemsByUser(userId);
       res.json(items);
     } catch (error) {
@@ -223,7 +326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/items', isAuthenticated, upload.single('image'), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const itemData = insertItemSchema.parse({
         ...req.body,
         ownerId: userId,
@@ -272,14 +375,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const itemId = req.params.id;
       
       // Check if user is authenticated
-      if (!req.user || !req.user.claims || !req.user.claims.sub) {
+      if (!req.user || !req.user || !req.user.id) {
         return res.json({ 
           action: 'login',
           message: 'Please log in to view this item'
         });
       }
 
-      const scannerId = req.user.claims.sub;
+      const scannerId = req.user.id;
       const item = await storage.getItem(itemId);
       
       if (!item) {
@@ -330,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/items/:id', isAuthenticated, upload.single('image'), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const itemId = req.params.id;
       
       const updateData = updateItemSchema.parse({
@@ -360,7 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/items/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const itemId = req.params.id;
       
       const success = await storage.deleteItem(itemId, userId);
@@ -377,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/items/my/search', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const query = req.query.q as string;
       
       if (!query) {
@@ -395,7 +498,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trust routes
   app.post('/api/trust', isAuthenticated, async (req: any, res) => {
     try {
-      const trusterId = req.user.claims.sub;
+      const trusterId = req.user.id;
       const trustData = insertTrustRelationshipSchema.parse({
         ...req.body,
         trusterId,
@@ -421,7 +524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/trust/:trusteeId', isAuthenticated, async (req: any, res) => {
     try {
-      const trusterId = req.user.claims.sub;
+      const trusterId = req.user.id;
       const trusteeId = req.params.trusteeId;
       
       const trustLevel = await storage.getTrustLevel(trusterId, trusteeId);
@@ -434,7 +537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/users/connections', isAuthenticated, async (req: any, res) => {
     try {
-      const trusterId = req.user.claims.sub;
+      const trusterId = req.user.id;
       const connections = await storage.getUserConnections(trusterId);
       res.json(connections);
     } catch (error) {
@@ -468,7 +571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/users/profile', isAuthenticated, upload.single('profileImage'), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       const updateData = updateUserProfileSchema.parse(req.body);
 
@@ -494,7 +597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/users/connections', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const connections = await storage.getUserConnections(userId);
       res.json(connections);
     } catch (error) {
@@ -518,7 +621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hasValidSession = req.session && req.session.passport && req.session.passport.user;
       const isAuthenticatedResult = typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : false;
       const hasUser = req.user && typeof req.user === 'object';
-      const hasClaims = hasUser && req.user.claims && req.user.claims.sub;
+      const hasClaims = hasUser && req.user.id;
       
       const isFullyAuthenticated = hasValidSession && isAuthenticatedResult && hasClaims;
       
@@ -541,7 +644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User connections route for loan modal
   app.get('/api/users/connections', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const connections = await storage.getUserConnections(userId);
       res.json(connections);
     } catch (error) {
@@ -553,7 +656,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trust request routes
   app.post('/api/trust-requests', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const validatedData = insertTrustRequestSchema.parse(req.body);
       const trustRequest = await storage.createTrustRequest(userId, {
         targetId: validatedData.targetId,
@@ -569,7 +672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/trust-requests/received', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const requests = await storage.getTrustRequestsReceived(userId);
       res.json(requests);
     } catch (error) {
@@ -580,7 +683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/trust-requests/sent', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const requests = await storage.getTrustRequestsSent(userId);
       res.json(requests);
     } catch (error) {
@@ -603,7 +706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loan request routes
   app.post('/api/loan-requests', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Manual validation to handle date conversion and borrowerId
       const { itemId, requestedStartDate, requestedEndDate, message } = req.body;
@@ -636,7 +739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loan-requests/my', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const requests = await storage.getLoanRequestsForUser(userId);
       res.json(requests);
     } catch (error) {
@@ -647,7 +750,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loan-requests/pending', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const requests = await storage.getLoanRequestsByOwnerWithDetails(userId);
       const pendingRequests = requests.filter(r => r.status === 'pending');
       res.json(pendingRequests);
@@ -659,7 +762,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/loan-requests/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { id } = req.params;
       const { status } = req.body;
       
@@ -699,7 +802,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loan routes
   app.post('/api/loans', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Manual validation to handle date conversion and lenderId
       const { itemId, borrowerId, startDate, expectedEndDate, status } = req.body;
@@ -737,7 +840,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loans/my-borrowed', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const loans = await storage.getLoansForUserWithDetails(userId);
       res.json(loans);
     } catch (error) {
@@ -748,7 +851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loans/my-lent', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const loans = await storage.getLoansForOwnerWithDetails(userId);
       res.json(loans);
     } catch (error) {
@@ -759,7 +862,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/loans/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { id } = req.params;
       
       // Manual validation and conversion instead of using schema to avoid date issues
@@ -810,7 +913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/loans/history/:itemId', isAuthenticated, async (req: any, res) => {
     try {
       const { itemId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get all loans for this item (both active and completed)
       const loanHistory = await storage.getLoansForItem(itemId);
