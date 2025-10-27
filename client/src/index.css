@@ -327,6 +327,11 @@ html {
   border-color: inherit;
 }
 
+.landing-page a {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background-attachment: fixed;
