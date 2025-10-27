@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### October 27, 2025 - PostgreSQL Session Persistence
+- **Migrated from in-memory sessions to PostgreSQL-backed persistent sessions**
+- Users now stay logged in for 30 days (instead of 1 week with in-memory storage)
+- Sessions survive server restarts and are stored in database
+- Created singleton database pool for session storage to prevent connection issues
+- Removed old "sessions" table from Replit Auth era
+- Session table auto-created by connect-pg-simple with proper schema (sid, sess, expire)
+- Configured persistent cookies with httpOnly, secure (in production), and sameSite protection
+- Automatic session pruning every hour removes expired sessions
+- Users remain authenticated across browser sessions and page refreshes
+- Logout still destroys sessions properly
+
 ### October 27, 2025 - Custom Email/Password Authentication System
 - **Complete authentication system migration from Replit Auth to local email/password authentication**
 - Created new `server/auth.ts` with bcrypt password hashing and Passport.js local strategy
@@ -119,7 +131,7 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js server
 - **Language**: TypeScript with ES modules
-- **Authentication**: Replit Auth using OpenID Connect with Passport.js
+- **Authentication**: Local email/password authentication with Passport.js
 - **Session Management**: Express sessions stored in PostgreSQL with connect-pg-simple
 - **File Uploads**: Multer middleware with image validation and 5MB size limits
 - **API Design**: RESTful endpoints with JSON responses
@@ -130,7 +142,7 @@ Preferred communication style: Simple, everyday language.
   - Users table for authentication and profile data
   - Items table with trust level requirements and owner relationships
   - Trust relationships table for user-to-user trust scores
-  - Sessions table for authentication state
+  - Session table for persistent authentication state (auto-created by connect-pg-simple)
 - **Key Relationships**: Items linked to owners, trust relationships between users
 
 ### Trust System
@@ -142,7 +154,7 @@ Preferred communication style: Simple, everyday language.
 ### Authentication & Authorization
 - **Provider**: Local email/password authentication with bcrypt hashing
 - **Strategy**: Passport.js local strategy for user authentication
-- **Session Storage**: In-memory sessions with 1-week TTL
+- **Session Storage**: PostgreSQL-backed sessions with 30-day TTL (persistent across server restarts)
 - **Route Protection**: Middleware-based authentication checks
 - **User Management**: Self-service registration with email verification ready
 - **Password Security**: Bcrypt with 10 salt rounds for password hashing
