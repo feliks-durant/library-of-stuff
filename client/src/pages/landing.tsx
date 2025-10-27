@@ -316,7 +316,7 @@ export default function Landing() {
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-lg leading-relaxed vapor-text-purple">
-                  My name is Feliks Durant, insta @feliks.durant I'll have a website
+                  My name is Feliks Durant, insta <a href="https://www.instagram.com/feliks.durant"></a>@feliks.durant I'll have a website
                   at some point but it aint today.
                 </p>
               </AccordionContent>
