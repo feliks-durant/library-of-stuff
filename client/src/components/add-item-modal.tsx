@@ -251,13 +251,16 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
                 variant="outline"
                 onClick={handleClose}
                 className="flex-1"
+                data-testid="button-cancel-add-item"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
+                variant="outline"
                 disabled={createItemMutation.isPending}
-                className="flex-1 bg-brand-blue hover:bg-blue-700"
+                className="flex-1"
+                data-testid="button-submit-add-item"
               >
                 {createItemMutation.isPending ? (
                   <>
