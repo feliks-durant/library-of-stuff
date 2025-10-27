@@ -10,6 +10,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### October 27, 2025 - QR Code Printing for My Items
+- **Added print mode to My Items page for batch QR code generation**
+- Print mode toggle button allows users to enter selection mode for QR code printing
+- Checkboxes appear in top-right corner of item cards when in print mode
+- Clicking cards in print mode toggles selection instead of opening detail modal
+- Select All / Deselect All button for convenient bulk selection
+- PDF generation creates A4 portrait document with:
+  - Boxes with rounded borders for each selected item
+  - Vertical divider splitting each box in half
+  - Left side displays item name and username
+  - Right side contains QR code linking to item sharing URL
+- PDF automatically downloads with timestamped filename
+- Print mode exits automatically after PDF generation
+- Fixed cache invalidation to ensure newly added items appear immediately in My Items list
+
 ### October 27, 2025 - PostgreSQL Session Persistence
 - **Migrated from in-memory sessions to PostgreSQL-backed persistent sessions**
 - Users now stay logged in for 30 days (instead of 1 week with in-memory storage)
