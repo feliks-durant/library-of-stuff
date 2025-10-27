@@ -129,7 +129,7 @@ export default function MyItems() {
               Manage the items you've shared
             </p>
           </div>
-          <Link href="/">
+          <Link href="/browse">
             <Button variant="outline">
               <i className="fas fa-arrow-left mr-2"></i>
               Back to Browse

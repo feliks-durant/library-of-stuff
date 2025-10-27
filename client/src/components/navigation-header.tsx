@@ -43,7 +43,7 @@ export default function NavigationHeader({
           {/* Logo Section - Responsive */}
           <div className="flex items-center min-w-0 flex-1">
             <div className="flex-shrink-0">
-              <Link href="/">
+              <Link href="/browse">
                 <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary hover:opacity-80 cursor-pointer transition-colors truncate">
                   <i className="fas fa-boxes mr-1 sm:mr-2"></i>
                   <span className="hidden xs:inline">Library of Stuff</span>
