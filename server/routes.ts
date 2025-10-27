@@ -724,12 +724,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const loanRequest = await storage.createLoanRequest({
         itemId,
-        borrowerId: userId,
         requestedStartDate: new Date(requestedStartDate),
         requestedEndDate: new Date(requestedEndDate),
         message,
         status: "pending",
-      });
+        borrowerId: userId,  // borrowerId is required in the actual table but not in InsertSchema
+      } as any);
       res.json(loanRequest);
     } catch (error) {
       console.error("Error creating loan request:", error);

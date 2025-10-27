@@ -26,8 +26,14 @@ export default function NavigationHeader({
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout error:", error);
+      window.location.href = "/";
+    }
   };
 
   return (

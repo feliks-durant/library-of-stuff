@@ -8,6 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { OnboardingModal } from "@/components/onboarding-modal";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 import Home from "@/pages/home";
 import TrustAssignment from "@/pages/trust-assignment";
 import MyItems from "@/pages/my-items";
@@ -37,16 +39,20 @@ function Router() {
   return (
     <>
       <Switch>
+        {/* Public routes */}
+        <Route path="/" component={Landing} />
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        
         {/* QR scan route - accessible to everyone */}
         <Route path="/qr/item/:itemId" component={QRItemScan} />
         {/* Trust request route - accessible to authenticated users */}
         <Route path="/request-trust/:userId" component={RequestTrust} />
         
-        {isLoading || !isAuthenticated ? (
-          <Route path="/" component={Landing} />
-        ) : (
+        {/* Protected routes */}
+        {isAuthenticated && (
           <>
-            <Route path="/" component={Home} />
+            <Route path="/browse" component={Home} />
             <Route path="/my-items" component={MyItems} />
             <Route path="/loan-requests" component={LoanRequests} />
             <Route path="/loans" component={Loans} />
@@ -57,10 +63,7 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
 
-      <OnboardingModal 
-        isOpen={showOnboarding}
-        onComplete={handleOnboardingComplete}
-      />
+      {/* No longer need onboarding modal - info collected during registration */}
     </>
   );
 }
