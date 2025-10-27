@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { registerUserSchema } from "@shared/schema";
 
 export default function Register() {
@@ -39,11 +39,16 @@ export default function Register() {
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate auth query to update authentication state
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Registration successful",
         description: "Welcome to Library of Stuff!",
       });
-      setLocation("/browse");
+      // Small delay to allow query to update
+      setTimeout(() => {
+        setLocation("/browse");
+      }, 100);
     },
     onError: (error: Error) => {
       toast({
