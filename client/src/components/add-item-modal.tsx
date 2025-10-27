@@ -82,6 +82,7 @@ export default function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
         description: "Your item has been added successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/items/my"] });
       form.reset();
       setTrustLevel([2]);
       onClose();
