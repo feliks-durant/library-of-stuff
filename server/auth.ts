@@ -2,7 +2,8 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import connectPgSimple from "connect-pg-simple";
+import { Pool } from "@neondatabase/serverless";
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
 import { users } from "@shared/schema";
@@ -19,10 +20,17 @@ export async function comparePassword(password: string, hash: string): Promise<b
 }
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const MemoryStore = createMemoryStore(session);
-  const sessionStore = new MemoryStore({
-    checkPeriod: 86400000, // prune expired entries every 24h
+  const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days (configurable)
+  
+  // Use PostgreSQL session store for persistence
+  const PgStore = connectPgSimple(session);
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  
+  const sessionStore = new PgStore({
+    pool,
+    tableName: 'session', // Table will be auto-created
+    createTableIfMissing: true,
+    pruneSessionInterval: 60 * 60, // Prune expired sessions every hour (in seconds)
   });
   
   return session({
@@ -33,6 +41,7 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // CSRF protection
       maxAge: sessionTtl,
     },
   });
