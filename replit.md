@@ -8,7 +8,39 @@ Library of Stuff is a trust-based item sharing platform that allows users to sha
 
 Preferred communication style: Simple, everyday language.
 
+## Docker Deployment
+
+The application can be deployed locally using Docker. See `DOCKER_DEPLOY.md` for complete instructions.
+
+### Quick Start
+```bash
+# Copy environment file and set SESSION_SECRET
+cp .env.example .env
+
+# Build and start
+docker compose up -d --build
+
+# Initialize database
+docker compose exec app npm run db:push
+```
+
+### Key Files
+- `Dockerfile` - Multi-stage build for production
+- `docker-compose.yml` - Orchestrates app + PostgreSQL
+- `.env.example` - Environment variable template
+- `DOCKER_DEPLOY.md` - Comprehensive deployment guide
+
 ## Recent Changes
+
+### December 5, 2025 - Docker Deployment Support
+- **Added Docker containerization for local Linux server deployment**
+- Created multi-stage Dockerfile with Node.js 20 Alpine for minimal image size
+- Added docker-compose.yml with PostgreSQL 16 service
+- Database configuration now auto-detects Neon vs standard PostgreSQL
+- Added health check endpoint (/api/health) for container monitoring
+- Created comprehensive deployment documentation (DOCKER_DEPLOY.md)
+- Environment example file (.env.example) with all required variables
+- Support for both Replit (Neon) and Docker (standard PostgreSQL) deployments
 
 ### October 27, 2025 - QR Code Printing for My Items
 - **Added print mode to My Items page for batch QR code generation**
