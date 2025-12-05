@@ -12,6 +12,31 @@ export default function Landing() {
   const explanationRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const scrollPositionRef = useRef<number>(0);
+
+  const handleAccordionChange = () => {
+    const savedScrollY = scrollPositionRef.current;
+    
+    const restore = () => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, savedScrollY);
+      
+      requestAnimationFrame(() => {
+        window.scrollTo(0, savedScrollY);
+        setTimeout(() => {
+          window.scrollTo(0, savedScrollY);
+          document.documentElement.style.scrollBehavior = '';
+        }, 300);
+      });
+    };
+    
+    restore();
+  };
+
+  const handleAccordionMouseDown = () => {
+    scrollPositionRef.current = window.scrollY;
+    document.documentElement.style.scrollBehavior = 'auto';
+  };
 
   // Temporarily remove dark class from landing page to preserve vaporwave theme
   useEffect(() => {
@@ -127,7 +152,7 @@ export default function Landing() {
         ref={explanationRef}
         id="learn-more"
         className="py-20 px-4 relative overflow-hidden"
-        style={{ backgroundColor: "#1a1a2e" }}
+        style={{ backgroundColor: "#1a1a2e", overflowAnchor: "none" }}
         data-testid="section-learn-more"
       >
         <div className="absolute inset-0 tv-static">
@@ -135,7 +160,7 @@ export default function Landing() {
         </div>
 
         <div className="max-w-4xl mx-auto relative z-10">
-          <Accordion type="single" collapsible className="w-full space-y-4">
+          <Accordion type="single" collapsible className="w-full space-y-4" onValueChange={handleAccordionChange}>
             {/* FAQ 1: What is it? */}
             <AccordionItem
               value="item-1"
@@ -145,6 +170,7 @@ export default function Landing() {
               <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-what-is-it"
+                onMouseDown={handleAccordionMouseDown}
               >
                 What is it?
               </AccordionTrigger>
@@ -193,6 +219,7 @@ export default function Landing() {
               <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-anti-capitalist"
+                onMouseDown={handleAccordionMouseDown}
               >
                 What is anti-capitalist infrastructure?
               </AccordionTrigger>
@@ -255,6 +282,7 @@ export default function Landing() {
               <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-hate-capitalism"
+                onMouseDown={handleAccordionMouseDown}
               >
                 Does that mean you hate capitalism?
               </AccordionTrigger>
@@ -280,6 +308,7 @@ export default function Landing() {
               <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-support"
+                onMouseDown={handleAccordionMouseDown}
               >
                 How can I support the Library of Stuff?
               </AccordionTrigger>
@@ -305,6 +334,7 @@ export default function Landing() {
               <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-who-built"
+                onMouseDown={handleAccordionMouseDown}
               >
                 Who built it?
               </AccordionTrigger>
@@ -325,6 +355,7 @@ export default function Landing() {
               <AccordionTrigger
                 className="px-6 py-4 text-2xl font-bold vapor-text-pink uppercase tracking-wide hover:no-underline hover:bg-opacity-80"
                 data-testid="accordion-trigger-how-was-it-built"
+                onMouseDown={handleAccordionMouseDown}
               >
                 How was it built?
               </AccordionTrigger>
