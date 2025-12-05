@@ -13,9 +13,9 @@ export async function generateQRCodesPDF(items: Item[], username: string) {
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 15;
   const boxGap = 5;
-  const boxWidth = (pageWidth - (margin * 2) - boxGap) / 2;
+  const boxWidth = (pageWidth - margin * 2 - boxGap) / 2;
   const boxHeight = 35;
-  const qrSize = 13;
+  const qrSize = 30;
   const dividerX = boxWidth / 2;
 
   let currentY = margin;
@@ -24,7 +24,7 @@ export async function generateQRCodesPDF(items: Item[], username: string) {
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const isLeftBox = i % 2 === 0;
-    
+
     // Add new page if needed (check before adding left box)
     if (isLeftBox && currentY + boxHeight > pageHeight - margin) {
       pdf.addPage();
@@ -56,12 +56,12 @@ export async function generateQRCodesPDF(items: Item[], username: string) {
     // Username
     pdf.setFontSize(8);
     pdf.setFont("helvetica", "normal");
-    const usernameY = contentStartY + (itemNameLines.length * 4) + 3;
+    const usernameY = contentStartY + itemNameLines.length * 4 + 3;
     pdf.text(`@${username}`, leftContentX, usernameY);
 
     // Right side - QR code
     const qrCodeUrl = `${window.location.origin}/qr/item/${item.id}`;
-    
+
     try {
       // Generate QR code as data URL
       const qrDataUrl = await QRCode.toDataURL(qrCodeUrl, {
@@ -91,6 +91,6 @@ export async function generateQRCodesPDF(items: Item[], username: string) {
   }
 
   // Save the PDF
-  const filename = `library-of-stuff-qr-codes-${new Date().toISOString().split('T')[0]}.pdf`;
+  const filename = `library-of-stuff-qr-codes-${new Date().toISOString().split("T")[0]}.pdf`;
   pdf.save(filename);
 }
