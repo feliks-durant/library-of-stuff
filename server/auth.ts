@@ -32,6 +32,11 @@ export function getSession() {
     errorLog: console.error, // Log errors for debugging
   });
   
+  // For local Docker deployments over HTTP, set COOKIE_SECURE=false
+  const secureCookie = process.env.COOKIE_SECURE === 'false' 
+    ? false 
+    : process.env.NODE_ENV === 'production';
+  
   return session({
     secret: process.env.SESSION_SECRET || "library-of-stuff-secret-change-in-production",
     store: sessionStore,
@@ -39,7 +44,7 @@ export function getSession() {
     saveUninitialized: false, // Don't create sessions for unauthenticated users
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: secureCookie,
       sameSite: 'lax', // CSRF protection
       maxAge: sessionTtl,
     },
