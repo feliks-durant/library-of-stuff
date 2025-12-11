@@ -22,6 +22,5 @@ coverage
 .idea
 *.swp
 *.swo
-attached_assets
 learn_more_static.png
 cookies.txt
