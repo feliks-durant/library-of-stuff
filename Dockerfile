@@ -27,6 +27,11 @@ COPY package*.json ./
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy files needed for database migrations
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+
 # Copy uploads directory (will be mounted as volume in production)
 RUN mkdir -p uploads
 
