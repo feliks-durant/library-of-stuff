@@ -3,9 +3,8 @@ import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
-import { Pool } from "@neondatabase/serverless";
 import type { Express, Request, Response, NextFunction } from "express";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { users } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 
@@ -19,9 +18,6 @@ export async function comparePassword(password: string, hash: string): Promise<b
   return bcrypt.compare(password, hash);
 }
 
-// Create a single pool instance for session store
-const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
-
 export function getSession() {
   const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days (configurable)
   
@@ -29,7 +25,7 @@ export function getSession() {
   const PgStore = connectPgSimple(session);
   
   const sessionStore = new PgStore({
-    pool: sessionPool,
+    pool: pool as any,
     tableName: 'session', // Table will be auto-created
     createTableIfMissing: true,
     pruneSessionInterval: 60 * 60, // Prune expired sessions every hour (in seconds)
