@@ -1,8 +1,21 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import path from "path";
+import fs from "fs";
 
 const app = express();
+
+// Debug: Log environment and paths at startup
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("CWD:", process.cwd());
+console.log("import.meta.dirname:", import.meta.dirname);
+const testPath = path.resolve(import.meta.dirname, "public");
+console.log("Expected static path:", testPath);
+console.log("Static path exists:", fs.existsSync(testPath));
+if (fs.existsSync(testPath)) {
+  console.log("Contents:", fs.readdirSync(testPath));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
