@@ -26,8 +26,8 @@ export function getSession() {
   
   const sessionStore = new PgStore({
     pool: pool as any,
-    tableName: 'session', // Table will be auto-created
-    createTableIfMissing: true,
+    tableName: 'session', // Table created by Drizzle schema
+    createTableIfMissing: false, // Table managed by db:push
     pruneSessionInterval: 60 * 60, // Prune expired sessions every hour (in seconds)
     errorLog: console.error, // Log errors for debugging
   });

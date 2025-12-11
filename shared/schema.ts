@@ -15,9 +15,9 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table (required for Replit Auth)
-export const sessions = pgTable(
-  "sessions",
+// Session storage table (for connect-pg-simple)
+export const session = pgTable(
+  "session",
   {
     sid: varchar("sid").primaryKey(),
     sess: jsonb("sess").notNull(),
