@@ -30,7 +30,20 @@ openssl rand -base64 32
 
 Update the `SESSION_SECRET` in your `.env` file with the generated value.
 
-### 3. Build and start the application
+### 3. Generate SSL certificates
+
+The application uses HTTPS for secure session cookies. Generate self-signed certificates:
+
+```bash
+cd nginx
+chmod +x generate-certs.sh
+./generate-certs.sh
+cd ..
+```
+
+This creates self-signed certificates valid for 1 year. For production with a real domain, replace with Let's Encrypt certificates.
+
+### 4. Build and start the application
 
 ```bash
 # Build and start all services
@@ -40,7 +53,7 @@ docker compose up -d --build
 docker compose logs -f
 ```
 
-### 4. Initialize the database
+### 6. Initialize the database
 
 After the containers are running, push the database schema:
 
@@ -48,10 +61,10 @@ After the containers are running, push the database schema:
 docker compose exec app npm run db:push
 ```
 
-### 5. Access the application
+### 7. Access the application
 
 Open your browser and navigate to:
-- Application: http://localhost:5000
+- Application: https://localhost (your browser will warn about the self-signed certificate - click "Advanced" and proceed)
 - Database Admin (optional): http://localhost:8080 (if using the admin profile)
 
 ## Configuration
